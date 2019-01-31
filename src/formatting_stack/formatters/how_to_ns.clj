@@ -16,7 +16,7 @@
   formatting-stack.protocols.formatter/Formatter
   (format! [this files]
     (require 'com.gfredericks.how-to-ns.main)
-    (let [how-to-ns (resolve 'com.gfredericks.how-to-ns.main/fix)
+    (let [how-to-ns @(resolve 'com.gfredericks.how-to-ns.main/fix)
           how-to-ns-files (remove #(str/ends-with? % ".edn") files)
           how-to-ns-opts (deep-merge default-how-to-ns-opts
                                      (or options {}))]
