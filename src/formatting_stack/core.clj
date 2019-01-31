@@ -1,39 +1,29 @@
 (ns formatting-stack.core
   (:require
-   [clojure.java.io :as io]
-   [clojure.string :as str]
+   [formatting-stack.formatters.cljfmt]
+   [formatting-stack.formatters.how-to-ns]
    [formatting-stack.impl :as impl]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.strategies :as strategies]))
 
-(def default-how-to-ns-opts {:require-docstring?      false
-                             :sort-clauses?           true
-                             ;; should be false, but https://git.io/fhMLm can break code:
-                             :allow-refer-all?        true
-                             :allow-extra-clauses?    false
-                             :align-clauses?          false
-                             :import-square-brackets? false})
+(def default-strategies [strategies/git-completely-staged])
+
+(defn default-formatters [third-party-indent-specs]
+  [(formatting-stack.formatters.cljfmt/map->Formatter {})
+   (formatting-stack.formatters.how-to-ns/map->Formatter {:third-party-indent-specs third-party-indent-specs})])
 
 (defn format! [& {:keys [strategies
-                         how-to-ns-opts
-                         cljfmt-opts
-                         third-party-indent-specs]}]
-  (require 'cljfmt.main)
-  (require 'com.gfredericks.how-to-ns.main)
+                         third-party-indent-specs
+                         formatters]}]
   ;; the following `or` clauses ensure that Components don't pass nil values
-  (let [strategies (or strategies [strategies/git-completely-staged])
-        how-to-ns-opts (or how-to-ns-opts default-how-to-ns-opts)
-        cljfmt-opts (or cljfmt-opts (resolve 'cljfmt.main/default-options))
+  (let [strategies               (or strategies default-strategies)
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
-        cljfmt (resolve 'cljfmt.main/fix)
-        how-to-ns (resolve 'com.gfredericks.how-to-ns.main/fix)
-        files (->> strategies
-                   (mapcat (fn [f]
-                             (f)))
-                   distinct)
-        cljfmt-files (map io/file files)
-        how-to-ns-files (remove #(str/ends-with? % ".edn") files)]
+        formatters               (or formatters (default-formatters third-party-indent-specs))
+        files                    (->> strategies
+                                      (mapcat (fn [f]
+                                                (f)))
+                                      distinct)]
     (impl/setup-cider-indents! third-party-indent-specs)
-    (impl/setup-cljfmt-indents! third-party-indent-specs)
-    (cljfmt cljfmt-files)
-    (how-to-ns how-to-ns-files how-to-ns-opts)))
+    (doseq [formatter formatters]
+      (protocols.formatter/format! formatter files))))

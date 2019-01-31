@@ -3,13 +3,12 @@
    [com.stuartsierra.component :as component]
    [formatting-stack.core :refer [format!]]))
 
-(defrecord Formatter [strategies how-to-ns-opts cljfmt-opts third-party-indent-specs]
+(defrecord Formatter [strategies third-party-indent-specs formatters]
   component/Lifecycle
   (start [this]
     (format! :strategies strategies
-             :how-to-ns-opts how-to-ns-opts
-             :cljfmt-opts cljfmt-opts
-             :third-party-indent-specs third-party-indent-specs)
+             :third-party-indent-specs third-party-indent-specs
+             :formatters formatters)
     this)
 
   (stop [this]

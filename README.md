@@ -12,7 +12,7 @@
   * and also for gradual formatting
 
 As of today, it is integrated with [cljfmt](https://github.com/weavejester/cljfmt) and [how-to-ns](https://github.com/gfredericks/how-to-ns).
-It aims to be fully configurable and extensible.
+It is fully configurable and extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
 ## Smart
 
