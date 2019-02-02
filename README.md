@@ -12,7 +12,7 @@
   * and also for gradual formatting
 
 As of today, it is integrated with [cljfmt](https://github.com/weavejester/cljfmt) and [how-to-ns](https://github.com/gfredericks/how-to-ns).
-It is fully configurable and extensible: you can configure the bundled formatters, remove them, and/or add your own.
+It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
 ## Smart
 
@@ -96,7 +96,7 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
 
 ## Reloaded Workflow integration
 
-* If you use the Component component, then `com.stuartsierra.component.repl` will use formatting-stack. 
+* If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack. 
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack.
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
