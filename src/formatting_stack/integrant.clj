@@ -5,7 +5,8 @@
 
 (defmethod integrant/init-key ::component [_ _]
   (fn [_]
-    (format!)))
+    (future ;; don't delay system initialization
+      (format!))))
 
 (defmethod integrant/halt-key! ::component [_ _]
   (fn [_]))
