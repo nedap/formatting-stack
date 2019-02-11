@@ -34,7 +34,7 @@
 
 (deftest git-not-completely-staged
   (is (= (strip-git not-completely-staged-files)
-         (sut.impl/git-not-completely-staged :files all-files))))
+         (sut/git-not-completely-staged :files all-files))))
 
 (deftest git-diff-against-default-branch
   (is (= ["a.clj"]
