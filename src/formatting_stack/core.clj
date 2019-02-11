@@ -1,19 +1,21 @@
 (ns formatting-stack.core
   (:require
+   [formatting-stack.formatters.cider]
    [formatting-stack.formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns]
-   [formatting-stack.impl :as impl]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
-   [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.compiler :as protocols.compiler]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.strategies :as strategies]))
 
 (def default-strategies [strategies/git-completely-staged])
 
 (defn default-formatters [third-party-indent-specs]
-  [(formatting-stack.formatters.cljfmt/map->Formatter {})
-   (formatting-stack.formatters.how-to-ns/map->Formatter {:third-party-indent-specs third-party-indent-specs})])
+  (let [opts {:third-party-indent-specs third-party-indent-specs}]
+    [(formatting-stack.formatters.cider/map->Formatter opts)
+     (formatting-stack.formatters.cljfmt/map->Formatter opts)
+     (formatting-stack.formatters.how-to-ns/map->Formatter opts)]))
 
 (def default-linters [])
 
@@ -34,7 +36,6 @@
                                       (mapcat (fn [f]
                                                 (f)))
                                       distinct)]
-    (impl/setup-cider-indents! third-party-indent-specs)
     (doseq [formatter formatters]
       (protocols.formatter/format! formatter files))
     (doseq [linter linters]

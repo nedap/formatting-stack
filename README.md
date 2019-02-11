@@ -85,14 +85,10 @@ This config is passed to `formatting-stack.core/format!`, either via Component/I
 
 ## Component/Integrant integration
 
-**formatting-stack** provides components that you can integrate into your system. You can put them in your dev system if that's easy.
-
-If not, you can put the component in your production system,
-because formatting-stack requires cljfmt and how-to-ns dynamically (conditionally), with that precise purpose.
+**formatting-stack** provides components that you can integrate into your system.
 
 The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`
 (fear not about reading code. Any namespace here not ending in `impl.clj` is optimized for readability).
-
 
 ## Reloaded Workflow integration
 

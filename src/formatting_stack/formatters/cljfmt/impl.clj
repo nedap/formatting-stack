@@ -71,7 +71,7 @@
                         (map #(vector % (-> % meta (select-keys [:style/indent :style.cljfmt/indent :style.cljfmt/type]))))
                         (filter (rcomp second seq)))]
       (doseq [[var-ref metadata] mappings]
-        (alter-var-root (resolve 'cljfmt.core/default-indents)
+        (alter-var-root #'cljfmt.core/default-indents
                         (fn [v]
                           (let [indent (to-cljfmt-indent metadata)
                                 name (-> var-ref meta :name)
@@ -80,10 +80,10 @@
                                    fqn indent
                                    ;; because https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work:
                                    name indent)))))
-      (alter-var-root (resolve 'cljfmt.core/default-indents)
+      (alter-var-root #'cljfmt.core/default-indents
                       #(merge % (cljfmt-third-party-indent-specs third-party-intent-specs)))
       ;; brings https://github.com/weavejester/cljfmt/pull/163/files:
-      (alter-var-root (resolve 'cljfmt.core/default-indents)
+      (alter-var-root #'cljfmt.core/default-indents
                       #(-> %
                            (dissoc-by (fn [x] ;; regexes can't be compared, hence this contraption
                                         (not= (pr-str x)
