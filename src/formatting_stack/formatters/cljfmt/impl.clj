@@ -1,23 +1,14 @@
 (ns formatting-stack.formatters.cljfmt.impl
   (:require
+   [cljfmt.core]
    [clojure.java.classpath :as classpath]
    [clojure.java.io :as io]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
-   [clojure.tools.namespace.parse :as parse])
+   [clojure.tools.namespace.parse :as parse]
+   [formatting-stack.util :refer [dissoc-by ns-name-from-filename rcomp]])
   (:import
    (java.io File)))
-
-(defmacro rcomp
-  "Like `comp`, but in reverse order.
-  With it, members of `->>` chains can consistently be read left-to-right."
-  [& fns]
-  (cons `comp (reverse fns)))
-
-(defn dissoc-by [m f]
-  (->> m
-       (filter (rcomp first f))
-       (into {})))
 
 ;; :block is for things like do, with*, ->
 ;; :inner is for things like def (and for workarounding multi-arity defns with some sort of "body" argument)

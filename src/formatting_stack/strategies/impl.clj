@@ -22,10 +22,3 @@
     *filter-existing-files?* (filter (fn [f]
                                        (-> f File. .exists)))
     true (remove #(str/ends-with? % "project.clj"))))
-
-(defn git-not-completely-staged [& {:keys [files]
-                                    :or {files (file-entries "git" "status" "--porcelain")}}]
-  (->> files
-       (filter #(re-find git-not-completely-staged-regex %))
-       (map #(str/replace-first % git-not-completely-staged-regex ""))
-       extract-clj-files))
