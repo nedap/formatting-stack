@@ -31,6 +31,19 @@
                  (f)))
        distinct))
 
+(defn process! [method members category-strategies default-strategies]
+  ;; `memoize` rationale: results are cached not for performance, but for avoiding the scenario where one `member` alters the git status,
+  ;; so the subsequent `member`s' strategies won't perceive the same set of files than the first one.
+  ;; e.g. cljfmt may operate upon `strategies/git-completely-staged`, formatting some files accordingly.
+  ;; Then `how-to-ns`, which follows the same strategy, would perceive a dirty git status.
+  ;; Accordingly it would do nothing, which is undesirable.
+  (let [files (memoize (fn [strategies]
+                         (files-from-strategies strategies)))]
+    (doseq [member members]
+      (let [{specific-strategies :strategies} member
+            strategies (or specific-strategies category-strategies default-strategies)]
+        (->> strategies files (method member))))))
+
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
                          formatters
@@ -50,21 +63,6 @@
          :compilers
          default-strategies
          :default}               strategies]
-
-    (doseq [formatter formatters]
-      (let [{specific-strategies :strategies} formatter
-            strategies (or specific-strategies formatters-strategies strategies)
-            files (files-from-strategies strategies)]
-        (protocols.formatter/format! formatter files)))
-
-    (doseq [linter linters]
-      (let [{specific-strategies :strategies} linter
-            strategies (or specific-strategies linters-strategies strategies)
-            files (files-from-strategies strategies)]
-        (protocols.linter/lint! linter files)))
-
-    (doseq [compiler compilers]
-      (let [{specific-strategies :strategies} compiler
-            strategies (or specific-strategies compilers-strategies strategies)
-            files (files-from-strategies strategies)]
-        (protocols.compiler/compile! compiler files)))))
+    (process! protocols.formatter/format! formatters formatters-strategies strategies)
+    (process! protocols.linter/lint!      linters    linters-strategies    strategies)
+    (process! protocols.compiler/compile! compilers  compilers-strategies  strategies)))
