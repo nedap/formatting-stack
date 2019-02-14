@@ -1,6 +1,8 @@
 # formatting-stack
 
-**formatting-stack** is a formatting solution that is typically integrated with:
+[Clojars](https://clojars.org/formatting-stack)
+
+**formatting-stack** is a formatting/linting solution that is typically integrated with:
 
 * your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [clojure.tools.namespace.repl](https://github.com/clojure/tools.namespace)) system
   * for instantaneous performance
@@ -11,7 +13,13 @@
   * for some performance gains (only added/changed files will be processed)
   * and also for gradual formatting
 
-As of today, it is integrated with [cljfmt](https://github.com/weavejester/cljfmt) and [how-to-ns](https://github.com/gfredericks/how-to-ns).
+As of today, it is integrated with:
+
+  * [cljfmt](https://github.com/weavejester/cljfmt)
+  * [how-to-ns](https://github.com/gfredericks/how-to-ns)
+  * [eastwood](https://github.com/jonase/eastwood)
+  * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
+
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
 ## Smart

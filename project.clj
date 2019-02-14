@@ -1,14 +1,15 @@
-(defproject formatting-stack "0.3.1-SNAPSHOT"
+(defproject formatting-stack "0.3.2"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[cljfmt "0.6.4"]
+                 [com.gfredericks/how-to-ns "0.2.2"]
+                 [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
                  [medley "1.1.0"]
                  [org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [org.clojure/tools.reader "1.1.1"]
-                 [com.gfredericks/how-to-ns "0.2.2"]
-                 [com.stuartsierra/component "0.4.0"]])
+                 [refactor-nrepl "2.4.0"]])

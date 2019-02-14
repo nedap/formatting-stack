@@ -1,6 +1,7 @@
 (ns formatting-stack.core
   (:require
    [formatting-stack.formatters.cider]
+   [formatting-stack.formatters.clean-ns]
    [formatting-stack.formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
@@ -19,7 +20,9 @@
   (let [opts {:third-party-indent-specs third-party-indent-specs}]
     [(formatting-stack.formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
      (formatting-stack.formatters.cljfmt/map->Formatter opts)
-     (formatting-stack.formatters.how-to-ns/map->Formatter opts)]))
+     (formatting-stack.formatters.how-to-ns/map->Formatter opts)
+     (formatting-stack.formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
+                                                                                        strategies/do-not-use-cached-results!)))]))
 
 (def default-linters [(formatting-stack.linters.eastwood/map->Eastwood {:strategies extended-strategies})])
 
