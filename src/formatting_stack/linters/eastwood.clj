@@ -3,20 +3,27 @@
    [clojure.string :as str]
    [eastwood.lint :as eastwood]
    [formatting-stack.protocols.linter]
-   [formatting-stack.util :refer [ns-name-from-filename]]))
+   [formatting-stack.util :refer [ns-name-from-filename]]
+   [medley.core :refer [deep-merge]]))
 
-(defrecord Eastwood []
+(def default-eastwood-options
+  ;; Avoid false positives or more-annoying-than-useful checks:
+  (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test}
+                        eastwood/default-linters)]
+    (-> eastwood/default-opts
+        (assoc :linters linters))))
+
+(defrecord Eastwood [eastwood-options]
   formatting-stack.protocols.linter/Linter
   (lint! [this filenames]
     (let [namespaces (->> filenames
                           (remove #(str/ends-with? % ".edn"))
                           (map ns-name-from-filename))
-          linters (remove #{:suspicious-test :unused-ret-vals}
-                          eastwood/default-linters)
+          options (deep-merge default-eastwood-options
+                              (or eastwood-options {}))
           result (->> (with-out-str
-                        (eastwood/eastwood (-> eastwood/default-opts
-                                               (assoc :linters linters
-                                                      :namespaces namespaces))))
+                        (eastwood/eastwood (-> options
+                                               (assoc :namespaces namespaces))))
                       (str/split-lines)
                       (remove (fn [line]
                                 (or (str/blank? line)
