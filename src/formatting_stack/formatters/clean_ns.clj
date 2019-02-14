@@ -15,12 +15,13 @@
       (when-let [clean-ns-form (some-> (clean-ns {:path filename})
                                        (pr-str)
                                        (how-to-ns/format-ns-str how-to-ns-opts))]
-        (println "Cleaning unused imports:" filename)
-        (->> original-ns-form
-             count
-             (subs buffer)
-             (str clean-ns-form)
-             (spit filename))))))
+        (when-not (= original-ns-form clean-ns-form)
+          (println "Cleaning unused imports:" filename)
+          (->> original-ns-form
+               count
+               (subs buffer)
+               (str clean-ns-form)
+               (spit filename)))))))
 
 (def default-nrepl-opts
   (-> refactor-nrepl.config/*config*
