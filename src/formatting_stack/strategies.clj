@@ -39,7 +39,7 @@
        impl/extract-clj-files))
 
 (defn do-not-use-cached-results!
-  "Normally, subsequent 'members' (formatters, linterers, compilers) using identical strategies will cache the results of those strategies.
+  "Normally, subsequent 'members' (formatters, linters, compilers) using identical strategies will cache the results of those strategies.
   That is apt for formatters that do safe modifications, but not for more dangerous formatters.
 
   By adding this empty strategy, it is signaled that the member using it should not use a cached result.

@@ -1,6 +1,6 @@
 # formatting-stack
 
-[Clojars](https://clojars.org/formatting-stack)
+**[Clojars](https://clojars.org/formatting-stack)**
 
 **formatting-stack** is a formatting/linting solution that is typically integrated with:
 
@@ -19,6 +19,7 @@ As of today, it is integrated with:
   * [how-to-ns](https://github.com/gfredericks/how-to-ns)
   * [eastwood](https://github.com/jonase/eastwood)
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
+  * [lein-all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
