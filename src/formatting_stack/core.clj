@@ -1,12 +1,13 @@
 (ns formatting-stack.core
   (:require
-   [formatting-stack.formatters.cider]
-   [formatting-stack.formatters.clean-ns]
-   [formatting-stack.formatters.cljfmt]
-   [formatting-stack.formatters.how-to-ns]
-   [formatting-stack.formatters.newlines]
+   [formatting-stack.formatters.cider :as formatters.cider]
+   [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
+   [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
+   [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
+   [formatting-stack.formatters.newlines :as formatters.newlines]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
-   [formatting-stack.linters.eastwood]
+   [formatting-stack.linters.bikeshed :as linters.bikeshed]
+   [formatting-stack.linters.eastwood :as linters.eastwood]
    [formatting-stack.protocols.compiler :as protocols.compiler]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
@@ -19,14 +20,15 @@
 
 (defn default-formatters [third-party-indent-specs]
   (let [opts {:third-party-indent-specs third-party-indent-specs}]
-    [(formatting-stack.formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
-     (formatting-stack.formatters.cljfmt/map->Formatter opts)
-     (formatting-stack.formatters.how-to-ns/map->Formatter opts)
-     (formatting-stack.formatters.newlines/map->Formatter opts)
-     (formatting-stack.formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
-                                                                                        strategies/do-not-use-cached-results!)))]))
+    [(formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
+     (formatters.cljfmt/map->Formatter opts)
+     (formatters.how-to-ns/map->Formatter opts)
+     (formatters.newlines/map->Formatter opts)
+     (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
+                                                                       strategies/do-not-use-cached-results!)))]))
 
-(def default-linters [(formatting-stack.linters.eastwood/map->Eastwood {:strategies extended-strategies})])
+(def default-linters [(linters.bikeshed/map->Bikeshed {:strategies extended-strategies})
+                      (linters.eastwood/map->Eastwood {:strategies extended-strategies})])
 
 (def default-compilers [])
 
@@ -37,7 +39,8 @@
        distinct))
 
 (defn process! [method members category-strategies default-strategies]
-  ;; `memoize` rationale: results are cached not for performance, but for avoiding the scenario where one `member` alters the git status,
+  ;; `memoize` rationale: results are cached not for performance,
+  ;; but for avoiding the scenario where one `member` alters the git status,
   ;; so the subsequent `member`s' strategies won't perceive the same set of files than the first one.
   ;; e.g. cljfmt may operate upon `strategies/git-completely-staged`, formatting some files accordingly.
   ;; Then `how-to-ns`, which follows the same strategy, would perceive a dirty git status.

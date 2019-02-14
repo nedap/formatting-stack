@@ -1,4 +1,4 @@
-(defproject formatting-stack "0.3.2"
+(defproject formatting-stack "0.4.0"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
@@ -9,6 +9,7 @@
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
+                 [lein-bikeshed "0.5.1"]
                  [medley "1.1.0"]
                  [org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
