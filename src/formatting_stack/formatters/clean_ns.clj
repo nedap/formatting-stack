@@ -25,7 +25,12 @@
 
 (def default-nrepl-opts
   (-> refactor-nrepl.config/*config*
-      (update :libspec-whitelist conj ".*\\.protocols\\..*" ".*\\.extensions\\..*" ".*\\.imports\\..*")
+      (update :libspec-whitelist
+              conj
+              ".*\\.protocols\\..*"
+              ".*\\.extensions\\..*"
+              ".*\\.imports\\..*"
+              "com.stuartsierra.component")
       (assoc :prefix-rewriting false)))
 
 (defrecord Formatter [how-to-ns-opts refactor-nrepl-opts]
