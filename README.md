@@ -9,8 +9,10 @@
     * no cold-starts!
   * and precise understanding of your codebase
     * no AST heuristics, no `eval` either
+  * and a reasonable triggering frequency
+    * so you don't format too frequently (format-on-save), or not frequently enough (git pre-commit hook)
 * Git status/branch information
-  * for some performance gains (only added/changed files will be processed)
+  * for some performance gains (typically only added/changed files will be processed)
   * and also for gradual formatting
 
 As of today, it is integrated with:
@@ -20,6 +22,7 @@ As of today, it is integrated with:
   * [eastwood](https://github.com/jonase/eastwood)
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
     * Used for "clean unused imports" functionality
+    * It's implemented, but temporarily excluded from the default configuration due to [this issue](https://github.com/clojure-emacs/refactor-nrepl/issues/239). 
   * [bikeshed](https://github.com/dakrone/lein-bikeshed)
     * Used for checking max column count
   * [all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
@@ -149,12 +152,6 @@ and retrofit those quirks into made-up rules that only make sense to you (or a m
 If you're unfamiliar with the traditional Lisp indentation, as standardized by cljfmt/clojure-style-guide,
 you'll likely end up finding that having fine-grained rules which distinguish macro and function indentation
 in fact makes code more readable. It's just so useful to distinguish between functions and macros at a glance!
-
-## Roadmap
-
-* ClojureScript support
-* More formatters
-* Linters!
 
 ## License
 
