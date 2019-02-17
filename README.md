@@ -50,12 +50,12 @@ Git integration is documented at `formatting-stack.strategies`.
 
 The general intent is to make formatting:
 
-* **Efficient**
+* Efficient
   * don't process non-touched files
-* **Gradual**
+* Gradual
   * don't format the whole project at once
   * favor reviewable diffs - nobody can review (or learn from) whole-project diffs
-* **Safe**
+* Safe
   * only format code that is completely staged by git
   * else any bug in formatting code could destroy your unsaved changes
 

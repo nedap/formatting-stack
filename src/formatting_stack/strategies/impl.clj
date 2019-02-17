@@ -12,7 +12,7 @@
 (def git-not-completely-staged-regex #"^( M|AM|AD| D|\?\?|) ")
 
 (defn file-entries [& args]
-  (->> args (apply sh) :out str/split-lines))
+  (->> args (apply sh) :out str/split-lines (filter seq)))
 
 (def ^:dynamic *filter-existing-files?* true)
 
