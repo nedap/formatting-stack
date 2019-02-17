@@ -50,12 +50,12 @@ Git integration is documented at `formatting-stack.strategies`.
 
 The general intent is to make formatting:
 
-* **efficient**
+* **Efficient**
   * don't process non-touched files
-* **gradual**
+* **Gradual**
   * don't format the whole project at once
-  * favor reviewable diffs - nobody can review whole-project diffs
-* **safe**
+  * favor reviewable diffs - nobody can review (or learn from) whole-project diffs
+* **Safe**
   * only format code that is completely staged by git
   * else any bug in formatting code could destroy your unsaved changes
 
@@ -87,7 +87,7 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 
 ## Advanced configuration
 
-If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern will be: 
+If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern would be: 
 
 ```clojure
 (formatting-stack.component/map->Formatter {:formatters (conj formatting-stack.defaults/default-formatters

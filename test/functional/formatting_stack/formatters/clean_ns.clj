@@ -1,6 +1,7 @@
 (ns functional.formatting-stack.formatters.clean-ns
   (:require
    [clojure.test :refer :all]
+   [formatting-stack.formatters.clean-ns :as sut]
    [formatting-stack.formatters.clean-ns.impl :as impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
    [functional.formatting-stack.formatters.clean-ns.should-be-cleaned]
@@ -35,11 +36,11 @@
   (is (seq (impl/used-namespace-names should-not-be-cleaned-2-f))))
 
 (deftest clean-ns-form
-  (are [op filename ns-form] (op (read-string (impl/clean-ns-form formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                                                  filename
-                                                                  ns-form))
-                                 ns-form)
-    not= should-be-cleaned-f               should-be-cleaned
-    =    should-not-be-partially-cleaned-f should-not-be-partially-cleaned
-    =    should-not-be-cleaned-f           should-not-be-cleaned
-    =    should-not-be-cleaned-2-f         should-not-be-cleaned-2))
+  (are [op filename ns-form] (op (impl/clean-ns-form {:how-to-ns-opts formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
+                                                      :refactor-nrepl-opts sut/default-nrepl-opts
+                                                      :filename filename
+                                                      :original-ns-form ns-form}))
+    some? should-be-cleaned-f               should-be-cleaned
+    nil?  should-not-be-partially-cleaned-f should-not-be-partially-cleaned
+    nil?  should-not-be-cleaned-f           should-not-be-cleaned
+    nil?  should-not-be-cleaned-2-f         should-not-be-cleaned-2))
