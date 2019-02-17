@@ -1,7 +1,5 @@
 # formatting-stack
 
-**[Clojars](https://clojars.org/formatting-stack)**
-
 **formatting-stack** is a formatting/linting solution that is typically integrated with:
 
 * your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [clojure.tools.namespace.repl](https://github.com/clojure/tools.namespace)) system
@@ -44,68 +42,21 @@ Armed with those powers, we can do two nifty things:
 * Inform CIDER of indentation rules through config
   * CIDER understands either metadata or emacs-specific rules, but not config
 
-### Metadata examples
+You can find examples of how to do such configuration in the [wiki](https://github.com/nedap/formatting-stack/wiki/Indentation-examples).
 
-For most macros/functions, adding `:style/indent n` as usual will suffice.
-formatting-stack will understand it (translating it for cljfmt, provided the spec is simply a number),
-and any spec-compliant editor will understand it too.
+## Installation
 
-```clojure
-(defmacro render
-  {:style/indent 1} ;; CIDER will use `1`, cljfmt will receive the translated value of [[:block 1]]
-  [options & body]
-  ...)
-```     
+**[Clojars](https://clojars.org/formatting-stack)**
 
-By default, `:block` indentation is assumed for cljfmt (see its README or [these examples](https://github.com/weavejester/cljfmt/blob/806e43b7a7d4e22b831d796f107f135d8efc986a/cljfmt/resources/cljfmt/indents/clojure.clj) for a primer on `:format` / `:inner`). You can use `:inner` via `:style.cljfmt/type`:
-
-```clojure
-(defmacro render
-  {:style/indent 1 ;; CIDER will use `1`
-   :style.cljfmt/type :inner} ;; cljfmt will receive the translated value of [[:inner 1]]
-  [options & body]
-  ...)
-```
-
-As said, formatting-stack can only translate simple, single-digit specs like `{:style/indent 1}` for cljfmt.
-If you need anything more complex, use `:style.cljfmt/indent`. The values will be passed verbatim to cljfmt.
-
-```clojure
-(defmacro render
-  {:style/indent 1 ;; CIDER will use `1`
-   :style.cljfmt/indent [[:block 2] [:inner 1]]} ;; cljfmt will use `[[:block 2] [:inner 1]]`
-  [...]
-  ...)
-```
-
-If you want to avoid the situation where you have to author complex indentation specs in two formats, I'd recommend:
-
-* avoid macros that parse the arguments in compile time (a trick occasionally found in the wild).
-  * Use standard Clojure calling conventions and facilities (e.g. destructuring) 
-* avoid superfluous multi-arity signatures: just always accept an options argument (`{}` or `& {}`, your choice)
-  * Or in any case avoid multi-arity signatures where the same positional argument can have different meanings depending on the arity. 
-
-## Config examples
-
-As mentioned, you should favor metadata over config. Anyway, the config format is simply a map of symbols to specs:
-
-```
-'{fulcro-spec.core/assertions {:style/indent 0
-                               :style.cljfmt/type :inner}}
-```
-
-The specs have the same semantics described in the previous section. 
-
-This config is passed to `formatting-stack.core/format!`, either via Component/Integrant or by direct invocation.
-
-## Component/Integrant integration
+### Component/Integrant integration
 
 **formatting-stack** provides components that you can integrate into your system.
 
-The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`
-(fear not about reading code. Any namespace here not ending in `impl.clj` is optimized for readability).
+The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`.
 
-## Reloaded Workflow integration
+(Fear not about reading code. Any namespace here not ending in `impl.clj` is optimized for readability.)
+
+### Reloaded Workflow integration
 
 * If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack. 
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack.
@@ -151,6 +102,28 @@ and retrofit those quirks into made-up rules that only make sense to you (or a m
 If you're unfamiliar with the traditional Lisp indentation, as standardized by cljfmt/clojure-style-guide,
 you'll likely end up finding that having fine-grained rules which distinguish macro and function indentation
 in fact makes code more readable. It's just so useful to distinguish between functions and macros at a glance!
+
+## Advanced configuration
+
+If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern will be: 
+
+```clojure
+(formatting-stack.component/map->Formatter {:formatters (conj formatting-stack.defaults/default-formatters
+                                                              my-custom-formatter)})
+```
+
+You can also pass `[]` for disabling a particular aspect:
+
+```clojure
+;; The default :formatters will be used, the default :linters will be omitted:
+(formatting-stack.component/map->Formatter {:linters []}) 
+```
+
+There's no facility for finer-grained manipulations, e.g. removing only certain formatters, or adding a formatter at a certain position rather than at the end.
+
+That's by design, to avoid intrincate DSLs or data structures.
+If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
+That ns is a deliberately thin and data-only with the precise purpose of being forked at no cost.  
 
 ## License
 
