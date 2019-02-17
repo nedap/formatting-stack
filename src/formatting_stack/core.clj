@@ -24,9 +24,8 @@
      (formatters.cljfmt/map->Formatter opts)
      (formatters.how-to-ns/map->Formatter opts)
      (formatters.newlines/map->Formatter opts)
-     ;; Disabled for now due to https://github.com/clojure-emacs/refactor-nrepl/issues/239 :
-     #_(formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
-                                                                         strategies/do-not-use-cached-results!)))]))
+     (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
+                                                                       strategies/do-not-use-cached-results!)))]))
 
 (def default-linters [(linters.bikeshed/map->Bikeshed {:strategies extended-strategies})
                       (linters.eastwood/map->Eastwood {:strategies extended-strategies})])
