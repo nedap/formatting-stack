@@ -2,19 +2,17 @@
   (:require
    [clojure.string :as str]
    [com.gfredericks.how-to-ns :as how-to-ns]
+   [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
    [medley.core :refer [deep-merge]]
-   [refactor-nrepl.config]
-   [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
+   [refactor-nrepl.config]))
 
 (defn clean! [how-to-ns-opts refactor-nrepl-opts filename]
   (binding [refactor-nrepl.config/*config* refactor-nrepl-opts]
     (let [buffer (slurp filename)
           original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
-      (when-let [clean-ns-form (some-> (clean-ns {:path filename})
-                                       (pr-str)
-                                       (how-to-ns/format-ns-str how-to-ns-opts))]
+      (when-let [clean-ns-form (impl/clean-ns-form how-to-ns-opts filename (read-string original-ns-form))]
         (when-not (= original-ns-form clean-ns-form)
           (println "Cleaning unused imports:" filename)
           (->> original-ns-form
@@ -25,12 +23,6 @@
 
 (def default-nrepl-opts
   (-> refactor-nrepl.config/*config*
-      (update :libspec-whitelist
-              conj
-              ".*\\.protocols\\..*"
-              ".*\\.extensions\\..*"
-              ".*\\.imports\\..*"
-              "com.stuartsierra.component")
       (assoc :prefix-rewriting false)))
 
 (defrecord Formatter [how-to-ns-opts refactor-nrepl-opts]
