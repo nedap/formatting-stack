@@ -46,7 +46,7 @@ You can find examples of how to do such configuration in the [wiki](https://gith
 
 ## Installation
 
-**[Clojars](https://clojars.org/formatting-stack)**
+[Clojars](https://clojars.org/formatting-stack)
 
 ### Component/Integrant integration
 
