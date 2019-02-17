@@ -30,17 +30,22 @@
 (assert should-not-be-cleaned-2)
 
 (deftest used-namespace-names
-  (is (not (seq (impl/used-namespace-names should-be-cleaned-f))))
-  (is (seq (impl/used-namespace-names should-not-be-partially-cleaned-f)))
-  (is (seq (impl/used-namespace-names should-not-be-cleaned-f)))
-  (is (seq (impl/used-namespace-names should-not-be-cleaned-2-f))))
+  (is (not (seq (impl/used-namespace-names should-be-cleaned-f #{}))))
+  (is (seq (impl/used-namespace-names should-not-be-partially-cleaned-f #{})))
+  (is (seq (impl/used-namespace-names should-not-be-cleaned-f #{})))
+  (is (seq (impl/used-namespace-names should-not-be-cleaned-2-f #{}))))
 
 (deftest clean-ns-form
-  (are [op filename ns-form] (op (impl/clean-ns-form {:how-to-ns-opts formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                                      :refactor-nrepl-opts sut/default-nrepl-opts
-                                                      :filename filename
-                                                      :original-ns-form ns-form}))
-    some? should-be-cleaned-f               should-be-cleaned
-    nil?  should-not-be-partially-cleaned-f should-not-be-partially-cleaned
-    nil?  should-not-be-cleaned-f           should-not-be-cleaned
-    nil?  should-not-be-cleaned-2-f         should-not-be-cleaned-2))
+  (are [op filename ns-form namespaces-that-should-never-cleaned]
+      (op (impl/clean-ns-form {:how-to-ns-opts formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
+                               :refactor-nrepl-opts sut/default-nrepl-opts
+                               :filename filename
+                               :original-ns-form ns-form
+                               :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned}))
+    some? should-be-cleaned-f               should-be-cleaned               #{}
+    some? "dev/user.clj"                    (ns-form-of "dev/user.clj")     #{}
+    nil?  "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-namespaces-that-should-never-cleaned
+    nil?  should-be-cleaned-f               should-be-cleaned               #{'functional.formatting-stack.formatters.clean-ns.should-be-cleaned}
+    nil?  should-not-be-partially-cleaned-f should-not-be-partially-cleaned #{}
+    nil?  should-not-be-cleaned-f           should-not-be-cleaned           #{}
+    nil?  should-not-be-cleaned-2-f         should-not-be-cleaned-2         #{}))

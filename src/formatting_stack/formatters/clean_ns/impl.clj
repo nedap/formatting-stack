@@ -17,8 +17,12 @@
   e.g. a namespace which is exclusively used through `:refer` has a 'unused namespace name',
   but it is not unused (because it is referred).
 
-  Use with caution accordingly, and not as a exclusive source of truth."
-  [filename]
+  Use with caution accordingly, and not as a exclusive source of truth.
+
+  `namespaces-that-should-never-cleaned` refers to the namespaces that are requiring libs - not the required libs themselves."
+  [filename namespaces-that-should-never-cleaned]
+  {:pre [(string? filename)
+         (set? namespaces-that-should-never-cleaned)]}
   (let [buffer (slurp filename)
         ns-obj (-> filename ns-form-of parse/name-from-ns-decl the-ns)
         _ (assert ns-obj)
@@ -27,6 +31,7 @@
         _ (assert (and (list? ns-form)
                        (= 'ns (first ns-form)))
                   (str "Filename " filename ": expected the first form to be of `(ns ...)` type."))
+        ns-name (-> ns-form parse/name-from-ns-decl)
         requires (-> ns-form parse/deps-from-ns-decl set)
         result (atom #{})
         aliases-keys (-> ns-obj ns-aliases keys set)
@@ -37,17 +42,20 @@
 
                                (aliases-keys n)
                                (-> ns-obj ns-aliases (get n) str symbol))))]
-    (walk/postwalk (fn traverse [x]
-                     (some->> x meta (walk/postwalk traverse))
-                     (when-let [n (and (ident? x) (expand-ident x))]
-                       (when (requires n)
-                         (swap! result conj n)))
-                     x)
-                   contents)
+    (if (namespaces-that-should-never-cleaned ns-name)
+      (reset! result #{'.*})
+      (walk/postwalk (fn traverse [x]
+                       (some->> x meta (walk/postwalk traverse))
+                       (when-let [n (and (ident? x) (expand-ident x))]
+                         (when (requires n)
+                           (swap! result conj n)))
+                       x)
+                     contents))
     @result))
 
-(defn clean-ns-form [{:keys [how-to-ns-opts refactor-nrepl-opts filename original-ns-form]}]
-  (let [whitelist (into [] (map str) (used-namespace-names filename))]
+(defn clean-ns-form [{:keys [how-to-ns-opts refactor-nrepl-opts filename original-ns-form namespaces-that-should-never-cleaned]}]
+  {:pre [how-to-ns-opts refactor-nrepl-opts filename original-ns-form namespaces-that-should-never-cleaned]}
+  (let [whitelist (into [] (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))]
     (binding [refactor-nrepl.config/*config* (-> refactor-nrepl-opts
                                                  (update :libspec-whitelist into whitelist))]
       (when-let [c (clean-ns {:path filename})]

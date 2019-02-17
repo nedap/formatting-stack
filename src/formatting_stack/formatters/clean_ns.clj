@@ -8,13 +8,14 @@
    [medley.core :refer [deep-merge]]
    [refactor-nrepl.config]))
 
-(defn clean! [how-to-ns-opts refactor-nrepl-opts filename]
+(defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned filename]
   (let [buffer (slurp filename)
         original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
     (when-let [clean-ns-form (impl/clean-ns-form {:how-to-ns-opts how-to-ns-opts
                                                   :refactor-nrepl-opts refactor-nrepl-opts,
                                                   :filename filename
-                                                  :original-ns-form (read-string original-ns-form)})]
+                                                  :original-ns-form (read-string original-ns-form)
+                                                  :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned})]
       (when-not (= original-ns-form clean-ns-form)
         (println "Cleaning unused imports:" filename)
         (->> original-ns-form
@@ -27,13 +28,18 @@
   (-> refactor-nrepl.config/*config*
       (assoc :prefix-rewriting false)))
 
-(defrecord Formatter [how-to-ns-opts refactor-nrepl-opts]
+(def default-namespaces-that-should-never-cleaned
+  #{'user 'dev})
+
+(defrecord Formatter [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned]
   formatting-stack.protocols.formatter/Formatter
   (format! [this files]
     (let [files (remove #(str/ends-with? % ".edn") files)
           refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config*
                                           (or refactor-nrepl-opts default-nrepl-opts))
           how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                     (or how-to-ns-opts {}))]
-      (mapv (partial clean! how-to-ns-opts refactor-nrepl-opts)
+                                     (or how-to-ns-opts {}))
+          namespaces-that-should-never-cleaned (or namespaces-that-should-never-cleaned
+                                                   default-namespaces-that-should-never-cleaned)]
+      (mapv (partial clean! how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned)
             files))))
