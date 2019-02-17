@@ -27,7 +27,7 @@ As of today, it is integrated with:
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
-## Smart
+## Smart code analysis
 
 As mentioned, **formatting-stack** understands your codebase and its dependencies.
 It knows which vars in the project are macros. It also reads the metadata of all function/macro vars.
@@ -44,6 +44,21 @@ Armed with those powers, we can do two nifty things:
 
 You can find examples of how to do such configuration in the [wiki](https://github.com/nedap/formatting-stack/wiki/Indentation-examples).
 
+## Graceful git strategies
+
+Git integration is documented at `formatting-stack.strategies`.
+
+The general intent is to make formatting:
+
+* **efficient**
+  * don't process non-touched files
+* **gradual**
+  * don't format the whole project at once
+  * favor reviewable diffs - nobody can review whole-project diffs
+* **safe**
+  * only format code that is completely staged by git
+  * else any bug in formatting code could destroy your unsaved changes
+
 ## Installation
 
 [Clojars](https://clojars.org/formatting-stack)
@@ -58,8 +73,8 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
 
 ### Reloaded Workflow integration
 
-* If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack. 
-* If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack.
+* If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters. 
+* If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack, applying all its formatters/linters.
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
 and you may find yourself using `clojure.tools.namespace.repl/refresh` instead.
@@ -69,39 +84,6 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 ```clojure
 (clojure.tools.namespace.repl/refresh :after 'formatting-stack.core/format!)
 ```
-
-## Git strategies
-
-See `formatting-stack.strategies`.
-
-The general intent is to make formatting:
-
-* **efficient**
-  * don't process non-touched files
-* **gradual**
-  * don't format the whole project at once
-  * favor reviewable diffs - nobody can review whole-project diffs
-* **safe**
-  * only format code that is completely staged by git
-  * else any bug in formatting code could destroy your unsaved changes
-
-## I don't like this indentation!
-
-**formatting-stack** doesn't introduce any creative formatting: it merely applies cljfmt,
-which in turn follows quite closely the [Clojure Style Guide](https://github.com/bbatsov/clojure-style-guide).
-
-It's obviously a good goal to adhere to standards and majorities.
-
-Also, when it comes to formatting it's worth considering that you might be wrong:
-
-> Who knows everything? -[Rich Hickey](https://github.com/matthiasn/talk-transcripts/commit/b3a1cdbb7480787d182d91b5d6921f7b9bc479ce#diff-7d9f1a837de37c2fa535dc0fd101220fR463)
-
-All IDEs/editors have quirks. It's very easy to get attached to them,
-and retrofit those quirks into made-up rules that only make sense to you (or a minority).
-
-If you're unfamiliar with the traditional Lisp indentation, as standardized by cljfmt/clojure-style-guide,
-you'll likely end up finding that having fine-grained rules which distinguish macro and function indentation
-in fact makes code more readable. It's just so useful to distinguish between functions and macros at a glance!
 
 ## Advanced configuration
 
@@ -123,7 +105,25 @@ There's no facility for finer-grained manipulations, e.g. removing only certain 
 
 That's by design, to avoid intrincate DSLs or data structures.
 If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
-That ns is a deliberately thin and data-only with the precise purpose of being forked at no cost.  
+That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.  
+
+## I don't like this indentation!
+
+**formatting-stack** doesn't introduce any creative formatting: it merely applies cljfmt,
+which in turn follows quite closely the [Clojure Style Guide](https://github.com/bbatsov/clojure-style-guide).
+
+It's obviously a good goal to adhere to standards and majorities.
+
+Also, when it comes to formatting it's worth considering that you might be wrong:
+
+> Who knows everything? -[Rich Hickey](https://github.com/matthiasn/talk-transcripts/commit/b3a1cdbb7480787d182d91b5d6921f7b9bc479ce#diff-7d9f1a837de37c2fa535dc0fd101220fR463)
+
+All IDEs/editors have quirks. It's very easy to get attached to them,
+and retrofit those quirks into made-up rules that only make sense to you (or a minority).
+
+If you're unfamiliar with the traditional Lisp indentation, as standardized by cljfmt/clojure-style-guide,
+you'll likely end up finding that having fine-grained rules which distinguish macro and function indentation
+in fact makes code more readable. It's just so useful to distinguish between functions and macros at a glance!
 
 ## License
 
