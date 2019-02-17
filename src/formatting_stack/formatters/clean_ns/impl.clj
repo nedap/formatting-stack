@@ -5,7 +5,7 @@
    [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.walk :as walk]
    [com.gfredericks.how-to-ns :as how-to-ns]
-   [formatting-stack.util :refer [rcomp]]
+   [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
 
 (defn ns-form-of [filename]
@@ -46,59 +46,11 @@
                    contents)
     @result))
 
-(defn parse-require-form [ns-form]
-  (let [require-form (atom nil)]
-    (walk/postwalk (fn [x]
-                     (when (and (sequential? x)
-                                (ident? (first x))
-                                (= "require" (name (first x))))
-                       (reset! require-form x))
-                     x)
-                   ns-form)
-    @require-form))
-
-(defn ensure-vector [x]
-  (if (sequential? x)
-    x
-    [x]))
-
-(defn any-leaf?
-  "Does any leaf in `form` (to be traversed with clojure.walk) satisfy `pred`?"
-  [pred form]
-  (let [result (atom false)]
-    (walk/postwalk (fn [x]
-                     (when (pred x)
-                       (reset! result true))
-                     x)
-                   form)
-    @result))
-
-(defn ensure-whitelist [ns-form whitelist original-ns-form]
-  (let [require-form (parse-require-form ns-form)
-        original-form (parse-require-form original-ns-form)
-        ensured-form (->> whitelist
-                          (remove (->> require-form
-                                       rest
-                                       (map (rcomp ensure-vector first))
-                                       set))
-                          (map (fn [x]
-                                 (->> original-form
-                                      rest
-                                      (map ensure-vector)
-                                      (filter (fn [[lib-name]]
-                                                (= lib-name x)))
-                                      first)))
-                          (concat require-form))
-        first-attempt (walk/postwalk-replace {require-form ensured-form} ns-form)]
-    (if (any-leaf? #{:require} first-attempt) ;; refactor-nrepl may have stripped the `:require` altogether
-      first-attempt
-      (let [[ns-keyword ns-name & tail] first-attempt]
-        `(~ns-keyword ~ns-name (:require ~@ensured-form) ~@tail)))))
-
-(defn clean-ns-form [how-to-ns-opts filename original-ns-form]
-  (when-let [c (clean-ns {:path filename})]
-    (let [whitelist (used-namespace-names filename)]
-      (-> c
-          (ensure-whitelist whitelist original-ns-form)
-          (pr-str)
-          (how-to-ns/format-ns-str how-to-ns-opts)))))
+(defn clean-ns-form [{:keys [how-to-ns-opts refactor-nrepl-opts filename original-ns-form]}]
+  (let [whitelist (into [] (map str) (used-namespace-names filename))]
+    (binding [refactor-nrepl.config/*config* (-> refactor-nrepl-opts
+                                                 (update :libspec-whitelist into whitelist))]
+      (when-let [c (clean-ns {:path filename})]
+        (-> c
+            (pr-str)
+            (how-to-ns/format-ns-str how-to-ns-opts))))))

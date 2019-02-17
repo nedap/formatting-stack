@@ -9,17 +9,19 @@
    [refactor-nrepl.config]))
 
 (defn clean! [how-to-ns-opts refactor-nrepl-opts filename]
-  (binding [refactor-nrepl.config/*config* refactor-nrepl-opts]
-    (let [buffer (slurp filename)
-          original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
-      (when-let [clean-ns-form (impl/clean-ns-form how-to-ns-opts filename (read-string original-ns-form))]
-        (when-not (= original-ns-form clean-ns-form)
-          (println "Cleaning unused imports:" filename)
-          (->> original-ns-form
-               count
-               (subs buffer)
-               (str clean-ns-form)
-               (spit filename)))))))
+  (let [buffer (slurp filename)
+        original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
+    (when-let [clean-ns-form (impl/clean-ns-form {:how-to-ns-opts how-to-ns-opts
+                                                  :refactor-nrepl-opts refactor-nrepl-opts,
+                                                  :filename filename
+                                                  :original-ns-form (read-string original-ns-form)})]
+      (when-not (= original-ns-form clean-ns-form)
+        (println "Cleaning unused imports:" filename)
+        (->> original-ns-form
+             count
+             (subs buffer)
+             (str clean-ns-form)
+             (spit filename))))))
 
 (def default-nrepl-opts
   (-> refactor-nrepl.config/*config*
