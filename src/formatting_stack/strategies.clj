@@ -4,10 +4,11 @@
    [formatting-stack.strategies.impl :as impl]))
 
 (defn all-files
-  "This strategy unconditionally processes all files. Requires the `tree` binary to be installed."
+  "This strategy unconditionally processes all files."
   []
-  (->> (impl/file-entries "tree" "-fi")
-       impl/extract-clj-files))
+  (let [tracked (impl/file-entries "git" "ls-files")
+        untracked (impl/file-entries "git" "ls-files" "--others" "--exclude-standard")]
+    (-> untracked (into tracked) impl/extract-clj-files)))
 
 (defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
@@ -39,7 +40,8 @@
        impl/extract-clj-files))
 
 (defn do-not-use-cached-results!
-  "Normally, subsequent 'members' (formatters, linters, compilers) using identical strategies will cache the results of those strategies.
+  "Normally, subsequent 'members' (formatters, linters, compilers)
+  using identical strategies will cache the results of those strategies.
   That is apt for formatters that do safe modifications, but not for more dangerous formatters.
 
   By adding this empty strategy, it is signaled that the member using it should not use a cached result.
