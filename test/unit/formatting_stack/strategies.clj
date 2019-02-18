@@ -30,13 +30,14 @@
 
 (deftest git-completely-staged
   (is (= (strip-git completely-staged-files)
-         (sut/git-completely-staged :files all-files))))
+         (sut/git-completely-staged :files [] :impl all-files))))
 
 (deftest git-not-completely-staged
   (is (= (strip-git not-completely-staged-files)
-         (sut/git-not-completely-staged :files all-files))))
+         (sut/git-not-completely-staged :files [] :impl all-files))))
 
 (deftest git-diff-against-default-branch
   (is (= ["a.clj"]
-         (sut/git-diff-against-default-branch :files ["a.clj" "b.clj"]
+         (sut/git-diff-against-default-branch :files []
+                                              :impl ["a.clj" "b.clj"]
                                               :blacklist ["b.clj"]))))
