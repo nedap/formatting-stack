@@ -11,6 +11,7 @@
   A strategy may not return nil."
   (:require
    [clojure.string :as str]
+   [formatting-stack.formatters.clean-ns.impl]
    [formatting-stack.strategies.impl :as impl]))
 
 (defn all-files
@@ -54,6 +55,24 @@
        (remove (set blacklist))
        impl/extract-clj-files
        (into files)))
+
+(defn exclude-cljs
+  "This strategy excludes .cljs files; .cljc files are not excluded in any case."
+  [& {:keys [files]}]
+  (->> files
+       (remove (partial re-find #"\.cljs$"))))
+
+(defn exclusively-cljs
+  "This strategy excludes files not suffixed in .cljs or .cljc"
+  [& {:keys [files]}]
+  (->> files
+       (filter (partial re-find #"\.clj[cs]$"))))
+
+(defn files-with-a-namespace
+  "This strategy excludes files that don't begin with a `(ns ...)` form."
+  [& {:keys [files]}]
+  (->> files
+       (filter formatting-stack.formatters.clean-ns.impl/ns-form-of)))
 
 (defn do-not-use-cached-results!
   "Normally, subsequent 'members' (formatters, linters, compilers)

@@ -6,7 +6,7 @@
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
-   [formatting-stack.util :refer [dissoc-by ns-name-from-filename rcomp]])
+   [formatting-stack.util :refer [dissoc-by rcomp]])
   (:import
    (java.io File)))
 
