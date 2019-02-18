@@ -8,8 +8,9 @@
 
 (defn files-from-strategies [strategies]
   (->> strategies
-       (mapcat (fn [f]
-                 (f)))
+       (reduce (fn [files strategy]
+                 (strategy :files files))
+               [])
        distinct))
 
 (defn process! [method members category-strategies default-strategies]
