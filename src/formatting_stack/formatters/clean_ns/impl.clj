@@ -9,7 +9,12 @@
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
 
 (defn ns-form-of [filename]
-  (-> filename slurp push-back-reader parse/read-ns-decl))
+  (try
+    (-> filename slurp push-back-reader parse/read-ns-decl)
+    (catch Exception e
+      (if (-> e ex-data :type #{:reader-exception})
+        nil
+        (throw e)))))
 
 (defn used-namespace-names
   "NOTE: this returns the set of namespace _names_ that are used, not the set of namespaces that are used.
