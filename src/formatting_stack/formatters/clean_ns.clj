@@ -30,7 +30,7 @@
             #{(str "^" x ".")
               (str "." x ".")
               (str "." x "$")})]
-    (->> ["specs" "imports" "exports" "extensions" "side-effects"]
+    (->> ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load"]
          (mapcat variations)
          (into #{"^cljsjs."}))))
 
