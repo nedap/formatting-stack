@@ -53,12 +53,25 @@
                      contents))
     @result))
 
-(defn clean-ns-form [{:keys [how-to-ns-opts refactor-nrepl-opts filename original-ns-form namespaces-that-should-never-cleaned]}]
-  {:pre [how-to-ns-opts refactor-nrepl-opts filename original-ns-form namespaces-that-should-never-cleaned]}
-  (let [whitelist (into [] (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))]
+(defn clean-ns-form [{:keys [how-to-ns-opts
+                             refactor-nrepl-opts
+                             filename
+                             original-ns-form
+                             namespaces-that-should-never-cleaned
+                             libspec-whitelist]}]
+  {:pre [how-to-ns-opts
+         refactor-nrepl-opts
+         filename
+         original-ns-form
+         namespaces-that-should-never-cleaned
+         libspec-whitelist]}
+  (let [whitelist (into libspec-whitelist (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))]
     (binding [refactor-nrepl.config/*config* (-> refactor-nrepl-opts
                                                  (update :libspec-whitelist into whitelist))]
       (when-let [c (clean-ns {:path filename})]
-        (-> c
-            (pr-str)
-            (how-to-ns/format-ns-str how-to-ns-opts))))))
+        (when-not (= c original-ns-form)
+          (let [v (-> c
+                      (pr-str)
+                      (how-to-ns/format-ns-str how-to-ns-opts))]
+            (when-not (= v (how-to-ns/format-ns-str (str original-ns-form) how-to-ns-opts))
+              v)))))))
