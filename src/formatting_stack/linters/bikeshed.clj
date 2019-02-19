@@ -18,8 +18,9 @@
                                     (some (fn [re]
                                             (re-find re line))
                                           [#"^Checking for lines"
+                                           #":refer \["
                                            #"^No lines found"])))))]
-      (when (seq output)
+      (when (-> output count (> 1))
         (let [[head & tail] output
               replacement (str "Lines exceeding " max-line-length " columns")
               output (-> head
