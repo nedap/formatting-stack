@@ -18,14 +18,16 @@
 
 (def completely-staged-files
   ["M  test/unit/formatting_stack/f.clj"
-   "R  test/unit/formatting_stack/g.clj"
+   "R  test/unit/formatting_stack/g.clj -> test/unit/formatting_stack/G.clj"
    "A  test/unit/formatting_stack/h.clj"])
 
 (def all-files (into not-completely-staged-files completely-staged-files))
 
 (defn strip-git [files]
   (letfn [(strip [s]
-            (str/replace s #".* " ""))]
+            (-> s
+                (str/replace #".* " "")
+                (str/replace "test/unit/formatting_stack/g.clj -> " "")))]
     (map strip files)))
 
 (deftest git-completely-staged
