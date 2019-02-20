@@ -31,6 +31,9 @@
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
        (map #(str/replace-first % impl/git-completely-staged-regex ""))
+       (map (fn [s]
+              ;; for renames:
+              (-> s (str/split #" -> ") last)))
        (impl/extract-clj-files)
        (into files)))
 
