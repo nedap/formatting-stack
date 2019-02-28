@@ -8,7 +8,7 @@
 
 (def default-eastwood-options
   ;; Avoid false positives or more-annoying-than-useful checks:
-  (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test}
+  (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
                         eastwood/default-linters)]
     (-> eastwood/default-opts
         (assoc :linters linters))))
