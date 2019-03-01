@@ -35,13 +35,17 @@
                          third-party-indent-specs
                          formatters
                          linters
-                         compilers]}]
+                         compilers
+                         in-background?]}]
   ;; the following `or` clauses ensure that Components don't pass nil values
   (let [strategies               (or strategies default-strategies)
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
         compilers                (or compilers default-compilers)
+        in-background?           (if (some? in-background?)
+                                   in-background?
+                                   true)
         {formatters-strategies
          :formatters
          linters-strategies
@@ -49,7 +53,12 @@
          compilers-strategies
          :compilers
          default-strategies
-         :default}               strategies]
-    (process! protocols.formatter/format! formatters formatters-strategies strategies)
-    (process! protocols.linter/lint!      linters    linters-strategies    strategies)
-    (process! protocols.compiler/compile! compilers  compilers-strategies  strategies)))
+         :default}               strategies
+        impl (fn []
+               (process! protocols.formatter/format! formatters formatters-strategies strategies)
+               (process! protocols.linter/lint!      linters    linters-strategies    strategies)
+               (process! protocols.compiler/compile! compilers  compilers-strategies  strategies))]
+    (if in-background?
+      (future
+        (impl))
+      (impl))))
