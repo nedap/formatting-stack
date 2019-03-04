@@ -33,8 +33,9 @@
                               (or eastwood-options {}))
           warnings-to-silence (or warnings-to-silence default-warnings-to-silence)
           result (->> (with-out-str
-                        (eastwood/eastwood (-> options
-                                               (assoc :namespaces namespaces))))
+                        (binding [*warn-on-reflection* true]
+                          (eastwood/eastwood (-> options
+                                                 (assoc :namespaces namespaces)))))
                       (str/split-lines)
                       (remove (fn [line]
                                 (or (str/blank? line)
