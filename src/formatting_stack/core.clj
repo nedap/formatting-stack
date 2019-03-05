@@ -1,5 +1,6 @@
 (ns formatting-stack.core
   (:require
+   [formatting-stack.background]
    [formatting-stack.defaults :refer :all]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.compiler :as protocols.compiler]
@@ -59,6 +60,5 @@
                (process! protocols.linter/lint!      linters    linters-strategies    strategies)
                (process! protocols.compiler/compile! compilers  compilers-strategies  strategies))]
     (if in-background?
-      (future
-        (impl))
+      (reset! formatting-stack.background/workload impl)
       (impl))))
