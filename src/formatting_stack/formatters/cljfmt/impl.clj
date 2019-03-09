@@ -19,6 +19,7 @@
   (or cljfmt-indent
       (and (number? cider-indent) [[(or cljfmt-type :block)
                                     cider-indent]])
+      (and (#{:defn} cider-indent) [[:inner 0]])
       nil))
 
 (defn cljfmt-third-party-indent-specs [specs]
