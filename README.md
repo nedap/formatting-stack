@@ -107,23 +107,7 @@ That's by design, to avoid intrincate DSLs or data structures.
 If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
 That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.  
 
-## I don't like this indentation!
-
-**formatting-stack** doesn't introduce any creative formatting: it merely applies cljfmt,
-which in turn follows quite closely the [Clojure Style Guide](https://github.com/bbatsov/clojure-style-guide).
-
-It's obviously a good goal to adhere to standards and majorities.
-
-Also, when it comes to formatting it's worth considering that you might be wrong:
-
-> Who knows everything? -[Rich Hickey](https://github.com/matthiasn/talk-transcripts/commit/b3a1cdbb7480787d182d91b5d6921f7b9bc479ce#diff-7d9f1a837de37c2fa535dc0fd101220fR463)
-
-All IDEs/editors have quirks. It's very easy to get attached to them,
-and retrofit those quirks into made-up rules that only make sense to you (or a minority).
-
-If you're unfamiliar with the traditional Lisp indentation, as standardized by cljfmt/clojure-style-guide,
-you'll likely end up finding that having fine-grained rules which distinguish macro and function indentation
-in fact makes code more readable. It's just so useful to distinguish between functions and macros at a glance!
+## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 
 ## License
 
