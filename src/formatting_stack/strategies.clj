@@ -27,7 +27,7 @@
 (defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
   [& {:keys [files impl]
-      :or {impl (impl/file-entries "git" "status" "--porcelain")}}]
+      :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
        (map #(str/replace-first % impl/git-completely-staged-regex ""))
@@ -40,7 +40,7 @@
 (defn git-not-completely-staged
   "This strategy processes all files that are not _completely_ staged with git. Untracked files are also included."
   [& {:keys [files impl]
-      :or {impl (impl/file-entries "git" "status" "--porcelain")}}]
+      :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-not-completely-staged-regex %))
        (map #(str/replace-first % impl/git-not-completely-staged-regex ""))
@@ -51,9 +51,9 @@
   "This strategy processes all files that this branch has modified.
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
-      :or {target-branch "master"
-           impl (impl/file-entries "git" "diff" "--name-only" target-branch)
-           blacklist (git-not-completely-staged)}}]
+      :or   {target-branch "master"
+             impl          (impl/file-entries "git" "diff" "--name-only" target-branch)
+             blacklist     (git-not-completely-staged)}}]
   (->> impl
        (remove (set blacklist))
        impl/extract-clj-files
@@ -64,6 +64,12 @@
   [& {:keys [files]}]
   (->> files
        (remove (partial re-find #"\.cljs$"))))
+
+(defn exclude-edn
+  "This strategy excludes .edn files."
+  [& {:keys [files]}]
+  (->> files
+       (remove (partial re-find #"\.edn$"))))
 
 (defn exclusively-cljs
   "This strategy excludes files not suffixed in .cljs or .cljc"

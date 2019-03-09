@@ -29,7 +29,8 @@
                                                                        strategies/files-with-a-namespace
                                                                        strategies/do-not-use-cached-results!)))]))
 
-(def default-linters [(linters.bikeshed/map->Bikeshed {:strategies extended-strategies})
+(def default-linters [(linters.bikeshed/map->Bikeshed {:strategies (conj extended-strategies
+                                                                         strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
                                                                          strategies/exclude-cljs)})])
 
