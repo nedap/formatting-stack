@@ -26,6 +26,7 @@
   (let [qualified (->> specs
                        (map (fn [[k v]]
                               [k (to-cljfmt-indent v)]))
+                       (remove (rcomp second nil?))
                        (into {}))
         ;; https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work
         unqualified (->> qualified
@@ -68,10 +69,12 @@
                           (let [indent (to-cljfmt-indent metadata)
                                 name (-> var-ref meta :name)
                                 fqn (-> var-ref meta :ns (str "/" name) symbol)]
-                            (assoc v
-                                   fqn indent
-                                   ;; because https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work:
-                                   name indent)))))
+                            (if-not indent
+                              v
+                              (assoc v
+                                     fqn indent
+                                     ;; because https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work:
+                                     name indent))))))
       (alter-var-root #'cljfmt.core/default-indents
                       #(merge % (cljfmt-third-party-indent-specs third-party-intent-specs)))
       ;; brings https://github.com/weavejester/cljfmt/pull/163/files:
