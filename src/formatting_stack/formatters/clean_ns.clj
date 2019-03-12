@@ -11,12 +11,12 @@
 (defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (let [buffer (slurp filename)
         original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
-    (when-let [clean-ns-form (impl/clean-ns-form {:how-to-ns-opts how-to-ns-opts
-                                                  :refactor-nrepl-opts refactor-nrepl-opts,
-                                                  :filename filename
-                                                  :original-ns-form (read-string original-ns-form)
+    (when-let [clean-ns-form (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
+                                                  :refactor-nrepl-opts                  refactor-nrepl-opts
+                                                  :filename                             filename
+                                                  :original-ns-form                     (read-string original-ns-form)
                                                   :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
-                                                  :libspec-whitelist libspec-whitelist})]
+                                                  :libspec-whitelist                    libspec-whitelist})]
       (when-not (= original-ns-form clean-ns-form)
         (println "Cleaning unused imports:" filename)
         (->> original-ns-form
@@ -25,14 +25,21 @@
              (str clean-ns-form)
              (spit filename))))))
 
-(def default-libspec-whitelist
+(def default-libspecs
+  ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load" "migration" "migrations"])
+
+(defn make-default-libspec-whitelist [& {:keys [libspecs]
+                                         :or   {libspecs default-libspecs}}]
   (letfn [(variations [x]
             #{(str "^" x ".")
               (str "." x ".")
               (str "." x "$")})]
-    (->> ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load" "migration" "migrations"]
+    (->> libspecs
          (mapcat variations)
          (into #{"^cljsjs."}))))
+
+(def default-libspec-whitelist
+  (make-default-libspec-whitelist))
 
 (def default-nrepl-opts
   (-> refactor-nrepl.config/*config*
