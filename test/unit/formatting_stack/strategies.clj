@@ -11,6 +11,7 @@
 
 (def not-completely-staged-files
   ["AM test/unit/formatting_stack/a.clj"
+   "MM test/unit/formatting_stack/a.clj"
    "AD test/unit/formatting_stack/b.clj"
    " M test/unit/formatting_stack/c.clj"
    " D test/unit/formatting_stack/d.clj"
