@@ -43,7 +43,11 @@
                  (map #(.getCanonicalFile ^File %))))
           (project-namespaces []
             (->> (find-files (classpath/classpath-directories) find/clj)
-                 (mapcat (rcomp file/read-file-ns-decl parse/deps-from-ns-decl))
+                 (mapcat (fn [file]
+                           (let [decl (-> file file/read-file-ns-decl)
+                                 n (-> decl parse/name-from-ns-decl)
+                                 deps (-> decl parse/deps-from-ns-decl)]
+                             (conj deps n))))
                  (distinct)
                  (map find-ns)
                  (filter identity)))
