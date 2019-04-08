@@ -1,5 +1,6 @@
 (ns formatting-stack.defaults
   (:require
+   [formatting-stack.compilers.refactor-nrepl :as compilers.refactor-nrepl]
    [formatting-stack.formatters.cider :as formatters.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
@@ -34,4 +35,4 @@
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
                                                                          strategies/exclude-cljs)})])
 
-(def default-compilers [])
+(def default-compilers [(compilers.refactor-nrepl/map->Compiler {})])

@@ -20,6 +20,7 @@ As of today, it is integrated with:
   * [eastwood](https://github.com/jonase/eastwood)
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
     * Used for "clean unused imports" functionality
+    * It also improves its overall performance by eagerly building its 'AST cache' whenever you refresh/reset.
   * [bikeshed](https://github.com/dakrone/lein-bikeshed)
     * Used for checking max column count
   * [all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
