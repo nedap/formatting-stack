@@ -1,10 +1,9 @@
-(defproject formatting-stack "0.10.7"
+(defproject formatting-stack "0.10.8"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[cider/cider-nrepl "0.16.0"] ;; dependency of `refactor-nrepl`, which `refactor-nrepl` excludes
-                 [cljfmt "0.6.4"]
+  :dependencies [[cljfmt "0.6.4"]
                  [com.gfredericks/how-to-ns "0.2.2"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.stuartsierra/component "0.4.0"]
