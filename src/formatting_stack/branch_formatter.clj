@@ -31,7 +31,9 @@
    (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                       strategies/exclude-cljs)})])
 
-(defn format-and-lint-branch! [& {:keys [target-branch] :or {target-branch "master"}}]
+(defn format-and-lint-branch! [& {:keys [target-branch in-background?]
+                                  :or   {target-branch  "master"
+                                         in-background? (not (System/getenv "CI"))}}]
   (let [default-strategies [(fn [& {:as options}]
                               (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
         formatters (default-formatters default-strategies)
@@ -39,4 +41,4 @@
     (formatting-stack.core/format! :strategies default-strategies
                                    :formatters formatters
                                    :linters linters
-                                   :in-background? false)))
+                                   :in-background? in-background?)))
