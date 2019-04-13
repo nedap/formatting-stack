@@ -28,6 +28,8 @@ As of today, it is integrated with:
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
+Each formatter makes full use of your CPU's cores.
+
 ## Smart code analysis
 
 As mentioned, **formatting-stack** understands your codebase and its dependencies.
