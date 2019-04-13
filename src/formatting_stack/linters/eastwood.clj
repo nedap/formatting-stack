@@ -2,6 +2,7 @@
   (:require
    [clojure.string :as str]
    [eastwood.lint :as eastwood]
+   [eastwood.util]
    [formatting-stack.protocols.linter]
    [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [deep-merge]]))
@@ -26,6 +27,7 @@
 (defrecord Eastwood [eastwood-options warnings-to-silence]
   formatting-stack.protocols.linter/Linter
   (lint! [this filenames]
+    (reset! eastwood.util/warning-enable-config-atom []) ;; https://github.com/jonase/eastwood/issues/317
     (let [namespaces (->> filenames
                           (remove #(str/ends-with? % ".edn"))
                           (map ns-name-from-filename))
