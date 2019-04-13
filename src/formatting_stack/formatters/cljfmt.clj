@@ -1,5 +1,6 @@
 (ns formatting-stack.formatters.cljfmt
   (:require
+   [cljfmt.core]
    [cljfmt.main]
    [clojure.java.io :as io]
    [formatting-stack.formatters.cljfmt.impl :as impl]
@@ -12,5 +13,6 @@
     (let [cljfmt-opts (deep-merge cljfmt.main/default-options
                                   (or options {}))
           cljfmt-files (map io/file files)]
-      (impl/setup-cljfmt-indents! third-party-indent-specs)
-      (cljfmt.main/fix cljfmt-files))))
+      (doseq [file files]
+        (with-redefs [cljfmt.core/default-indents (impl/cljfmt-indents-for file third-party-indent-specs)]
+          (cljfmt.main/fix [file]))))))

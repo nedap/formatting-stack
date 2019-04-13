@@ -23,23 +23,23 @@
       nil))
 
 (defn cljfmt-third-party-indent-specs [specs]
-  (let [qualified (->> specs
-                       (map (fn [[k v]]
-                              [k (to-cljfmt-indent v)]))
-                       (remove (rcomp second nil?))
-                       (into {}))
-        ;; https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work
-        unqualified (->> qualified
-                         (map (fn [[k v]]
-                                [(-> k name symbol) v]))
-                         (into {}))]
-    (merge qualified unqualified)))
+  (->> specs
+       (map (fn [[k v]]
+              [k (to-cljfmt-indent v)]))
+       (remove (rcomp second nil?))
+       (into {})))
 
-(defn setup-cljfmt-indents!
-  "Updates `#'cljfmt.core/default-indents` with:
+(defn fully-qualified-name-of [var-ref]
+  (let [name (-> var-ref meta :name)]
+    (-> var-ref meta :ns (str "/" name) symbol)))
+
+(defn cljfmt-indents-for
+  "Returns a value derive from `#'cljfmt.core/default-indents`, with:
   * the indentation specs defined in your project (and its dependencies) via metadata
-  * the specs explicitly passed as an argument to this defn."
-  [third-party-intent-specs]
+  * the specs explicitly passed as an argument to this defn.
+
+  The ns of `file` is analysed, for resolving `:refer`-ed symbols accurately."
+  [file third-party-intent-specs]
   (letfn [(find-files [dirs platform]
             (->> dirs
                  (map io/file)
@@ -61,30 +61,38 @@
             (->> ns ns-publics vals (filter (fn [var-ref]
                                               (or (#{:macro :arglists} (meta var-ref))
                                                   (fn? @var-ref))))))]
-    (let [mappings (->> (project-namespaces)
-                        (map namespace-macros)
-                        (filter seq)
-                        (flatten)
-                        (map #(vector % (-> % meta (select-keys [:style/indent :style.cljfmt/indent :style.cljfmt/type]))))
-                        (filter (rcomp second seq)))]
-      (doseq [[var-ref metadata] mappings]
-        (alter-var-root #'cljfmt.core/default-indents
-                        (fn [v]
-                          (let [indent (to-cljfmt-indent metadata)
-                                name (-> var-ref meta :name)
-                                fqn (-> var-ref meta :ns (str "/" name) symbol)]
-                            (if-not indent
-                              v
-                              (assoc v
-                                     fqn indent
-                                     ;; because https://github.com/weavejester/cljfmt/pull/109/files doesn't appear to work:
-                                     name indent))))))
-      (alter-var-root #'cljfmt.core/default-indents
-                      #(merge % (cljfmt-third-party-indent-specs third-party-intent-specs)))
+    (let [project-macro-mappings (->> (project-namespaces)
+                                      (map namespace-macros)
+                                      (filter seq)
+                                      (flatten)
+                                      (map #(vector % (-> % meta (select-keys [:style/indent :style.cljfmt/indent :style.cljfmt/type]))))
+                                      (filter (rcomp second seq)))
+          ns-mappings (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map)
+          result (atom cljfmt.core/default-indents)]
+      (doseq [[var-ref metadata] project-macro-mappings]
+        (swap! result
+               (fn [v]
+                 (let [indent (to-cljfmt-indent metadata)
+                       fqn (fully-qualified-name-of var-ref)]
+                   (if-not indent
+                     v
+                     (assoc v fqn indent))))))
+      (swap! result
+             #(merge % (cljfmt-third-party-indent-specs third-party-intent-specs)))
       ;; brings https://github.com/weavejester/cljfmt/pull/163/files:
-      (alter-var-root #'cljfmt.core/default-indents
-                      #(-> %
-                           (dissoc-by (fn [x] ;; regexes can't be compared, hence this contraption
-                                        (not= (pr-str x)
-                                              (pr-str #"^def"))))
-                           (assoc #"^def(?!ault)(?!late)(?!er)" [[:inner 0]]))))))
+      (swap! result
+             #(-> %
+                  (dissoc-by (fn [x] ;; regexes can't be compared, hence this contraption
+                               (not= (pr-str x)
+                                     (pr-str #"^def"))))
+                  (assoc #"^def(?!ault)(?!late)(?!er)" [[:inner 0]])))
+      ;; :refer awareness:
+      (doseq [[sym var-ref] ns-mappings
+              :when (var? var-ref)
+              :let [fqn (fully-qualified-name-of var-ref)]
+              :when (some (fn [[k v]]
+                            (= k fqn))
+                          @result)
+              :let [indent (get @result fqn)]]
+        (swap! result assoc sym indent))
+      @result)))
