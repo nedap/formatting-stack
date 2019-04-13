@@ -3,6 +3,7 @@
    [clojure.string :as str]
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter]
+   [formatting-stack.util :refer [process-in-parallel!]]
    [medley.core :refer [deep-merge]]))
 
 (def default-how-to-ns-opts {:require-docstring?      false
@@ -19,4 +20,6 @@
     (let [how-to-ns-files (remove #(str/ends-with? % ".edn") files)
           how-to-ns-opts (deep-merge default-how-to-ns-opts
                                      (or options {}))]
-      (how-to-ns.main/fix how-to-ns-files how-to-ns-opts))))
+      (->> how-to-ns-files
+           (process-in-parallel! (fn [filename]
+                                   (how-to-ns.main/fix [filename] how-to-ns-opts)))))))

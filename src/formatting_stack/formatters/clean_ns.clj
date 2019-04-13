@@ -5,6 +5,7 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
+   [formatting-stack.util :refer [process-in-parallel!]]
    [medley.core :refer [deep-merge]]
    [refactor-nrepl.config]))
 
@@ -59,5 +60,10 @@
           namespaces-that-should-never-cleaned (or namespaces-that-should-never-cleaned
                                                    default-namespaces-that-should-never-cleaned)
           libspec-whitelist (or libspec-whitelist default-libspec-whitelist)]
-      (mapv (partial clean! how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist)
-            files))))
+      (->> files
+           (process-in-parallel! (fn [filename]
+                                   (clean! how-to-ns-opts
+                                           refactor-nrepl-opts
+                                           namespaces-that-should-never-cleaned
+                                           libspec-whitelist
+                                           filename)))))))

@@ -3,9 +3,13 @@
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
+                             :username :env/artifactory_user
+                             :password :env/artifactory_pass}}
   :dependencies [[cljfmt "0.6.4"]
                  [com.gfredericks/how-to-ns "0.2.2"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
+                 [com.nedap.staffing-solutions/utils.collections "0.3.1"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
