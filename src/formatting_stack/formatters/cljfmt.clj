@@ -13,6 +13,7 @@
     (let [cljfmt-opts (deep-merge cljfmt.main/default-options
                                   (or options {}))
           cljfmt-files (map io/file files)]
-      (doseq [file files]
-        (with-redefs [cljfmt.core/default-indents (impl/cljfmt-indents-for file third-party-indent-specs)]
-          (cljfmt.main/fix [file]))))))
+      (binding [impl/*cache* (atom {})]
+        (doseq [file files]
+          (with-redefs [cljfmt.core/default-indents (impl/cljfmt-indents-for file third-party-indent-specs)]
+            (cljfmt.main/fix [file])))))))
