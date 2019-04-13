@@ -71,11 +71,11 @@
         v)))
 
 (defn cljfmt-indents-for
-  "Returns a value derive from `#'cljfmt.core/default-indents`, with:
-  * the indentation specs defined in your project (and its dependencies) via metadata
+  "Returns a value derived from `#'cljfmt.core/default-indents`, with:
+  * the indentation specs defined in your project (and its dependencies) via metadata; and
   * the specs explicitly passed as an argument to this defn.
 
-  The ns of `file` is analysed, for resolving `:refer`-ed symbols accurately."
+  The ns of `file` is analysed, for resolving `:def`-ed and `:refer`-ed symbols accurately."
   [file third-party-intent-specs]
   (let [macro-mappings (project-macro-mappings)
         ns-mappings (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map)
