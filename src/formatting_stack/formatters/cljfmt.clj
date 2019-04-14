@@ -17,6 +17,5 @@
 
       (->> files
            (process-in-parallel! (fn [filename]
-                                   (with-redefs [cljfmt.core/default-indents (impl/cljfmt-indents-for filename
-                                                                                                      third-party-indent-specs)]
-                                     (cljfmt.main/fix [filename]))))))))
+                                   (let [indents (impl/cljfmt-indents-for filename third-party-indent-specs)]
+                                     (cljfmt.main/fix [filename] {:indents indents}))))))))
