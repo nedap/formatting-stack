@@ -49,13 +49,37 @@
                                                                                               (sut/cljfmt-indents-for {}))]
                     (case e
                       :unqualified-too
-                      (is (= u q [[:block 0]]))
+                      (is (= u
+                             q
+                             [[:block 0]]))
 
                       :qualified-only
                       (do
                         (is (nil? u))
-                        (is (= q [[:block 0]])))))
+                        (is (= q
+                               [[:block 0]])))))
 
       this-file      :unqualified-too
       related-file   :unqualified-too
-      unrelated-file :qualified-only)))
+      unrelated-file :qualified-only))
+
+  (testing "Rules can override clojure.core's"
+    (are [file e] (let [{u 'do
+                         q 'unit.formatting-stack.formatters.cljfmt.impl.sample-data/do} (-> file
+                                                                                             str
+                                                                                             (sut/cljfmt-indents-for {}))]
+                    (case e
+                      :unqualified-too
+                      (is (= u
+                             q
+                             [[:block 7]]))
+
+                      :qualified-only
+                      (do
+                        (is (= u
+                               [[:block 0]]))
+                        (is (= q
+                               [[:block 7]])))))
+
+      this-file    :qualified-only
+      related-file :unqualified-too)))
