@@ -55,4 +55,20 @@
   (->> files
        (distribute-evenly-by {:f (fn [^String filename]
                                    (-> (File. filename) .length))})
-       (partitioning-pmap f)))
+       (partitioning-pmap (bound-fn [filename]
+                            (try
+                              (f filename)
+                              (catch Exception e
+                                (let [s (->> e
+                                             .getStackTrace
+                                             (map (fn [x]
+                                                    (str "    " x)))
+                                             (interpose "\n"))]
+                                  (println (apply str
+                                                  "Encountered an exception, processing file: "
+                                                  filename
+                                                  ". The exception will be printed in the next line. "
+                                                  "formatting-stack execution has *not* been aborted.\n"
+                                                  (-> e .getMessage)
+                                                  "\n"
+                                                  s)))))))))
