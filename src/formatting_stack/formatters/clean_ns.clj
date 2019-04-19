@@ -1,6 +1,5 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
-   [clojure.string :as str]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
@@ -52,8 +51,7 @@
 (defrecord Formatter [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]
   formatting-stack.protocols.formatter/Formatter
   (format! [this files]
-    (let [files (remove #(str/ends-with? % ".edn") files)
-          refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config*
+    (let [refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config*
                                           (or refactor-nrepl-opts default-nrepl-opts))
           how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
                                      (or how-to-ns-opts {}))
