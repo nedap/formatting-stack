@@ -37,7 +37,7 @@
               (str "." x "$")})]
     (->> libspecs
          (mapcat variations)
-         (into #{"^cljsjs."}))))
+         (into #{"^cljsjs." "clojure.main"}))))
 
 (def default-libspec-whitelist
   (make-default-libspec-whitelist))

@@ -1,5 +1,6 @@
 (ns formatting-stack.core
   (:require
+   [clojure.main]
    [formatting-stack.background]
    [formatting-stack.defaults :refer :all]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]

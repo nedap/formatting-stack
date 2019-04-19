@@ -1,6 +1,5 @@
 (ns formatting-stack.formatters.cljfmt
   (:require
-   [cljfmt.core]
    [cljfmt.main]
    [clojure.java.io :as io]
    [formatting-stack.formatters.cljfmt.impl :as impl]
