@@ -83,7 +83,8 @@
                       {}
                       (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map))
         result (atom cljfmt.core/default-indents)]
-    (doseq [[var-ref metadata] macro-mappings]
+    (doseq [[var-ref metadata] macro-mappings
+            :when (and var-ref metadata)]
       (swap! result
              (fn [v]
                (let [indent (to-cljfmt-indent metadata)

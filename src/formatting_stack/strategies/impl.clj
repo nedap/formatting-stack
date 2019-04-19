@@ -1,10 +1,10 @@
 (ns formatting-stack.strategies.impl
   (:require
+   [clojure.java.shell :refer [sh]]
+   [clojure.string :as str]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader]
-   [clojure.tools.reader.reader-types :refer [push-back-reader]]
-   [clojure.java.shell :refer [sh]]
-   [clojure.string :as str])
+   [clojure.tools.reader.reader-types :refer [push-back-reader]])
   (:import
    (java.io File)))
 
