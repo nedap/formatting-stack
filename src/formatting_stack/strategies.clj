@@ -59,6 +59,12 @@
        impl/extract-clj-files
        (into files)))
 
+(defn exclude-cljc
+  "This strategy excludes .cljc files; .cljs files are not excluded in any case."
+  [& {:keys [files]}]
+  (->> files
+       (remove (partial re-find #"\.cljc$"))))
+
 (defn exclude-cljs
   "This strategy excludes .cljs files; .cljc files are not excluded in any case."
   [& {:keys [files]}]
