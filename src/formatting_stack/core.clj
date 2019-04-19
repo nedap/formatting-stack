@@ -6,7 +6,8 @@
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.compiler :as protocols.compiler]
    [formatting-stack.protocols.formatter :as protocols.formatter]
-   [formatting-stack.protocols.linter :as protocols.linter]))
+   [formatting-stack.protocols.linter :as protocols.linter]
+   [formatting-stack.util :refer [with-serialized-output]]))
 
 (defn files-from-strategies [strategies]
   (->> strategies
@@ -24,14 +25,16 @@
   ;; Accordingly it would do nothing, which is undesirable.
   (let [files (memoize (fn [strategies]
                          (files-from-strategies strategies)))]
-    (doseq [member members]
-      (let [{specific-strategies :strategies} member
-            strategies (or specific-strategies category-strategies default-strategies)]
-        (try
-          (->> strategies files (method member))
-          (catch Exception e
-            (println "Encountered an exception, which will be printed in the next line. formatting-stack execution has *not* been aborted.")
-            (-> e .printStackTrace)))))))
+    (with-serialized-output
+      (doseq [member members]
+        (let [{specific-strategies :strategies} member
+              strategies (or specific-strategies category-strategies default-strategies)]
+          (try
+            (->> strategies files (method member))
+            (catch Exception e
+              (println "Encountered an exception, which will be printed in the next line."
+                       "formatting-stack execution has *not* been aborted.")
+              (-> e .printStackTrace))))))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
