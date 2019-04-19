@@ -33,8 +33,8 @@
        (into {})))
 
 (defn fully-qualified-name-of [var-ref]
-  (let [name (-> var-ref meta :name)]
-    (-> var-ref meta :ns (str "/" name) symbol)))
+  (let [name (some-> var-ref meta :name)]
+    (some-> var-ref meta :ns (str "/" name) symbol)))
 
 (defn find-files [dirs platform]
   (->> dirs
@@ -52,8 +52,8 @@
                        deps (-> decl parse/deps-from-ns-decl)]
                    (conj deps n))))
        (distinct)
-       (map find-ns)
-       (filter identity)))
+       (filter identity)
+       (keep find-ns)))
 
 (defn namespace-macros [ns]
   (some->> ns ns-publics vals (filter (fn [var-ref]
@@ -89,7 +89,7 @@
              (fn [v]
                (let [indent (to-cljfmt-indent metadata)
                      fqn (fully-qualified-name-of var-ref)]
-                 (if-not indent
+                 (if-not (and indent fqn)
                    v
                    (assoc v fqn indent))))))
     (swap! result
