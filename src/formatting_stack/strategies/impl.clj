@@ -1,5 +1,8 @@
 (ns formatting-stack.strategies.impl
   (:require
+   [clojure.tools.namespace.parse :as parse]
+   [clojure.tools.reader]
+   [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.java.shell :refer [sh]]
    [clojure.string :as str])
   (:import
@@ -16,9 +19,22 @@
 
 (def ^:dynamic *filter-existing-files?* true)
 
+(defn unreadable?
+  "Is this file unreadable to clojure.tools.reader? (because of custom reader tags, unbalanced parentheses or such)"
+  [^String filename]
+  (if-not (-> filename File. .exists)
+    false ;; undecidable
+    (let [contents (-> filename slurp)
+          wrapped (str "[" contents "]")]
+      (try
+        (-> wrapped push-back-reader clojure.tools.reader/read nil?)
+        (catch Exception e
+          true)))))
+
 (defn extract-clj-files [files]
   (cond->> files
     true                     (filter #(re-find #"\.(clj|cljc|cljs|edn)$" %))
-    *filter-existing-files?* (filter (fn [f]
+    *filter-existing-files?* (filter (fn [^String f]
                                        (-> f File. .exists)))
-    true                     (remove #(str/ends-with? % "project.clj"))))
+    true                     (remove #(str/ends-with? % "project.clj"))
+    true                     (remove unreadable?)))
