@@ -3,6 +3,7 @@
    [cljfmt.core]
    [clojure.java.classpath :as classpath]
    [clojure.java.io :as io]
+   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
@@ -55,9 +56,9 @@
        (filter identity)))
 
 (defn namespace-macros [ns]
-  (->> ns ns-publics vals (filter (fn [var-ref]
-                                    (or (#{:macro :arglists} (meta var-ref))
-                                        (fn? @var-ref))))))
+  (some->> ns ns-publics vals (filter (fn [var-ref]
+                                        (or (#{:macro :arglists} (meta var-ref))
+                                            (fn? @var-ref))))))
 
 (defn project-macro-mappings []
   (or (some-> *cache* deref ::project-macro-mappings)
@@ -78,7 +79,9 @@
   The ns of `file` is analysed, for resolving `:def`-ed and `:refer`-ed symbols accurately."
   [file third-party-intent-specs]
   (let [macro-mappings (project-macro-mappings)
-        ns-mappings (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map)
+        ns-mappings (if (some-> file (string/ends-with? ".cljs"))
+                      {}
+                      (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map))
         result (atom cljfmt.core/default-indents)]
     (doseq [[var-ref metadata] macro-mappings]
       (swap! result
