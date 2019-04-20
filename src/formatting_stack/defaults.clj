@@ -6,6 +6,7 @@
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
    [formatting-stack.formatters.newlines :as formatters.newlines]
+   [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
    [formatting-stack.strategies :as strategies]))
@@ -29,6 +30,7 @@
     [(formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
      (formatters.cljfmt/map->Formatter cljfmt-and-how-to-ns-opts)
      (formatters.how-to-ns/map->Formatter cljfmt-and-how-to-ns-opts)
+     (formatters.no-extra-blank-lines/map->Formatter {})
      (formatters.newlines/map->Formatter opts)
      (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
                                                                        strategies/files-with-a-namespace

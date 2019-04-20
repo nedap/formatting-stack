@@ -1,14 +1,15 @@
 (ns formatting-stack.project-formatter
   "A set of defaults apt for formatting a whole project."
   (:require
-   [formatting-stack.indent-specs]
-   [formatting-stack.core]
    [formatting-stack.compilers.refactor-nrepl :as compilers.refactor-nrepl]
+   [formatting-stack.core]
    [formatting-stack.formatters.cider :as formatters.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
    [formatting-stack.formatters.newlines :as formatters.newlines]
+   [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
+   [formatting-stack.indent-specs]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
    [formatting-stack.strategies :as strategies]))
@@ -22,6 +23,7 @@
     [(formatters.cider/map->Formatter {})
      (formatters.cljfmt/map->Formatter opts)
      (formatters.how-to-ns/map->Formatter (-> opts (assoc :strategies (conj default-strategies strategies/exclude-cljc))))
+     (formatters.no-extra-blank-lines/map->Formatter {})
      (formatters.newlines/map->Formatter opts)
      (formatters.clean-ns/map->Formatter (-> opts (assoc :strategies (conj default-strategies
                                                                            strategies/files-with-a-namespace
