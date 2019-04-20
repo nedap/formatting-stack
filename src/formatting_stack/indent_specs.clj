@@ -36,9 +36,13 @@
     fulcrologic.semantic-ui.factories/ui-table-row        {:style/indent 1}
     fulcro.client.dom/div                                 {:style/indent 1}
     fulcro.client.dom/span                                {:style/indent 1}
-    fulcro-spec.core/specification                        {:style/indent 1}
+    fulcro-spec.core/assertions                           {:style/indent      0
+                                                           :style.cljfmt/type :inner}
     fulcro-spec.core/behavior                             {:style/indent 1}
     fulcro-spec.core/component                            {:style/indent 1}
-    fulcro-spec.core/assertions                           {:style/indent      0
+    fulcro-spec.core/specification                        {:style/indent 1}
+    fulcro-spec.core/when-mocking!                        {:style/indent      0
+                                                           :style.cljfmt/type :inner}
+    fulcro-spec.core/when-mocking                         {:style/indent      0
                                                            :style.cljfmt/type :inner}
     garden.stylesheet/at-media                            {:style/indent 1}})
