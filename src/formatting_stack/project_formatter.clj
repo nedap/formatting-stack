@@ -36,9 +36,15 @@
 
 (def default-compilers [])
 
-(defn format-and-lint-project! [& {:keys [in-background?]
-                                   :or   {in-background? (not (System/getenv "CI"))}}]
+(defn format-and-lint-project! [& {:keys [in-background?]}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
+                                 :linters default-linters
+                                 :in-background? in-background?))
+
+(defn lint-project! [& {:keys [in-background?]}]
+  (formatting-stack.core/format! :strategies default-strategies
+                                 :formatters []
+                                 :compilers []
                                  :linters default-linters
                                  :in-background? in-background?))

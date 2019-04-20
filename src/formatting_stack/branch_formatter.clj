@@ -44,3 +44,14 @@
                                    :formatters formatters
                                    :linters linters
                                    :in-background? in-background?)))
+
+(defn lint-branch! [& {:keys [target-branch in-background?]
+                       :or   {target-branch "master"}}]
+  (let [default-strategies [(fn [& {:as options}]
+                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
+        linters (default-linters default-strategies)]
+    (formatting-stack.core/format! :strategies default-strategies
+                                   :formatters []
+                                   :compilers []
+                                   :linters linters
+                                   :in-background? in-background?)))
