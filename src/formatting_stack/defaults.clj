@@ -41,4 +41,4 @@
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
                                                                          strategies/exclude-cljs)})])
 
-(def default-compilers [(compilers.refactor-nrepl/map->Compiler {})])
+(def default-compilers [])

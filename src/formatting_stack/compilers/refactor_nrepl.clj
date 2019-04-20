@@ -1,7 +1,9 @@
 (ns formatting-stack.compilers.refactor-nrepl
   "Warms up refactor-nrepl's 'AST cache', for a more efficient performance than the default.
 
-  If your IDE/Editor doesn't use this Compiler, nothing bad will happen. You are free to disable it."
+  Excluded from the foramtting-stack defaults:
+  AST analysis can be quite slow (much more than a `clojure.tools.namespace.repl/refresh`),
+  increasing the chances for concurrent (buggy) refreshing of Clojure namespaces."
   (:require
    [clojure.pprint :as pprint]
    [formatting-stack.protocols.compiler]

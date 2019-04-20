@@ -34,7 +34,7 @@
                       (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                                          strategies/exclude-cljs)})])
 
-(def default-compilers [(compilers.refactor-nrepl/map->Compiler {})])
+(def default-compilers [])
 
 (defn format-and-lint-project! [& {:keys [in-background?]
                                    :or   {in-background? (not (System/getenv "CI"))}}]
