@@ -1,7 +1,6 @@
 (ns formatting-stack.project-formatter
   "A set of defaults apt for formatting a whole project."
   (:require
-   [formatting-stack.compilers.refactor-nrepl :as compilers.refactor-nrepl]
    [formatting-stack.core]
    [formatting-stack.formatters.cider :as formatters.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
@@ -12,6 +11,7 @@
    [formatting-stack.indent-specs]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
+   [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.strategies :as strategies]))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
@@ -31,7 +31,9 @@
                                                                            strategies/exclude-edn
                                                                            strategies/do-not-use-cached-results!))))]))
 
-(def default-linters [(linters.bikeshed/map->Bikeshed {:strategies (conj default-strategies
+(def default-linters [(linters.loc-per-ns/map->Linter {:strategies (conj default-strategies
+                                                                         strategies/exclude-edn)})
+                      (linters.bikeshed/map->Bikeshed {:strategies (conj default-strategies
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                                          strategies/exclude-cljs)})])

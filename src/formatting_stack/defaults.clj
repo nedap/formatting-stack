@@ -1,6 +1,5 @@
 (ns formatting-stack.defaults
   (:require
-   [formatting-stack.compilers.refactor-nrepl :as compilers.refactor-nrepl]
    [formatting-stack.formatters.cider :as formatters.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
@@ -9,6 +8,7 @@
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
+   [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.strategies :as strategies]))
 
 (def default-strategies [strategies/git-completely-staged])
@@ -38,7 +38,9 @@
                                                                        strategies/exclude-edn
                                                                        strategies/do-not-use-cached-results!)))]))
 
-(def default-linters [(linters.bikeshed/map->Bikeshed {:strategies (conj extended-strategies
+(def default-linters [(linters.loc-per-ns/map->Linter {:strategies (conj extended-strategies
+                                                                         strategies/exclude-edn)})
+                      (linters.bikeshed/map->Bikeshed {:strategies (conj extended-strategies
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
                                                                          strategies/exclude-cljs)})])

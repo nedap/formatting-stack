@@ -11,6 +11,7 @@
    [formatting-stack.indent-specs]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
+   [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.strategies :as strategies]
    [medley.core :refer [mapply]]))
 
@@ -30,7 +31,9 @@
                                                                        strategies/do-not-use-cached-results!)))]))
 
 (defn default-linters [default-strategies]
-  [(linters.bikeshed/map->Bikeshed {:strategies (conj default-strategies
+  [(linters.loc-per-ns/map->Linter {:strategies (conj default-strategies
+                                                      strategies/exclude-edn)})
+   (linters.bikeshed/map->Bikeshed {:strategies (conj default-strategies
                                                       strategies/exclude-edn)})
    (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                       strategies/exclude-cljs)})])
