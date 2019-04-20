@@ -2,6 +2,7 @@
   (:require
    [clojure.java.shell :refer [sh]]
    [clojure.string :as str]
+   [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader]
    [clojure.tools.reader.reader-types :refer [push-back-reader]])
@@ -19,17 +20,24 @@
 
 (def ^:dynamic *filter-existing-files?* true)
 
-(defn unreadable?
-  "Is this file unreadable to clojure.tools.reader? (because of custom reader tags, unbalanced parentheses or such)"
+(defn readable?
+  "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
   [^String filename]
   (if-not (-> filename File. .exists)
-    false ;; undecidable
+    true ;; undecidable
     (let [contents (-> filename slurp)
           wrapped (str "[" contents "]")]
       (try
-        (-> wrapped push-back-reader clojure.tools.reader/read nil?)
+        (and (do
+               (-> wrapped push-back-reader clojure.tools.reader/read)
+               true)
+             (if-let [decl (-> filename file/read-file-ns-decl)]
+               (do
+                 (-> decl parse/deps-from-ns-decl) ;; no exceptions thrown
+                 true)
+               true))
         (catch Exception e
-          true)))))
+          false)))))
 
 (defn extract-clj-files [files]
   (cond->> files
@@ -37,4 +45,4 @@
     *filter-existing-files?* (filter (fn [^String f]
                                        (-> f File. .exists)))
     true                     (remove #(str/ends-with? % "project.clj"))
-    true                     (remove unreadable?)))
+    true                     (filter readable?)))
