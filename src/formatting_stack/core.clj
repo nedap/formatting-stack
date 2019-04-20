@@ -59,7 +59,7 @@
          :compilers
          default-strategies
          :default}               strategies
-        impl (fn []
+        impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
                (process! protocols.formatter/format! formatters formatters-strategies strategies)
                (process! protocols.linter/lint!      linters    linters-strategies    strategies)
                (process! protocols.compiler/compile! compilers  compilers-strategies  strategies))]

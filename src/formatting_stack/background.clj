@@ -1,14 +1,16 @@
 (ns formatting-stack.background)
 
-(def workload (atom nil))
+(defonce workload (atom nil))
 
 (defonce runner
   (future
     (while (not (-> (Thread/currentThread) .isInterrupted))
       (if-let [job @workload]
-        (do
-          (compare-and-set! workload job nil)
-          (job))
+        (when (compare-and-set! workload job nil)
+          (try
+            (job)
+            (catch Exception e
+              (-> e .printStackTrace))))
         (Thread/sleep 50)))))
 
 (comment ;; perform the following before `refresh`ing this ns:
