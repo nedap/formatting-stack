@@ -7,11 +7,25 @@
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
+   [formatting-stack.indent-specs]
    [formatting-stack.util :refer [dissoc-by rcomp]])
   (:import
    (java.io File)))
 
 (def ^:dynamic *cache* nil)
+
+(defn safe-ns-map
+  "Works around:
+
+  * .clj files not required yet (bad Reloaded integration);
+  * .clj files not meant to be required (test files, scripts, etc); and
+  * .cljs files (cannot be required from JVM clojure)."
+  [namespace]
+  (try
+    (require namespace)
+    (ns-map namespace)
+    (catch Exception e
+      {})))
 
 ;; :block is for things like do, with*, ->
 ;; :inner is for things like def (and for workarounding multi-arity defns with some sort of "body" argument)
@@ -81,7 +95,7 @@
   (let [macro-mappings (project-macro-mappings)
         ns-mappings (if (some-> file (string/ends-with? ".cljs"))
                       {}
-                      (some-> file file/read-file-ns-decl parse/name-from-ns-decl ns-map))
+                      (some-> file file/read-file-ns-decl parse/name-from-ns-decl safe-ns-map))
         result (atom cljfmt.core/default-indents)]
     (doseq [[var-ref metadata] macro-mappings
             :when (and var-ref metadata)]
@@ -109,5 +123,12 @@
                           (= k fqn))
                         @result)
             :let [indent (get @result fqn)]]
+      (swap! result assoc sym indent))
+    (doseq [:when file
+            :let [deps (-> file file/read-file-ns-decl parse/deps-from-ns-decl)]
+            [triggering-ns indents] formatting-stack.indent-specs/magic-symbol-mappings
+            :when (-> deps set (contains? triggering-ns))
+            [sym raw-indent] indents
+            :let [indent (to-cljfmt-indent raw-indent)]]
       (swap! result assoc sym indent))
     @result))

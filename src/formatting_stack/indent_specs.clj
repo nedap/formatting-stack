@@ -46,3 +46,12 @@
     fulcro-spec.core/when-mocking                         {:style/indent      0
                                                            :style.cljfmt/type :inner}
     garden.stylesheet/at-media                            {:style/indent 1}})
+
+(def magic-symbol-mappings
+  "If a given ns requires e.g. `fulcro.server`, then `action` will have the specified indent rule.
+
+  Apt for macros such as `fulcro.server/defmutation` which inject `action` into the local environment."
+  '{fulcro.server           {action {:style/indent      0
+                                     :style.cljfmt/type :inner}}
+    fulcro.client.mutations {action {:style/indent      0
+                                     :style.cljfmt/type :inner}}})

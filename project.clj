@@ -1,4 +1,4 @@
-(defproject formatting-stack "0.13.0"
+(defproject formatting-stack "0.14.0"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
@@ -19,6 +19,8 @@
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
                  [org.clojure/tools.reader "1.1.1"]
                  [refactor-nrepl "2.4.0"]]
-  :profiles {:dev  {:source-paths ["dev"]}
+  :profiles {:dev  {:source-paths   ["dev"]
+                    :resource-paths ["test-resources"]}
              ;; `dev` in :test is important - a test depends on it:
-             :test {:source-paths ["dev"]}})
+             :test {:source-paths   ["dev"]
+                    :resource-paths ["test-resources"]}})
