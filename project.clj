@@ -1,4 +1,4 @@
-(defproject formatting-stack "0.15.0"
+(defproject formatting-stack "0.16.0"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"

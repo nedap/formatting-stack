@@ -16,6 +16,20 @@
                [])
        distinct))
 
+(def newliner
+  (reify
+    protocols.formatter/Formatter
+    (format! [_ _]
+      (println))
+
+    protocols.linter/Linter
+    (lint! [_ _]
+      (println))
+
+    protocols.compiler/Compiler
+    (compile! [_ _]
+      (println))))
+
 (defn process! [method members category-strategies default-strategies]
   ;; `memoize` rationale: results are cached not for performance,
   ;; but for avoiding the scenario where one `member` alters the git status,
@@ -23,7 +37,8 @@
   ;; e.g. cljfmt may operate upon `strategies/git-completely-staged`, formatting some files accordingly.
   ;; Then `how-to-ns`, which follows the same strategy, would perceive a dirty git status.
   ;; Accordingly it would do nothing, which is undesirable.
-  (let [files (memoize (fn [strategies]
+  (let [members (->> members (interpose newliner))
+        files (memoize (fn [strategies]
                          (files-from-strategies strategies)))]
     (with-serialized-output
       (doseq [member members]
@@ -61,7 +76,9 @@
          :default}               strategies
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
                (process! protocols.formatter/format! formatters formatters-strategies strategies)
+               (println)
                (process! protocols.linter/lint!      linters    linters-strategies    strategies)
+               (println)
                (process! protocols.compiler/compile! compilers  compilers-strategies  strategies))]
     (if in-background?
       (reset! formatting-stack.background/workload impl)
