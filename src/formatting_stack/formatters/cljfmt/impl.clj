@@ -14,6 +14,8 @@
 
 (def ^:dynamic *cache* nil)
 
+(defonce require-lock (Object.))
+
 (defn safe-ns-map
   "Works around:
 
@@ -22,7 +24,8 @@
   * .cljs files (cannot be required from JVM clojure)."
   [namespace]
   (try
-    (require namespace)
+    (locking require-lock
+      (require namespace))
     (ns-map namespace)
     (catch Exception e
       {})))
