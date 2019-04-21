@@ -1,7 +1,5 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
-   [clojure.tools.namespace.file :as file]
-   [clojure.tools.namespace.parse :as parse]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
@@ -50,17 +48,6 @@
 (def default-namespaces-that-should-never-cleaned
   #{'user 'dev})
 
-(defonce require-lock (Object.))
-
-(defn try-require [filename]
-  (try
-    (when-let [namespace (some-> filename file/read-file-ns-decl parse/name-from-ns-decl)]
-      (locking require-lock
-        (require namespace)))
-    true
-    (catch Exception _
-      false)))
-
 (defrecord Formatter [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]
   formatting-stack.protocols.formatter/Formatter
   (format! [this files]
@@ -73,7 +60,8 @@
           libspec-whitelist (or libspec-whitelist default-libspec-whitelist)]
       (->> files
            (process-in-parallel! (fn [filename]
-                                   (when (try-require filename)
+                                   (when (and (impl/try-require filename)
+                                              (not (impl/has-duplicate-requires? filename)))
                                      (clean! how-to-ns-opts
                                              refactor-nrepl-opts
                                              namespaces-that-should-never-cleaned

@@ -1,10 +1,13 @@
 (ns formatting-stack.formatters.clean-ns.impl
   (:require
+   [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader :as tools.reader]
    [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.walk :as walk]
    [com.gfredericks.how-to-ns :as how-to-ns]
+   [formatting-stack.util]
+   [formatting-stack.util :refer [rcomp]]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
 
@@ -42,11 +45,12 @@
         aliases-keys (-> ns-obj ns-aliases keys set)
         expand-ident (fn [ident]
                        (when-let [n (some-> ident namespace symbol)]
-                         (cond (requires n)
-                               n
+                         (cond
+                           (requires n)
+                           n
 
-                               (aliases-keys n)
-                               (-> ns-obj ns-aliases (get n) str symbol))))]
+                           (aliases-keys n)
+                           (-> ns-obj ns-aliases (get n) str symbol))))]
     (if (namespaces-that-should-never-cleaned ns-name)
       (reset! result #{'.*})
       (walk/postwalk (fn traverse [x]
@@ -80,3 +84,27 @@
                       (how-to-ns/format-ns-str how-to-ns-opts))]
             (when-not (= v (how-to-ns/format-ns-str (str original-ns-form) how-to-ns-opts))
               v)))))))
+
+(defonce require-lock (Object.))
+
+(defn try-require [filename]
+  (try
+    (when-let [namespace (some-> filename file/read-file-ns-decl parse/name-from-ns-decl)]
+      (locking require-lock
+        (require namespace)))
+    true
+    (catch Exception _
+      false)))
+
+(defn has-duplicate-requires? [filename]
+  (->> filename
+       ns-form-of
+       formatting-stack.util/require-from-ns-decl
+       rest
+       (map (fn [x]
+              (if (coll? x)
+                x
+                [x])))
+       (group-by first)
+       (vals)
+       (some (rcomp count (complement #{1})))))

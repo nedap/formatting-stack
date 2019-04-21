@@ -4,8 +4,7 @@
    [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [formatting-stack.protocols.linter]
-   [formatting-stack.util :refer [process-in-parallel!]]
-   [medley.core :refer [find-first]]))
+   [formatting-stack.util :refer [process-in-parallel!]]))
 
 (defn clause= [a b]
   (->> [a b]
@@ -74,9 +73,7 @@
            (process-in-parallel! (fn [filename]
                                    (let [bad-require-clauses (->> filename
                                                                   file/read-file-ns-decl
-                                                                  (find-first (fn [x]
-                                                                                (and (sequential? x)
-                                                                                     (#{:require} (first x)))))
+                                                                  formatting-stack.util/require-from-ns-decl
                                                                   (rest)
                                                                   (remove (partial acceptable-require-clause?
                                                                                    acceptable-aliases-whitelist)))]
@@ -87,7 +84,8 @@
                                                                          (string/join "\n"))]
                                          (-> (str "Warning for "
                                                   filename
-                                                  ": the following :require aliases are not derived from their refered namespace:\n"
+                                                  ": the following :require aliases are not derived from their refered namespace:"
+                                                  "\n"
                                                   formatted-bad-requires
                                                   ". See https://stuartsierra.com/2015/05/10/clojure-namespace-aliases\n")
                                              (println)))))))))))

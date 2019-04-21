@@ -2,6 +2,7 @@
   (:require
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
+   [medley.core :refer [find-first]]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
    [nedap.utils.collections.seq :refer [distribute-evenly-by]])
   (:import
@@ -72,3 +73,8 @@
                                                   (-> e .getMessage)
                                                   "\n"
                                                   s)))))))))
+(defn require-from-ns-decl [ns-decl]
+  (->> ns-decl
+       (find-first (fn [x]
+                     (and (sequential? x)
+                          (#{:require} (first x)))))))
