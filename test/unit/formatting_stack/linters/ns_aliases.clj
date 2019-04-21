@@ -41,6 +41,10 @@
     'net.xyz.core.alpha     :as 'xyz                     true
     'net.xyz.core.alpha     :as 'net.xyz                 true
 
+    'buddy.core.keys        :as 'buddy.keys              true
+    'buddy.core.keys        :as 'buddy.core.keys         true
+    'buddy.core.keys        :as 'keys.buddy              false
+
     'clj-http               :as 'http                    true
     'clj-http               :as 'htta                    false
     'clj-time.core          :as 'time                    true

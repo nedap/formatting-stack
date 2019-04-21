@@ -37,7 +37,7 @@
                                                        name
                                                        (string/split #"\.")
                                                        (reverse)))))
-        ns-fragments-without-core (->> ns-fragments (drop-while #{"core" "alpha" "api" "kws"}))]
+        ns-fragments-without-core (->> ns-fragments (remove #{"core" "alpha" "api" "kws"}))]
     (->> [ns-fragments ns-fragments-without-core]
          (distinct)
          (some #(->> (map clause= alias-fragments %)
