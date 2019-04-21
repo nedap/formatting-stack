@@ -51,11 +51,13 @@
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
-                                 :in-background? in-background?))
+                                 :in-background? in-background?
+                                 :intersperse-newlines? true))
 
 (defn lint-project! [& {:keys [in-background?]}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
                                  :compilers []
                                  :linters default-linters
-                                 :in-background? in-background?))
+                                 :in-background? in-background?
+                                 :intersperse-newlines? true))

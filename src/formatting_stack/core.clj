@@ -30,14 +30,16 @@
     (compile! [_ _]
       (println))))
 
-(defn process! [method members category-strategies default-strategies]
+(defn process! [method members category-strategies default-strategies intersperse-newlines?]
   ;; `memoize` rationale: results are cached not for performance,
   ;; but for avoiding the scenario where one `member` alters the git status,
   ;; so the subsequent `member`s' strategies won't perceive the same set of files than the first one.
   ;; e.g. cljfmt may operate upon `strategies/git-completely-staged`, formatting some files accordingly.
   ;; Then `how-to-ns`, which follows the same strategy, would perceive a dirty git status.
   ;; Accordingly it would do nothing, which is undesirable.
-  (let [members (->> members (interpose newliner))
+  (let [members (if-not intersperse-newlines?
+                  members
+                  (->> members (interpose newliner)))
         files (memoize (fn [strategies]
                          (files-from-strategies strategies)))]
     (with-serialized-output
@@ -56,7 +58,8 @@
                          formatters
                          linters
                          compilers
-                         in-background?]}]
+                         in-background?
+                         intersperse-newlines?]}]
   ;; the following `or` clauses ensure that Components don't pass nil values
   (let [strategies               (or strategies default-strategies)
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
@@ -75,11 +78,13 @@
          default-strategies
          :default}               strategies
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
-               (process! protocols.formatter/format! formatters formatters-strategies strategies)
-               (println)
-               (process! protocols.linter/lint!      linters    linters-strategies    strategies)
-               (println)
-               (process! protocols.compiler/compile! compilers  compilers-strategies  strategies))]
+               (process! protocols.formatter/format! formatters formatters-strategies strategies intersperse-newlines?)
+               (when intersperse-newlines?
+                 (println))
+               (process! protocols.linter/lint!      linters    linters-strategies    strategies intersperse-newlines?)
+               (when intersperse-newlines?
+                 (println))
+               (process! protocols.compiler/compile! compilers  compilers-strategies  strategies intersperse-newlines?))]
     (if in-background?
       (reset! formatting-stack.background/workload impl)
       (impl))))
