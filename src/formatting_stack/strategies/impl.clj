@@ -5,7 +5,8 @@
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader]
-   [clojure.tools.reader.reader-types :refer [push-back-reader]])
+   [clojure.tools.reader.reader-types :refer [push-back-reader]]
+   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]])
   (:import
    (java.io File)))
 
@@ -25,19 +26,20 @@
   [^String filename]
   (if-not (-> filename File. .exists)
     true ;; undecidable
-    (let [contents (-> filename slurp)
-          wrapped (str "[" contents "]")]
-      (try
+    (try
+      (let [ns-obj (some-> filename ns-form-of parse/name-from-ns-decl the-ns)]
         (and (do
-               (-> wrapped push-back-reader clojure.tools.reader/read)
+               (if-not ns-obj
+                 true
+                 (-> filename slurp (safely-read-ns-contents ns-obj)))
                true)
              (if-let [decl (-> filename file/read-file-ns-decl)]
                (do
                  (-> decl parse/deps-from-ns-decl) ;; no exceptions thrown
                  true)
-               true))
-        (catch Exception e
-          false)))))
+               true)))
+      (catch Exception e
+        false))))
 
 (defn extract-clj-files [files]
   (cond->> files

@@ -8,6 +8,7 @@
    [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.util]
    [formatting-stack.util :refer [rcomp]]
+   [nedap.utils.speced :as speced]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
 
@@ -18,6 +19,10 @@
       (if (-> e ex-data :type #{:reader-exception})
         nil
         (throw e)))))
+
+(speced/defn safely-read-ns-contents [^string? buffer, ^clojure.lang.Namespace ns-obj]
+  (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
+    (tools.reader/read-string {} (str "[ " buffer " ]"))))
 
 (defn used-namespace-names
   "NOTE: this returns the set of namespace _names_ that are used, not the set of namespaces that are used.
@@ -34,8 +39,7 @@
   (let [buffer (slurp filename)
         ns-obj (-> filename ns-form-of parse/name-from-ns-decl the-ns)
         _ (assert ns-obj)
-        [ns-form & contents] (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
-                               (tools.reader/read-string {} (str "[ " buffer " ]")))
+        [ns-form & contents] (safely-read-ns-contents buffer ns-obj)
         _ (assert (and (list? ns-form)
                        (= 'ns (first ns-form)))
                   (str "Filename " filename ": expected the first form to be of `(ns ...)` type."))
