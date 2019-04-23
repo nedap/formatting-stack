@@ -1,9 +1,12 @@
 (ns formatting-stack.indent-specs)
 
 (def default-third-party-indent-specs
-  '{hiccup.page/html5                                     {:style/indent 1}
-    hiccup.form/form-to                                   {:style/indent 1}
+  '{clojure.core/delay                                    {:style/indent 0}
+    clojure.core/time                                     {:style/indent 0}
     clojure.test.check.properties/for-all                 {:style/indent 1}
+    datomic.api/q                                         {:style/indent 1}
+    hiccup.form/form-to                                   {:style/indent 1}
+    hiccup.page/html5                                     {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-button           {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-card-content     {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-dropdown         {:style/indent 1}
