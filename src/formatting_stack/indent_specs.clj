@@ -2,6 +2,8 @@
 
 (def default-third-party-indent-specs
   '{cats.core/mlet                                        {:style/indent 1}
+    cats.monad.either                                     {:style/indent 1}
+    cljs.test/async                                       {:style/indent 1}
     clojure.core/delay                                    {:style/indent 0}
     clojure.core/time                                     {:style/indent 0}
     clojure.test.check.properties/for-all                 {:style/indent 1}
