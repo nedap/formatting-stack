@@ -21,13 +21,18 @@
 
 (def ^:dynamic *filter-existing-files?* true)
 
+(defn safe-the-ns [ns-name]
+  (try
+    (the-ns ns-name)
+    (catch Exception _)))
+
 (defn readable?
   "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
   [^String filename]
   (if-not (-> filename File. .exists)
     true ;; undecidable
     (try
-      (let [ns-obj (some-> filename ns-form-of parse/name-from-ns-decl the-ns)]
+      (let [ns-obj (some-> filename ns-form-of parse/name-from-ns-decl safe-the-ns)]
         (and (do
                (if-not ns-obj
                  true
