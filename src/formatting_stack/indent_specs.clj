@@ -14,6 +14,7 @@
     fulcrologic.semantic-ui.factories/ui-dropdown         {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-dropdown-menu    {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-form             {:style/indent 1}
+    fulcrologic.semantic-ui.factories/ui-form-button      {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-form-group       {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-grid             {:style/indent 1}
     fulcrologic.semantic-ui.factories/ui-grid-column      {:style/indent 1}
