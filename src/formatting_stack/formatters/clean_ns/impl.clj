@@ -7,7 +7,7 @@
    [clojure.walk :as walk]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.util]
-   [formatting-stack.util :refer [rcomp]]
+   [formatting-stack.util :refer [rcomp try-require]]
    [nedap.utils.speced :as speced]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
@@ -88,17 +88,6 @@
                       (how-to-ns/format-ns-str how-to-ns-opts))]
             (when-not (= v (how-to-ns/format-ns-str (str original-ns-form) how-to-ns-opts))
               v)))))))
-
-(defonce require-lock (Object.))
-
-(defn try-require [filename]
-  (try
-    (when-let [namespace (some-> filename file/read-file-ns-decl parse/name-from-ns-decl)]
-      (locking require-lock
-        (require namespace)))
-    true
-    (catch Exception _
-      false)))
 
 (defn has-duplicate-requires? [filename]
   (->> filename

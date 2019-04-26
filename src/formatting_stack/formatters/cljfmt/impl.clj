@@ -8,13 +8,11 @@
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.indent-specs]
-   [formatting-stack.util :refer [dissoc-by rcomp]])
+   [formatting-stack.util :refer [dissoc-by rcomp require-lock]])
   (:import
    (java.io File)))
 
 (def ^:dynamic *cache* nil)
-
-(defonce require-lock (Object.))
 
 (defn safe-ns-map
   "Works around:

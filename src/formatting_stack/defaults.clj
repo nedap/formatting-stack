@@ -50,6 +50,7 @@
                       (linters.bikeshed/map->Bikeshed {:strategies (conj extended-strategies
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
-                                                                         strategies/exclude-cljs)})])
+                                                                         strategies/exclude-cljs
+                                                                         strategies/jvm-requirable-files)})])
 
 (def default-compilers [])

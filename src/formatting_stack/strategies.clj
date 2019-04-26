@@ -12,7 +12,8 @@
   (:require
    [clojure.string :as str]
    [formatting-stack.formatters.clean-ns.impl]
-   [formatting-stack.strategies.impl :as impl]))
+   [formatting-stack.strategies.impl :as impl]
+   [formatting-stack.util :refer [try-require]]))
 
 (defn all-files
   "This strategy unconditionally processes all files."
@@ -88,6 +89,12 @@
   [& {:keys [files]}]
   (->> files
        (filter formatting-stack.formatters.clean-ns.impl/ns-form-of)))
+
+(defn jvm-requirable-files
+  "This strategy excludes files that can't be `require`d under JVM Clojure."
+  [& {:keys [files]}]
+  (->> files
+       (filter try-require)))
 
 (defn do-not-use-cached-results!
   "Normally, subsequent 'members' (formatters, linters, compilers)

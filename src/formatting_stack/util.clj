@@ -78,3 +78,16 @@
        (find-first (fn [x]
                      (and (sequential? x)
                           (#{:require} (first x)))))))
+
+;; `require` is not thread-safe in Clojure.
+(def require-lock
+  (Object.))
+
+(defn try-require [filename]
+  (try
+    (when-let [namespace (some-> filename file/read-file-ns-decl parse/name-from-ns-decl)]
+      (locking require-lock
+        (require namespace)))
+    true
+    (catch Exception _
+      false)))

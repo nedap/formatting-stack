@@ -4,7 +4,7 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
-   [formatting-stack.util :refer [process-in-parallel!]]
+   [formatting-stack.util :refer [process-in-parallel! try-require]]
    [medley.core :refer [deep-merge]]
    [refactor-nrepl.config]))
 
@@ -60,7 +60,7 @@
           libspec-whitelist (or libspec-whitelist default-libspec-whitelist)]
       (->> files
            (process-in-parallel! (fn [filename]
-                                   (when (and (impl/try-require filename)
+                                   (when (and (try-require filename)
                                               (not (impl/has-duplicate-requires? filename)))
                                      (clean! how-to-ns-opts
                                              refactor-nrepl-opts

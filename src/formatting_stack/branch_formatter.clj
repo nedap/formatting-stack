@@ -43,7 +43,8 @@
    (linters.bikeshed/map->Bikeshed {:strategies (conj default-strategies
                                                       strategies/exclude-edn)})
    (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
-                                                      strategies/exclude-cljs)})])
+                                                      strategies/exclude-cljs
+                                                      strategies/jvm-requirable-files)})])
 
 (defn format-and-lint-branch! [& {:keys [target-branch in-background?]
                                   :or   {target-branch  "master"
