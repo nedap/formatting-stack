@@ -86,5 +86,9 @@
                  (println))
                (process! protocols.compiler/compile! compilers  compilers-strategies  strategies intersperse-newlines?))]
     (if in-background?
-      (reset! formatting-stack.background/workload impl)
-      (impl))))
+      (do
+        (reset! formatting-stack.background/workload impl)
+        'Running...)
+      (do
+        (impl)
+        'Done))))
