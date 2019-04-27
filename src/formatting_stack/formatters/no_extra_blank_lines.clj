@@ -19,4 +19,4 @@
                                        formatted (without-extra-newlines contents)]
                                    (when-not (= contents formatted)
                                      (println "Removing extra blank lines:" filename)
-                                     (spit filename contents))))))))
+                                     (spit filename formatted))))))))
