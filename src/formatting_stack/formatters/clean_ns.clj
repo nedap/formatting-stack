@@ -4,19 +4,20 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
-   [formatting-stack.util :refer [process-in-parallel! try-require]]
+   [formatting-stack.util :refer [process-in-parallel! try-require without-aliases]]
    [medley.core :refer [deep-merge]]
    [refactor-nrepl.config]))
 
 (defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (let [buffer (slurp filename)
         original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
-    (when-let [clean-ns-form (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
-                                                  :refactor-nrepl-opts                  refactor-nrepl-opts
-                                                  :filename                             filename
-                                                  :original-ns-form                     (read-string original-ns-form)
-                                                  :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
-                                                  :libspec-whitelist                    libspec-whitelist})]
+    (when-let [clean-ns-form (without-aliases
+                               (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
+                                                    :refactor-nrepl-opts                  refactor-nrepl-opts
+                                                    :filename                             filename
+                                                    :original-ns-form                     (read-string original-ns-form)
+                                                    :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
+                                                    :libspec-whitelist                    libspec-whitelist}))]
       (when-not (= original-ns-form clean-ns-form)
         (println "Cleaning unused imports:" filename)
         (->> original-ns-form
