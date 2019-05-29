@@ -20,7 +20,9 @@
                  [org.clojure/tools.reader "1.1.1"]
                  [refactor-nrepl "2.4.0"]]
   :profiles {:dev  {:source-paths   ["dev"]
-                    :resource-paths ["test-resources"]}
+                    :resource-paths ["test-resources"]
+                    :plugins        [[lein-cloverage "1.0.13"]]}
+             :ci   {:plugins        [[cider/cider-nrepl "0.21.1"]]}
              ;; `dev` in :test is important - a test depends on it:
              :test {:source-paths   ["dev"]
                     :resource-paths ["test-resources"]}})
