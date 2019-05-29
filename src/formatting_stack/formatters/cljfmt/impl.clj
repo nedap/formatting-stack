@@ -1,16 +1,12 @@
 (ns formatting-stack.formatters.cljfmt.impl
   (:require
    [cljfmt.core]
-   [clojure.java.classpath :as classpath]
-   [clojure.java.io :as io]
    [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
-   [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.indent-specs]
-   [formatting-stack.util :refer [dissoc-by rcomp require-lock]])
-  (:import
-   (java.io File)))
+   [formatting-stack.project-parsing :refer [project-namespaces]]
+   [formatting-stack.util :refer [dissoc-by rcomp require-lock]]))
 
 (def ^:dynamic *cache* nil)
 
@@ -50,25 +46,6 @@
 (defn fully-qualified-name-of [var-ref]
   (let [name (some-> var-ref meta :name)]
     (some-> var-ref meta :ns (str "/" name) symbol)))
-
-(defn find-files [dirs platform]
-  (->> dirs
-       (map io/file)
-       (map #(.getCanonicalFile ^File %))
-       (filter #(.exists ^File %))
-       (mapcat #(find/find-sources-in-dir % platform))
-       (map #(.getCanonicalFile ^File %))))
-
-(defn project-namespaces []
-  (->> (find-files (classpath/classpath-directories) find/clj)
-       (mapcat (fn [file]
-                 (let [decl (-> file file/read-file-ns-decl)
-                       n (-> decl parse/name-from-ns-decl)
-                       deps (-> decl parse/deps-from-ns-decl)]
-                   (conj deps n))))
-       (distinct)
-       (filter identity)
-       (keep find-ns)))
 
 (defn namespace-macros [ns]
   (some->> ns ns-publics vals (filter (fn [var-ref]
