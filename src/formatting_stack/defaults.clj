@@ -32,6 +32,7 @@
      (formatters.newlines/map->Formatter opts)
      (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
                                                                        strategies/files-with-a-namespace
+                                                                       strategies/exclude-cljc
                                                                        strategies/exclude-cljs
                                                                        strategies/exclude-edn
                                                                        strategies/do-not-use-cached-results!)))]))
