@@ -24,11 +24,7 @@
         ;; ideally the how-to-ns formatter would have an extra `files-with-a-namespace` strategy but that would break git caching,
         ;; making usage more awkward.
         ;; the strategies mechanism needs some rework to avoid this limitation.
-        ;; ---
-        ;; .cljc is excluded b/c https://github.com/gfredericks/how-to-ns/issues/9 .
-        ;; cljfmt must also pay the cost of that for now, for the reason above.
-        cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies (conj default-strategies
-                                                                    strategies/exclude-cljc)))]
+        cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies default-strategies))]
     [(formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
      (formatters.cljfmt/map->Formatter cljfmt-and-how-to-ns-opts)
      (formatters.how-to-ns/map->Formatter cljfmt-and-how-to-ns-opts)

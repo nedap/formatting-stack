@@ -23,7 +23,7 @@
   (let [opts {:third-party-indent-specs third-party-indent-specs}]
     [(formatters.cider/map->Formatter (assoc opts :strategies default-strategies))
      (formatters.cljfmt/map->Formatter opts)
-     (formatters.how-to-ns/map->Formatter opts)
+     (formatters.how-to-ns/map->Formatter (assoc opts :strategies strategies/files-with-a-namespace))
      (formatters.no-extra-blank-lines/map->Formatter {})
      (formatters.newlines/map->Formatter opts)
      (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies

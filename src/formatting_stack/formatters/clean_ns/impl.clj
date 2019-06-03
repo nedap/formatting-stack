@@ -22,7 +22,9 @@
 
 (speced/defn safely-read-ns-contents [^string? buffer, ^clojure.lang.Namespace ns-obj]
   (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
-    (tools.reader/read-string {} (str "[ " buffer " ]"))))
+    (tools.reader/read-string {:read-cond :allow
+                               :features  #{:clj}}
+                              (str "[ " buffer " ]"))))
 
 (defn used-namespace-names
   "NOTE: this returns the set of namespace _names_ that are used, not the set of namespaces that are used.
