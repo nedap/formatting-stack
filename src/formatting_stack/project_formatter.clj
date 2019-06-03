@@ -54,14 +54,16 @@
 
 (def default-compilers [])
 
-(defn format-and-lint-project! [& {:keys [in-background?]}]
+(defn format-and-lint-project! [& {:keys [in-background?]
+                                   :or   {in-background? false}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
                                  :in-background? in-background?
                                  :intersperse-newlines? true))
 
-(defn lint-project! [& {:keys [in-background?]}]
+(defn lint-project! [& {:keys [in-background?]
+                        :or   {in-background? false}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
                                  :compilers []
