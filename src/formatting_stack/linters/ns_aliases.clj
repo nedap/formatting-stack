@@ -12,6 +12,8 @@
               (-> s
                   (string/replace "-clj" "")
                   (string/replace "clj-" "")
+                  (string/replace "-cljs" "")
+                  (string/replace "cljs-" "")
                   (string/replace "-clojure" "")
                   (string/replace "clojure-" ""))))
        (apply =)))
