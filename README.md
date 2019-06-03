@@ -18,12 +18,19 @@ As of today, it is integrated with:
   * [cljfmt](https://github.com/weavejester/cljfmt)
   * [how-to-ns](https://github.com/gfredericks/how-to-ns)
   * [eastwood](https://github.com/jonase/eastwood)
+  * [clj-kondo](https://github.com/borkdude/clj-kondo)
+    * Defaults to processing .cljs files only, given the overlap with Eastwood.
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
     * Used for "clean unused imports" functionality
   * [bikeshed](https://github.com/dakrone/lein-bikeshed)
     * Used for checking max column count
   * [all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
     * Configurable, you can ensure either 0 or 1 ending newlines per file.
+
+And it also bundles a few tiny linters of its own:
+
+  * [loc-per-ns](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/loc_per_ns.clj) warns if a given NS surpasses a targeted LOC count.
+  * [ns-aliases](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/ns_aliases.clj) warns if [Sierra's](https://stuartsierra.com/2015/05/10/clojure-namespace-aliases) aliasing guide is disregarded.
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 

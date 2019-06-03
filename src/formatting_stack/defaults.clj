@@ -8,6 +8,7 @@
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
+   [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.strategies :as strategies]))
@@ -51,6 +52,10 @@
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
                                                                          strategies/exclude-cljs
-                                                                         strategies/jvm-requirable-files)})])
+                                                                         strategies/jvm-requirable-files)})
+                      (linters.kondo/map->Linter {:strategies (conj extended-strategies
+                                                                    strategies/exclude-edn
+                                                                    strategies/exclude-clj
+                                                                    strategies/exclude-cljc)})])
 
 (def default-compilers [])

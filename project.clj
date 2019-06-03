@@ -12,6 +12,7 @@
                  [com.nedap.staffing-solutions/utils.collections "0.3.1"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
+                 [clj-kondo "2019.05.19-alpha"]
                  [jonase/eastwood "0.3.5"]
                  [lein-bikeshed "0.5.1"]
                  [medley "1.1.0"]
