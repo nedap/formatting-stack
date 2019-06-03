@@ -3,17 +3,19 @@
    [clojure.java.io :as io]
    [clojure.test :refer :all]
    [formatting-stack.formatters.cljfmt.impl :as sut]
-   [unit.formatting-stack.formatters.cljfmt.impl.sample-data :refer [foo]]))
+   [unit.formatting-stack.formatters.cljfmt.impl.sample-data :refer [foo]])
+  (:import
+   (java.io File)))
 
-(def this-file
+(def ^File this-file
   "A file that contains a 'foo refer."
   (io/file "test" "unit" "formatting_stack" "formatters" "cljfmt" "impl.clj"))
 
-(def related-file
+(def ^File related-file
   "A file that contains a 'foo def."
   (io/file "test" "unit" "formatting_stack" "formatters" "cljfmt" "impl" "sample_data.clj"))
 
-(def unrelated-file
+(def ^File unrelated-file
   "A file that contains no 'foo def or refer."
   (io/file "test" "unit" "formatting_stack" "strategies.clj"))
 
