@@ -1,4 +1,4 @@
-# formatting-stack
+# formatting-stack [![CircleCI](https://circleci.com/gh/nedap/formatting-stack.svg?style=svg&circle-token=581a4a0fa4b19f0ac5c7d90d494c9df0c34cee68)](https://circleci.com/gh/nedap/formatting-stack)
 
 **formatting-stack** is a formatting/linting solution that is typically integrated with:
 
@@ -85,7 +85,7 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
 
 ### Reloaded Workflow integration
 
-* If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters. 
+* If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters.
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack, applying all its formatters/linters.
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
@@ -99,7 +99,7 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 
 ## Advanced configuration
 
-If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern would be: 
+If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern would be:
 
 ```clojure
 (formatting-stack.component/map->Formatter {:formatters (conj formatting-stack.defaults/default-formatters
@@ -110,14 +110,14 @@ You can also pass `[]` for disabling a particular aspect:
 
 ```clojure
 ;; The default :formatters will be used, the default :linters will be omitted:
-(formatting-stack.component/map->Formatter {:linters []}) 
+(formatting-stack.component/map->Formatter {:linters []})
 ```
 
 There's no facility for finer-grained manipulations, e.g. removing only certain formatters, or adding a formatter at a certain position rather than at the end.
 
 That's by design, to avoid intrincate DSLs or data structures.
 If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
-That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.  
+That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.
 
 ## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 
