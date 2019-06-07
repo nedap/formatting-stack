@@ -1,4 +1,4 @@
-(defproject formatting-stack "0.18.3"
+(defproject formatting-stack "0.18.4"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
   :url "https://github.com/nedap/formatting-stack"
   :license {:name "Eclipse Public License"
@@ -23,7 +23,7 @@
   :profiles {:dev  {:source-paths   ["dev"]
                     :resource-paths ["test-resources"]
                     :plugins        [[lein-cloverage "1.0.13"]]}
-             :ci   {:plugins        [[cider/cider-nrepl "0.21.1"]]}
+             :ci   {:plugins [[cider/cider-nrepl "0.21.1"]]}
              ;; `dev` in :test is important - a test depends on it:
              :test {:source-paths   ["dev"]
                     :resource-paths ["test-resources"]}})
