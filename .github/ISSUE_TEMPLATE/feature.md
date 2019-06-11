@@ -19,4 +19,4 @@ assignees: ''
 
 ## Additional resources
 
-<!-- Screenshots, links, etc -->
+<!-- Design documents, links, etc -->

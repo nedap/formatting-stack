@@ -17,11 +17,13 @@ assignees: ''
 
 ## Reproduction steps
 
+## Suspected cause
+
 ## Screenshot, stacktrace, etc
 
 ## Environment info
 
-<!-- Browser, etc -->
+<!-- Browser, lib/app versions, etc -->
 
 ## Additional links
 
