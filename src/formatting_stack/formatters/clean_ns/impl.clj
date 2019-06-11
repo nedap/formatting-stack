@@ -10,15 +10,18 @@
    [formatting-stack.util :refer [rcomp try-require]]
    [nedap.utils.speced :as speced]
    [refactor-nrepl.config]
-   [refactor-nrepl.ns.clean-ns :refer [clean-ns]]))
+   [refactor-nrepl.ns.clean-ns :refer [clean-ns]])
+  (:import
+   (java.io File)))
 
-(defn ns-form-of [filename]
-  (try
-    (-> filename slurp push-back-reader parse/read-ns-decl)
-    (catch Exception e
-      (if (-> e ex-data :type #{:reader-exception})
-        nil
-        (throw e)))))
+(speced/defn ns-form-of [^string? filename]
+  (when-not (-> filename File. .isDirectory)
+    (try
+      (-> filename slurp push-back-reader parse/read-ns-decl)
+      (catch Exception e
+        (if (-> e ex-data :type #{:reader-exception})
+          nil
+          (throw e))))))
 
 (speced/defn safely-read-ns-contents [^string? buffer, ^clojure.lang.Namespace ns-obj]
   (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
@@ -88,7 +91,9 @@
           (let [v (-> c
                       (pr-str)
                       (how-to-ns/format-ns-str how-to-ns-opts))]
-            (when-not (= v (how-to-ns/format-ns-str (str original-ns-form) how-to-ns-opts))
+            (when-not (= v
+                         (how-to-ns/format-ns-str (str original-ns-form)
+                                                  how-to-ns-opts))
               v)))))))
 
 (defn has-duplicate-requires? [filename]
