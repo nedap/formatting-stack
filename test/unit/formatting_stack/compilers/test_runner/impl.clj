@@ -31,11 +31,16 @@
     (is (= '("unit.com.example.thing"
              "test.com.example.thing"
 
-             "com.example.thing.unit"
-             "com.example.thing.test"
-
+             ;; note that this example doesn't make much sense but it is unavoidable:
+             ;; `unit` could be anywhere in the middle of the ns
              "com.unit.example.thing"
-             "com.test.example.thing")
+             "com.test.example.thing"
+
+             "com.example.unit.thing"
+             "com.example.test.thing"
+
+             "com.example.thing.unit"
+             "com.example.thing.test")
            (sut/permutations (make-ns :com.example/thing) #{"test" "unit"}))))
 
   (testing "Single-segment ns"

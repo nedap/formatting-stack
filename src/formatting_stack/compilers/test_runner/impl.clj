@@ -31,22 +31,23 @@
          (concat first-segments)
          (string/join "."))))
 
+(speced/defn insert-at [^int? i, ^string? s, ^vector? v]
+  (reduce into [(subvec v 0 i)
+                [s]
+                (subvec v i)]))
+
 (speced/defn permutations [^Namespace n, categorizations]
   (let [s (str n)
-        [first-ns-fragment & other-ns-fragments] (string/split s #"\.")
-        prefixed (->> categorizations
-                      (map (fn [c]
-                             (str c "." s))))
-        suffixed (->> categorizations
-                      (map (fn [c]
-                             (str s "." c))))
-        in-second-position (when other-ns-fragments
-                             (->> categorizations
-                                  (map (fn [c]
-                                         (->> other-ns-fragments
-                                              (apply list first-ns-fragment c)
-                                              (string/join "."))))))]
-    (concat prefixed suffixed in-second-position)))
+        ns-fragments (string/split s #"\.")
+        index-count (-> ns-fragments count inc)
+        indices (->> (range) (take index-count))]
+    (->> (for [i indices]
+           (->> categorizations
+                (map (fn [c]
+                       (->> ns-fragments
+                            (insert-at i c)
+                            (string/join "."))))))
+         (apply concat))))
 
 (speced/defn ^::namespaces possible-derived-testing-namespaces [^Namespace n]
   (let [s (str n)
@@ -60,7 +61,7 @@
          (keep find-ns))))
 
 (speced/defn ^::namespaces sut-consumers
-  "Returns the set namespaces which require `n` under the `sut` alias (or similar)."
+  "Returns the set of namespaces which require `n` under the `sut` alias (or similar)."
   [^::namespaces corpus, ^Namespace n]
   (->> corpus
        (partitioning-pmap (speced/fn [^Namespace project-namespace]
