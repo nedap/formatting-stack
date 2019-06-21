@@ -31,25 +31,31 @@
          (concat first-segments)
          (string/join "."))))
 
+(speced/defn permutations [^Namespace n, categorizations]
+  (let [s (str n)
+        [first-ns-fragment & other-ns-fragments] (string/split s #"\.")
+        prefixed (->> categorizations
+                      (map (fn [c]
+                             (str c "." s))))
+        suffixed (->> categorizations
+                      (map (fn [c]
+                             (str s "." c))))
+        in-second-position (when other-ns-fragments
+                             (->> categorizations
+                                  (map (fn [c]
+                                         (->> other-ns-fragments
+                                              (apply list first-ns-fragment c)
+                                              (string/join "."))))))]
+    (concat prefixed suffixed in-second-position)))
+
 (speced/defn ^::namespaces possible-derived-testing-namespaces [^Namespace n]
   (let [s (str n)
+        categorizations #{"test" "unit" "integration" "acceptance" "functional"}
         derivations [(str s "-test")
                      (str s "-spec")
-
-                     (str "test." s)
-                     (str "unit." s)
-                     (str "integration." s)
-                     (str "acceptance." s)
-                     (str "functional." s)
-
-                     (str s ".test")
-                     (str s ".unit")
-                     (str s ".integration")
-                     (str s ".acceptance")
-                     (str s ".functional")
-
                      (add-t n)]]
     (->> derivations
+         (into (permutations n categorizations))
          (map symbol)
          (keep find-ns))))
 

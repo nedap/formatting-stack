@@ -26,6 +26,26 @@
                              (sut/sut-consumers corpus input))
       (the-ns 'formatting-stack.strategies) [(the-ns 'unit.formatting-stack.strategies)])))
 
+(deftest permutations
+  (testing "Multi-segment ns"
+    (is (= '("unit.com.example.thing"
+             "test.com.example.thing"
+
+             "com.example.thing.unit"
+             "com.example.thing.test"
+
+             "com.unit.example.thing"
+             "com.test.example.thing")
+           (sut/permutations (make-ns :com.example/thing) #{"test" "unit"}))))
+
+  (testing "Single-segment ns"
+    (is (= '("unit.thing"
+             "test.thing"
+
+             "thing.unit"
+             "thing.test")
+           (sut/permutations (make-ns :thing) #{"test" "unit"})))))
+
 (deftest testable-namespaces
   (are [input expected] (= expected
                            (sut/testable-namespaces input))
