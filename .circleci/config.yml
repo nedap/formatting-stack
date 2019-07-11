@@ -68,6 +68,10 @@ jobs:
       - run:
           name: release to JFrog
           command: lein deploy
+          
+      - run:
+          name: release to Clojars
+          command: lein deploy clojars
 
 workflows:
   version: 2
