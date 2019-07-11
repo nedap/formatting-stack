@@ -4,10 +4,10 @@
    [clojure.string :as str]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
-   [clojure.tools.reader]
-   [clojure.tools.reader.reader-types :refer [push-back-reader]]
-   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]])
+   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]]
+   [nedap.utils.speced :as speced])
   (:import
+   (clojure.lang Namespace)
    (java.io File)))
 
 ;; modified, added, renamed
@@ -26,13 +26,16 @@
     (the-ns ns-name)
     (catch Exception _)))
 
+(speced/defn ^::speced/nilable ^Namespace filename->ns [^string? filename]
+  (some-> filename ns-form-of parse/name-from-ns-decl safe-the-ns))
+
 (defn readable?
   "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
   [^String filename]
   (if-not (-> filename File. .exists)
     true ;; undecidable
     (try
-      (let [ns-obj (some-> filename ns-form-of parse/name-from-ns-decl safe-the-ns)]
+      (let [ns-obj (filename->ns filename)]
         (and (do
                (if-not ns-obj
                  true

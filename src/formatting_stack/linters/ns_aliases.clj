@@ -46,14 +46,15 @@
          (boolean))))
 
 (def default-acceptable-aliases-whitelist
-  '{d    [datomic.api]
-    impl [::anything]
-    log  [::anything]
-    s    [clojure.spec.alpha cljs.spec.alpha]
-    spec [clojure.spec.alpha cljs.spec.alpha]
-    str  [clojure.string]
-    sut  [::anything]
-    t    [clojure.test cljs.test]})
+  '{d        [datomic.api]
+    impl     [::anything]
+    log      [::anything]
+    s        [clojure.spec.alpha cljs.spec.alpha]
+    spec     [clojure.spec.alpha cljs.spec.alpha]
+    str      [clojure.string]
+    sut      [::anything]
+    sut.impl [::anything]
+    t        [clojure.test cljs.test]})
 
 (defn acceptable-require-clause? [whitelist require-clause]
   (if-not (vector? require-clause)
