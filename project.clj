@@ -1,4 +1,4 @@
-(defproject formatting-stack "0.19.1"
+(defproject formatting-stack "0.19.2"
   :description "An efficient, smart, graceful composition of formatters, linters and such."
 
   :url "https://github.com/nedap/formatting-stack"
