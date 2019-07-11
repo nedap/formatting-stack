@@ -6,10 +6,10 @@
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
                              :username :env/artifactory_user
                              :password :env/artifactory_pass}}
-  :dependencies [[cljfmt "0.6.4"]
+  :dependencies [[cljfmt "0.6.4" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
-                 [com.nedap.staffing-solutions/utils.spec "0.8.2"]
+                 [com.nedap.staffing-solutions/utils.spec "0.9.0"]
                  [com.nedap.staffing-solutions/utils.collections "0.3.1"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
@@ -19,12 +19,19 @@
                  [medley "1.1.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
-                 [org.clojure/tools.reader "1.1.1"]
-                 [refactor-nrepl "2.4.0"]]
-  :profiles {:dev  {:source-paths   ["dev"]
-                    :resource-paths ["test-resources"]
-                    :plugins        [[lein-cloverage "1.0.13"]]}
-             :ci   {:plugins [[cider/cider-nrepl "0.21.1"]]}
+                 [org.clojure/tools.reader "1.2.2"]
+                 [refactor-nrepl "2.4.0"]
+                 [rewrite-clj "0.6.1"]]
+  :profiles {:dev      {:source-paths   ["dev"]
+                        :resource-paths ["test-resources"]
+                        :plugins        [[lein-cloverage "1.0.13"]]}
+             ;; dedicated `:pedantic` profile since the `lein-cloverage` plugin would introduce faults,
+             ;; and plugins don't accept :exclusions
+             :pedantic {:pedantic? :abort}
+             :ci       {:plugins      [[cider/cider-nrepl "0.21.1"]]
+                        :jvm-opts     ["-Dclojure.main.report=stderr"]
+                        :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.1.0-alpha6"]]}
              ;; `dev` in :test is important - a test depends on it:
-             :test {:source-paths   ["dev"]
-                    :resource-paths ["test-resources"]}})
+             :test     {:source-paths   ["dev"]
+                        :resource-paths ["test-resources"]}})

@@ -70,10 +70,15 @@ The general intent is to make formatting:
 
 ## Installation
 
-* Install the latest version as per [Clojars](https://clojars.org/formatting-stack).
-* **Also** you have to add the latest [cider-nrepl](https://clojars.org/cider/cider-nrepl).
-  * It's a transitive, non-automatically-fetched dependency of refactor-nrepl.
-  * Sadly we cannot just add it to our project.clj, since it would affect users of lower cider-nrepl versions.
+#### Coordinates
+
+```clojure
+[formatting-stack "0.19.0-alpha2"]
+```
+
+**Also** you have to add the latest [cider-nrepl](https://clojars.org/cider/cider-nrepl).
+* It's a transitive, non-automatically-fetched dependency of refactor-nrepl.
+* Sadly we cannot just add it to our project.clj, since it would affect users of lower cider-nrepl versions.
 
 ### Component/Integrant integration
 

@@ -31,7 +31,7 @@ jobs:
         # fallback to using the latest cache if no exact match is found
         - v1-dependencies-
 
-    - run: lein with-profile +ci deps
+    - run: lein with-profile -dev,+ci,+pedantic deps
 
     - save_cache:
         paths:
@@ -40,13 +40,34 @@ jobs:
 
     - run:
         name: 'Run JVM tests, reporting coverage'
-        command: lein with-profile +ci trampoline cloverage --lcov --junit -o coverage/
+        command: lein with-profile -dev,+ci trampoline cloverage --lcov --junit -o coverage/
 
     - store_test_results:
         path: ~/repo/coverage
 
     - store_artifacts:
         path: ~/repo/coverage
+
+  jfrog:
+    docker:
+      - image: circleci/clojure:lein-2.8.1-node
+
+    working_directory: ~/repo
+
+    steps:
+      - run:
+          name: import GPG key
+          command: echo -e "$GPG_KEY_V2" | gpg --import
+          
+      - checkout
+
+      - run:
+          name: Perform pre-release sanity check
+          command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
+          
+      - run:
+          name: release to JFrog
+          command: lein deploy
 
 workflows:
   version: 2
@@ -57,3 +78,14 @@ workflows:
           filters:
             branches:
               only: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/              
+      - jfrog:
+          context: JFrog
+          requires: 
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
