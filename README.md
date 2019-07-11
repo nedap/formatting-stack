@@ -73,7 +73,7 @@ The general intent is to make formatting:
 #### Coordinates
 
 ```clojure
-[formatting-stack "0.19.2"]
+[formatting-stack "0.19.3"]
 ```
 
 **Also** you have to add the latest [cider-nrepl](https://clojars.org/cider/cider-nrepl).
