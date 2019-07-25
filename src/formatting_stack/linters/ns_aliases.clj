@@ -51,6 +51,7 @@
     log      [::anything]
     s        [clojure.spec.alpha cljs.spec.alpha]
     spec     [clojure.spec.alpha cljs.spec.alpha]
+    speced   [nedap.speced.def]
     str      [clojure.string]
     sut      [::anything]
     sut.impl [::anything]
