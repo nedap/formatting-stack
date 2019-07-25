@@ -8,7 +8,7 @@
    [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.util]
    [formatting-stack.util :refer [rcomp try-require]]
-   [nedap.utils.speced :as speced]
+   [nedap.speced.def :as speced]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]])
   (:import
