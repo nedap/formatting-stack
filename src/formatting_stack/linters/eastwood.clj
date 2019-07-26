@@ -17,7 +17,7 @@
 (def default-warnings-to-silence
   [#"== Eastwood"
    #"^dbg "
-   #"Warning: protocol .* is overwriting function" ;; False positive with nedap.utils.speced
+   #"Warning: protocol .* is overwriting function" ;; False positive with nedap.speced.def
    #"Directories scanned"
    #"Entering directory"
    #".*wrong-pre-post.*\*.*\*" ;; False positives for dynamic vars https://git.io/fhQTx

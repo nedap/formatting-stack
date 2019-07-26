@@ -6,7 +6,7 @@
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
-   [nedap.utils.speced :as speced])
+   [nedap.speced.def :as speced])
   (:import
    (java.io File)))
 

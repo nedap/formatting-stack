@@ -5,7 +5,7 @@
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]]
-   [nedap.utils.speced :as speced])
+   [nedap.speced.def :as speced])
   (:import
    (clojure.lang Namespace)
    (java.io File)))

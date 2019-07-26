@@ -4,7 +4,7 @@
    [clojure.test :refer :all]
    [formatting-stack.compilers.test-runner.impl :as sut]
    [formatting-stack.project-parsing :refer [project-namespaces]]
-   [nedap.utils.speced :as speced]))
+   [nedap.speced.def :as speced]))
 
 (speced/defn make-ns [^keyword? k]
   (-> k

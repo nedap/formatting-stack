@@ -5,7 +5,7 @@
    [formatting-stack.project-parsing :refer [project-namespaces]]
    [formatting-stack.strategies.impl :refer [filename->ns]]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
-   [nedap.utils.speced :as speced])
+   [nedap.speced.def :as speced])
   (:import
    (clojure.lang Namespace)))
 
