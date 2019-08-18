@@ -1,13 +1,10 @@
 (ns formatting-stack.formatters.clean-ns.impl
   (:require
-   [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader :as tools.reader]
    [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.walk :as walk]
-   [com.gfredericks.how-to-ns :as how-to-ns]
-   [formatting-stack.util]
-   [formatting-stack.util :refer [rcomp try-require]]
+   [formatting-stack.util :refer [ensure-coll rcomp try-require]]
    [nedap.speced.def :as speced]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]])
@@ -86,25 +83,14 @@
   (let [whitelist (into libspec-whitelist (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))]
     (binding [refactor-nrepl.config/*config* (-> refactor-nrepl-opts
                                                  (update :libspec-whitelist into whitelist))]
-      (when-let [c (clean-ns {:path filename})]
-        (when-not (= c original-ns-form)
-          (let [v (-> c
-                      (pr-str)
-                      (how-to-ns/format-ns-str how-to-ns-opts))]
-            (when-not (= v
-                         (how-to-ns/format-ns-str (str original-ns-form)
-                                                  how-to-ns-opts))
-              v)))))))
+      (clean-ns {:path filename}))))
 
 (defn has-duplicate-requires? [filename]
   (->> filename
        ns-form-of
        formatting-stack.util/require-from-ns-decl
        rest
-       (map (fn [x]
-              (if (coll? x)
-                x
-                [x])))
+       (map ensure-coll)
        (group-by first)
        (vals)
        (some (rcomp count (complement #{1})))))

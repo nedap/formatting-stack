@@ -110,3 +110,8 @@
            (try
              (alias alias# namespace#)
              (catch Exception _#)))))))
+
+(defn ensure-coll [x]
+  (if (coll? x)
+    x
+    [x]))
