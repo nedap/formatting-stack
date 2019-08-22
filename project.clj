@@ -33,16 +33,13 @@
                  [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
 
-  :profiles {:dev      {:source-paths   ["dev"]
-                        :resource-paths ["test-resources"]
-                        :plugins        [[lein-cloverage "1.0.13"]]}
-             ;; dedicated `:pedantic` profile since the `lein-cloverage` plugin would introduce faults,
-             ;; and plugins don't accept :exclusions
-             :pedantic {:pedantic? :abort}
-             :ci       {:plugins      [[cider/cider-nrepl "0.21.1"]]
-                        :jvm-opts     ["-Dclojure.main.report=stderr"]
-                        :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha3"]]}
+  :profiles {:dev  {:source-paths   ["dev" "test"]
+                    :resource-paths ["test-resources"]}
+             :ci   {:plugins      [[cider/cider-nrepl "0.21.1"]]
+                    :pedantic?    :abort
+                    :jvm-opts     ["-Dclojure.main.report=stderr"]
+                    :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                    :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha3"]]}
              ;; `dev` in :test is important - a test depends on it:
-             :test     {:source-paths   ["dev"]
-                        :resource-paths ["test-resources"]}})
+             :test {:source-paths   ["dev"]
+                    :resource-paths ["test-resources"]}})

@@ -31,7 +31,7 @@ jobs:
         # fallback to using the latest cache if no exact match is found
         - v1-dependencies-
 
-    - run: lein with-profile -dev,+ci,+pedantic deps
+    - run: lein with-profile -dev,+ci deps
 
     - save_cache:
         paths:
@@ -39,14 +39,8 @@ jobs:
         key: v1-dependencies-{{ checksum "project.clj" }}
 
     - run:
-        name: 'Run JVM tests, reporting coverage'
-        command: lein with-profile -dev,+ci trampoline cloverage --lcov --junit -o coverage/
-
-    - store_test_results:
-        path: ~/repo/coverage
-
-    - store_artifacts:
-        path: ~/repo/coverage
+        name: 'Run JVM tests'
+        command: lein with-profile -dev,+ci test
 
   jfrog:
     docker:
