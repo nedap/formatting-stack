@@ -1,10 +1,23 @@
 (ns formatting-stack.util.ns
   (:require
+   [clojure.spec.alpha :as spec]
+   [clojure.string :as string]
+   [clojure.tools.reader :as tools.reader]
    [com.gfredericks.how-to-ns :as how-to-ns]
-   [nedap.speced.def :as speced]))
+   [formatting-stack.util :refer [rcomp]]
+   [nedap.speced.def :as speced]
+   [nedap.utils.spec.api :refer [check!]]))
+
+(spec/def ::ns-form (spec/and sequential?
+                              (rcomp first #{'ns `ns})))
+
+(spec/def ::ns-form-str (spec/and string?
+                                  (complement string/blank?)))
+
+(spec/def ::clean-ns-form (spec/nilable string?))
 
 (speced/defn formatted= [^string? original-ns-form
-                         ^::speced/nilable ^string? clean-ns-form
+                         ^::clean-ns-form clean-ns-form
                          ^map? how-to-ns-opts]
   (if-not clean-ns-form
     true
@@ -13,12 +26,21 @@
                 (how-to-ns/format-ns-str form how-to-ns-opts)))
          (apply =))))
 
+(speced/defn safely-read-ns-form [^::ns-form-str ns-form-str]
+  (-> (tools.reader/read-string {:read-cond :preserve
+                                 :features  #{:clj :cljs}}
+                                (str "[ " ns-form-str " ]"))
+      first))
+
 (speced/defn replaceable-ns-form
   [^string? filename, ^ifn? ns-cleaner, ^map? how-to-ns-opts]
   (let [buffer (slurp filename)
         original-ns-form-str (-> buffer how-to-ns/slurp-ns-from-string)
-        original-ns-form (-> original-ns-form-str read-string)
+        original-ns-form (-> original-ns-form-str safely-read-ns-form)
         clean-ns-form (ns-cleaner original-ns-form)]
+    (check! ::ns-form-str   original-ns-form-str
+            ::ns-form       original-ns-form
+            ::clean-ns-form clean-ns-form)
     (cond
       (not clean-ns-form)
       nil

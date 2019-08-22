@@ -8,7 +8,7 @@
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
    [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp try-require]]
-   [formatting-stack.util.ns :refer [replace-ns-form!]]
+   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]))
 
@@ -25,9 +25,7 @@
         (distinct optionful)
         [(first optionless)]))))
 
-(speced/defn remove-exact-duplicates [^{::speced/spec (spec/and sequential?
-                                                                (rcomp first #{'ns `ns}))}
-                                      ns-form]
+(speced/defn remove-exact-duplicates [^::util.ns/ns-form ns-form]
   (let [replacement (->> ns-form
                          (walk/postwalk (fn [x]
                                           (if-not (and (sequential? x)

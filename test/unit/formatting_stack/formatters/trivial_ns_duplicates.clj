@@ -1,7 +1,8 @@
 (ns unit.formatting-stack.formatters.trivial-ns-duplicates
   (:require
    [clojure.test :refer :all]
-   [formatting-stack.formatters.trivial-ns-duplicates :as sut]))
+   [formatting-stack.formatters.trivial-ns-duplicates :as sut]
+   [formatting-stack.util.ns :as util.ns]))
 
 (deftest maybe-remove-optionless-libspecs
   (are [input expected] (= expected
@@ -12,9 +13,8 @@
     '[[a :as foo] [a :refer [bar]]] '[[a :as foo] [a :refer [bar]]]))
 
 (deftest remove-exact-duplicates
-  (are [desc input expected] (testing desc
-                               (= expected
-                                  (sut/remove-exact-duplicates input)))
+  (are [desc input expected] (= expected
+                                (sut/remove-exact-duplicates input))
 
     "returns nil when there's nothing to fix"
     '(ns foo)                                              nil
@@ -42,3 +42,23 @@
 
     "Does not remove non-exact duplicates, returning nil instead (mixed `:as` and `:refer` clause)"
     '(ns foo (:require [a :as foo] [a :refer [bar]]))      nil))
+
+(deftest cljc-handling
+  (are [desc input expected] (= expected
+                                (sut/remove-exact-duplicates input))
+
+    "Returns nil when there's nothing to fix"
+    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+    nil
+
+    "Ensures all libspecs are colls"
+    (util.ns/safely-read-ns-form "(ns foo (:require #?(:clj foo :cljs bar)))")
+    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+
+    "Removes identical duplicates"
+    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)] [#?(:clj foo :cljs bar)]))")
+    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+
+    "Removes non-identical trivial duplicates"
+    (util.ns/safely-read-ns-form "(ns foo (:require #?(:clj foo :cljs bar) [#?(:clj foo :cljs bar)]))")
+    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")))
