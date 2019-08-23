@@ -44,21 +44,28 @@
     '(ns foo (:require [a :as foo] [a :refer [bar]]))      nil))
 
 (deftest cljc-handling
-  (are [desc input expected] (= expected
-                                (sut/remove-exact-duplicates input))
+  (are [input expected] (= (some-> expected util.ns/safely-read-ns-form)
+                           (-> input
+                               util.ns/safely-read-ns-form
+                               sut/remove-exact-duplicates))
 
-    "Returns nil when there's nothing to fix"
-    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+    "(ns foo (:require [#?(:clj foo :cljs bar)]))"
     nil
 
-    "Ensures all libspecs are colls"
-    (util.ns/safely-read-ns-form "(ns foo (:require #?(:clj foo :cljs bar)))")
-    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+    "(ns foo (:require #?(:clj foo :cljs bar)))"
+    nil
 
-    "Removes identical duplicates"
-    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)] [#?(:clj foo :cljs bar)]))")
-    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")
+    "(ns foo (:require #?(:clj foo :cljs bar) :baz))"
+    "(ns foo (:require [:baz] #?(:clj foo :cljs bar)))"
 
-    "Removes non-identical trivial duplicates"
-    (util.ns/safely-read-ns-form "(ns foo (:require #?(:clj foo :cljs bar) [#?(:clj foo :cljs bar)]))")
-    (util.ns/safely-read-ns-form "(ns foo (:require [#?(:clj foo :cljs bar)]))")))
+    "(ns foo (:require #?(:clj [foo] :cljs [bar])))"
+    nil
+
+    "(ns foo (:require [#?(:clj foo :cljs bar)] [#?(:clj foo :cljs bar)]))"
+    "(ns foo (:require [#?(:clj foo :cljs bar)]))"
+
+    "(ns foo (:require #?(:clj foo :cljs bar) #?(:clj foo :cljs bar)))"
+    "(ns foo (:require #?(:clj foo :cljs bar)))"
+
+    "(ns foo (:require #?(:clj foo :cljs bar) [#?(:clj foo :cljs bar)]))"
+    nil))

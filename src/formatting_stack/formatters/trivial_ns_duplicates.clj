@@ -25,22 +25,39 @@
         (distinct optionful)
         [(first optionless)]))))
 
+(speced/defn ^boolean? is-or-has-reader-conditional? [x]
+  (or (reader-conditional? x)
+      (and (coll? x)
+           (let [result (atom false)]
+             (->> x
+                  (walk/postwalk (fn [item]
+                                   (when (reader-conditional? item)
+                                     (reset! result true))
+                                   item)))
+             @result))))
+
 (speced/defn remove-exact-duplicates [^::util.ns/ns-form ns-form]
   (let [replacement (->> ns-form
                          (walk/postwalk (fn [x]
                                           (if-not (and (sequential? x)
                                                        (#{:require :require-macros :import} (first x)))
                                             x
-                                            (apply list
-                                                   (first x)
-                                                   (->> x
-                                                        rest
-                                                        (map ensure-coll)
-                                                        (group-by first)
-                                                        (mapcat (fn [[_ libspecs]]
-                                                                  (->> libspecs
-                                                                       distinct
-                                                                       maybe-remove-optionless-libspecs)))))))))]
+                                            (let [{reader-conditionals true
+                                                   normal-forms        false} (->> x
+                                                                                   rest
+                                                                                   (group-by is-or-has-reader-conditional?))
+                                                  reader-conditionals (->> reader-conditionals
+                                                                           (distinct)
+                                                                           (sort-by coll?))
+                                                  normal-forms (->> normal-forms
+                                                                    (map ensure-coll)
+                                                                    (group-by first)
+                                                                    (mapcat (fn [[_ libspecs]]
+                                                                              (->> libspecs
+                                                                                   distinct
+                                                                                   maybe-remove-optionless-libspecs))))
+                                                  all-forms (concat normal-forms reader-conditionals)]
+                                              (apply list (first x) all-forms))))))]
     (when-not (= replacement ns-form)
       replacement)))
 
