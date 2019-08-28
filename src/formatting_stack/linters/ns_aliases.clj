@@ -46,7 +46,7 @@
          (boolean))))
 
 (def default-acceptable-aliases-whitelist
-  '{d        [datomic.api]
+  '{d        [datomic.api datomic.client.api]
     impl     [::anything]
     log      [::anything]
     s        [clojure.spec.alpha cljs.spec.alpha]
