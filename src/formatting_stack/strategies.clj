@@ -122,15 +122,15 @@
   "This stragegy excludes the files that are Clojure/Script namespaces
   but are placed outside `#'clojure.tools.namespace.repl/refresh-dirs`.
 
-  This variable must be set beforehand, and all its values must correspond to existing folders (relative to the project root.).
+  This variable must be set beforehand, and all its values must correspond to existing folders (relative to the project root).
 
   Files such as project.clj, or .edn files, etc are not excluded, since they aren't namespaces.
 
-  The rationale for this strategy is allowing you to create clj namepace directories that are excluded from `refresh-dirs`.
-  e.g. protocol definitions, and avoiding that code-evaluating tools
-  such as refactor-nrepl or Eastwood also respect that exclusion.
+  The rationale for this strategy is allowing you to create clj namespace directories that are excluded from `refresh-dirs`.
+  e.g. protocol definitions,
+  and then ensuring that code-evaluating tools such as refactor-nrepl or Eastwood also respect that exclusion.
 
-  That can avoid some code-reloaded issues related to duplicate `defprotocol` definitions, etc."
+  That can avoid some code-reloading issues related to duplicate `defprotocol` definitions, etc."
   [& {:keys [files]}]
   {:pre [(check! seq                                                 refresh-dirs
                  (partial every? (speced/fn [^string? refresh-dir]
