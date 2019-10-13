@@ -3,7 +3,7 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
-   [formatting-stack.util :refer [process-in-parallel! try-require without-aliases]]
+   [formatting-stack.util :refer [process-in-parallel! try-require]]
    [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -11,14 +11,13 @@
 
 (defn make-cleaner [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (speced/fn ^{::speced/spec (complement #{"nil"})} [original-ns-form]
-    (without-aliases
-      (some-> (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
-                                   :refactor-nrepl-opts                  refactor-nrepl-opts
-                                   :filename                             filename
-                                   :original-ns-form                     original-ns-form
-                                   :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
-                                   :libspec-whitelist                    libspec-whitelist})
-              pr-str))))
+    (some-> (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
+                                 :refactor-nrepl-opts                  refactor-nrepl-opts
+                                 :filename                             filename
+                                 :original-ns-form                     original-ns-form
+                                 :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
+                                 :libspec-whitelist                    libspec-whitelist})
+            pr-str)))
 
 (defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (replace-ns-form! filename

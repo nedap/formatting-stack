@@ -4,7 +4,7 @@
    [eastwood.lint]
    [eastwood.util]
    [formatting-stack.protocols.linter]
-   [formatting-stack.util :refer [ns-name-from-filename without-aliases]]
+   [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [deep-merge]]))
 
 (def default-eastwood-options
@@ -36,9 +36,8 @@
           warnings-to-silence (or warnings-to-silence default-warnings-to-silence)
           result (->> (with-out-str
                         (binding [*warn-on-reflection* true]
-                          (without-aliases
-                            (eastwood.lint/eastwood (-> options
-                                                        (assoc :namespaces namespaces))))))
+                          (eastwood.lint/eastwood (-> options
+                                                      (assoc :namespaces namespaces)))))
                       (str/split-lines)
                       (remove (fn [line]
                                 (or (str/blank? line)
