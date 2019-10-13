@@ -37,6 +37,7 @@
                                                                            strategies/exclude-cljc
                                                                            strategies/exclude-cljs
                                                                            strategies/exclude-edn
+                                                                           strategies/namespaces-within-refresh-dirs-only
                                                                            strategies/do-not-use-cached-results!))))]))
 
 (def default-linters [(linters.ns-aliases/map->Linter {:strategies (conj default-strategies
@@ -51,7 +52,8 @@
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                                          strategies/exclude-cljs
-                                                                         strategies/jvm-requirable-files)})
+                                                                         strategies/jvm-requirable-files
+                                                                         strategies/namespaces-within-refresh-dirs-only)})
                       (linters.kondo/map->Linter {:strategies (conj default-strategies
                                                                     strategies/exclude-edn
                                                                     strategies/exclude-clj

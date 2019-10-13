@@ -2,6 +2,7 @@
   (:require
    [clojure.java.shell :refer [sh]]
    [clojure.string :as str]
+   [clojure.test :refer [is]]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]]
@@ -56,3 +57,18 @@
                                        (-> f File. .exists)))
     true                     (remove #(str/ends-with? % "project.clj"))
     true                     (filter readable?)))
+
+(speced/defn ^boolean? dir-contains?
+  {:test (fn []
+           (is (dir-contains? "." (-> "src/formatting_stack/strategies/impl.clj" File.)))
+           (is (dir-contains? (-> "." File. .getAbsolutePath) (File. "project.clj")))
+           (is (dir-contains? "." (File. "project.clj")))
+           (is (dir-contains? "." (File. "dev/user.clj")))
+           (is (dir-contains? "dev" (File. "dev/user.clj")))
+           (is (not (dir-contains? "dev" (File. "user.clj")))))}
+  [^string? dirname, ^File filename]
+  (->> (file-seq (File. dirname))
+       (map (speced/fn [^File f]
+              (-> f .getCanonicalPath)))
+       (some #{(-> filename .getCanonicalPath)})
+       (boolean)))
