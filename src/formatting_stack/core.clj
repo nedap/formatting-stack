@@ -43,15 +43,16 @@
         files (memoize (fn [strategies]
                          (files-from-strategies strategies)))]
     (with-serialized-output
-      (doseq [member members]
-        (let [{specific-strategies :strategies} member
-              strategies (or specific-strategies category-strategies default-strategies)]
-          (try
-            (->> strategies files (method member))
-            (catch Exception e
-              (println "Encountered an exception, which will be printed in the next line."
-                       "formatting-stack execution has *not* been aborted.")
-              (-> e .printStackTrace))))))))
+      (map (fn [member]
+            (let [{specific-strategies :strategies} member
+                  strategies (or specific-strategies category-strategies default-strategies)]
+              (try
+                (->> strategies files (method member))
+                (catch Exception e
+                  (println "Encountered an exception, which will be printed in the next line."
+                           "formatting-stack execution has *not* been aborted.")
+                  (-> e .printStackTrace)))))
+           members))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs

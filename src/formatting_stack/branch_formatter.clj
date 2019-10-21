@@ -1,6 +1,7 @@
 (ns formatting-stack.branch-formatter
   "A set of defaults apt for formatting a git branch (namely, the files that a branch has modified, respective to another)."
   (:require
+   [clojure.string :as str]
    [formatting-stack.core]
    [formatting-stack.formatters.cider :as formatters.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
@@ -16,7 +17,9 @@
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.strategies :as strategies]
-   [medley.core :refer [mapply]]))
+   [medley.core :refer [mapply]]
+   [nedap.speced.def :as speced])
+  (:gen-class))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
 
@@ -81,3 +84,44 @@
                                    :compilers []
                                    :linters linters
                                    :in-background? in-background?)))
+
+(speced/defn -main [command & _args]
+  (assert (#{"pristine?"} command)
+          (str "Command not recognised.\n\n"
+               "Available commands: pristine?.\n\n"
+               "You can refer to the documentation in: https://github.com/nedap/formatting-stack"))
+
+  (let [default-strategies [(fn [& {:as options}]
+                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch "master")))]
+        opts               {:third-party-indent-specs third-party-indent-specs}
+        linters            [(formatters.cljfmt/map->Formatter opts)
+                            (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
+                                                                                              strategies/files-with-a-namespace
+                                                                                              strategies/exclude-cljc
+                                                                                              strategies/exclude-cljs
+                                                                                              strategies/exclude-edn
+                                                                                              strategies/do-not-use-cached-results!)))]
+        results            (formatting-stack.core/process! formatting-stack.protocols.linter/lint!
+                                                           linters
+                                                           nil
+                                                           default-strategies
+                                                           false)
+
+        print-results (fn [results] (->> (zipmap (map type linters) results)
+                                         (reduce-kv (fn reduce-linters [memo linter filenames]
+                                                      (reduce (fn reduce-files [memo filename]
+                                                                  (update memo filename (fnil conj []) linter))
+                                                        memo
+                                                        filenames))
+                                                    {})
+                                         (run! (fn print-violations [[filename linters]]
+                                                 (println (str "📄" "\033[1m ./" filename "\033[0m\n"
+                                                               (->> linters
+                                                                    (map #(str " - " (pr-str %) "\n"))
+                                                                    (apply str))))))))]
+    (when-not (every? empty? results)
+      (println "🚨 Violations found: \n")
+      (print-results results)
+      (System/exit 1)))
+
+  (println "👍🏻 No violations found"))

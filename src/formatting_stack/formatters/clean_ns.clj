@@ -3,11 +3,14 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
+   [formatting-stack.protocols.linter]
    [formatting-stack.util :refer [process-in-parallel! try-require]]
    [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
-   [refactor-nrepl.config]))
+   [refactor-nrepl.config])
+  (:import
+   (java.io File)))
 
 (defn make-cleaner [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (speced/fn ^{::speced/spec (complement #{"nil"})} [original-ns-form]
@@ -49,6 +52,14 @@
   #{'user 'dev})
 
 (defrecord Formatter [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]
+  formatting-stack.protocols.linter/Linter
+  (lint! [this files]
+    (let [changed-files (atom [])]
+      (with-redefs [spit (fn [f & _]
+                           (swap! changed-files conj (if (string? f) f (.getPath ^File f))))]
+        (with-out-str (formatting-stack.protocols.formatter/format! this files))
+        @changed-files)))
+
   formatting-stack.protocols.formatter/Formatter
   (format! [this files]
     (let [refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config*

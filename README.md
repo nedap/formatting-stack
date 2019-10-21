@@ -124,6 +124,15 @@ That's by design, to avoid intrincate DSLs or data structures.
 If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
 That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.
 
+## CI integration
+
+**formatting-stack** can be used in a CI configuration to assert that there's no formatting errors or new warnings introduced.
+```bash
+lein with-profile -dev,+ci run -m formatting-stack.branch-formatter pristine?
+```
+
+will yield assertion errors if the build introduces new warnings / formatting changes in files touched against the `master`-branch. 
+
 ## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 
 ## License
