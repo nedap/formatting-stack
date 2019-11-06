@@ -132,11 +132,14 @@
 
   That can avoid some code-reloading issues related to duplicate `defprotocol` definitions, etc."
   [& {:keys [files]}]
-  {:pre [(check! seq                                                 refresh-dirs
+  {:pre [(check! seq                            refresh-dirs
                  (partial every? (speced/fn [^string? refresh-dir]
                                    (let [file (-> refresh-dir File.)]
-                                     (and (-> file .exists)
-                                          (-> file .isDirectory))))) refresh-dirs)]}
+                                     (if (-> file .exists)
+                                       (-> file .isDirectory)
+                                       ;; allow non-existing directories.
+                                       ;; Temporary, until https://git.io/Jeaah is a thing:
+                                       true)))) refresh-dirs)]}
   (->> files
        (filter (speced/fn [^string? filename]
                  (if-not (formatting-stack.formatters.clean-ns.impl/ns-form-of filename)
