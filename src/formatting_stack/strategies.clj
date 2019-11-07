@@ -119,7 +119,7 @@
   files)
 
 (defn namespaces-within-refresh-dirs-only
-  "This stragegy excludes the files that are Clojure/Script namespaces
+  "This strategy excludes the files that are Clojure/Script namespaces
   but are placed outside `#'clojure.tools.namespace.repl/refresh-dirs`.
 
   This variable must be set beforehand, and all its values must correspond to existing folders (relative to the project root).

@@ -1,71 +1,53 @@
-# Clojure CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-clojure/ for more details
-#
-version: 2
-jobs:
-  build:
+version: 2.1
+
+commands:
+  setup-env:
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "project.clj" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: lein with-profile -dev,+test,+ci deps
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "project.clj" }}
+
+executors:
+  lein-executor:
     docker:
-    # specify the version you desire here
-    - image: circleci/clojure:openjdk-8-lein-2.9.1
-
-    # Specify service dependencies here if necessary
-    # CircleCI maintains a library of pre-built images
-    # documented at https://circleci.com/docs/2.0/circleci-images/
-    # - image: circleci/postgres:9.4
-
+      - image: circleci/clojure:openjdk-8-lein-2.9.1-node
     working_directory: ~/repo
-
     environment:
       LEIN_ROOT: "true"
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
 
+jobs:
+  build:
+    executor: lein-executor
     steps:
-    - checkout
-
-    # Download and cache dependencies
-    - restore_cache:
-        keys:
-        - v1-dependencies-{{ checksum "project.clj" }}
-        # fallback to using the latest cache if no exact match is found
-        - v1-dependencies-
-
-    - run: lein with-profile -dev,+ci deps
-
-    - save_cache:
-        paths:
-        - ~/.m2
-        key: v1-dependencies-{{ checksum "project.clj" }}
-
-    - run:
-        name: 'Run JVM tests'
-        command: lein with-profile -dev,+ci test
-
-  jfrog:
-    docker:
-      - image: circleci/clojure:lein-2.8.1-node
-
-    working_directory: ~/repo
-
+      - setup-env
+      - run:
+          name: 'Run JVM tests'
+          command: lein with-profile -dev,+ci test
+  deploy:
+    executor: lein-executor
     steps:
+      - setup-env
       - run:
           name: import GPG key
           command: echo -e "$GPG_KEY_V2" | gpg --import
-          
-      - checkout
-
       - run:
           name: Perform pre-release sanity check
           command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
-          
       - run:
           name: release to JFrog
           command: lein deploy
-          
       - run:
           name: release to Clojars
-          command: lein deploy clojars
+          command: lein deploy clojars          
 
 workflows:
   version: 2
@@ -77,10 +59,10 @@ workflows:
             branches:
               only: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/              
-      - jfrog:
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
+      - deploy:
           context: JFrog
-          requires: 
+          requires:
             - build
           filters:
             branches:

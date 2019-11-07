@@ -3,6 +3,7 @@
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [medley.core :refer [find-first]]
+   [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
    [nedap.utils.collections.seq :refer [distribute-evenly-by]])
   (:import
@@ -92,7 +93,7 @@
     (catch Exception _
       false)))
 
-(defn ensure-coll [x]
+(speced/defn ensure-coll [^some? x]
   (if (coll? x)
     x
     [x]))
