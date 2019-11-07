@@ -1,8 +1,8 @@
 (ns unit.formatting-stack.indent-specs
   (:require
    [clojure.test :refer :all]
-   [formatting-stack.formatters.cljfmt.impl :as cljfmt.impl]
    [formatting-stack.formatters.cider :as formatters.cider]
+   [formatting-stack.formatters.cljfmt.impl :as cljfmt.impl]
    [formatting-stack.indent-specs :as sut]
    [formatting-stack.protocols.formatter :refer [format!]]))
 

@@ -4,8 +4,8 @@
    [clojure.string :as string]
    [formatting-stack.project-parsing :refer [project-namespaces]]
    [formatting-stack.strategies.impl :refer [filename->ns]]
-   [nedap.utils.collections.eager :refer [partitioning-pmap]]
-   [nedap.speced.def :as speced])
+   [nedap.speced.def :as speced]
+   [nedap.utils.collections.eager :refer [partitioning-pmap]])
   (:import
    (clojure.lang Namespace)))
 
