@@ -16,7 +16,7 @@
                                    :username :env/clojars_user
                                    :password :env/clojars_pass}}
 
-  :dependencies [[cljfmt "0.6.4" :exclusions [rewrite-clj]]
+  :dependencies [[cljfmt "0.6.5"]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "1.0.0"]
