@@ -1,7 +1,7 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "1.0.0-alpha10"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[cljfmt "0.6.4" :exclusions [rewrite-clj]]
+  :dependencies [[cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "1.1.1"]
@@ -14,7 +14,7 @@
                  [medley "1.1.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.namespace "0.3.0-alpha4"]
-                 [org.clojure/tools.reader "1.2.2"]
+                 [org.clojure/tools.reader "1.3.2"]
                  [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
 
