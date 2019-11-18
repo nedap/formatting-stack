@@ -25,6 +25,7 @@
   * [ ] Security
   * [ ] Performance
   * [ ] Breaking API changes
+  * [ ] Cross-compatibility (Clojure/ClojureScript)
 
 ## Reviewer checklist
 
@@ -41,24 +42,4 @@
   * [ ] Security
   * [ ] Performance
   * [ ] Breaking API changes
-
-<!-- The following is a template for PRs automatically created with `com.nedap.staffing-solutions/ci.release-workflow`. -->
-<!-- Please uncomment it when adequate, deleting the rest of template. -->
-<!--
-
-Delivers: <!-- (place here links to the included PRs/commits) -->
-
-## Release checklist (author)
-
-* [ ] All PRs / relevant commits since the previous release are listed in this PR's description 
-* [ ] The new proposed version follows semver 
-* [ ] The build passes
-* [ ] New features are (briefly) reflected in the README
-
-## Release checklist (reviewer)
-
-* [ ] All PRs / relevant commits since the previous release are listed in this PR's description 
-* [ ] The new proposed version follows semver 
-* [ ] New features are (briefly) reflected in the README
-
--->
+  * [ ] Cross-compatibility (Clojure/ClojureScript)
