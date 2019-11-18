@@ -41,7 +41,7 @@
   (let [replacement (->> ns-form
                          (walk/postwalk (fn [x]
                                           (if-not (and (sequential? x)
-                                                       (#{:require :require-macros :import} (first x)))
+                                                       (#{:require :require-macros} (first x)))
                                             x
                                             (let [{reader-conditionals true
                                                    normal-forms        false} (->> x
