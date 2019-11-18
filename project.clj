@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "1.0.0-alpha10"
+(defproject formatting-stack "1.0.0-alpha11"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
