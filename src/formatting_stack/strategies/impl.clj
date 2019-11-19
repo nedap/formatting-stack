@@ -58,9 +58,9 @@
     true                     (filter readable?)))
 
 (speced/defn ^boolean? dir-contains?
-  [^string? dirname, ^File filename]
+  [^string? dirname, ^File file]
   (->> (file-seq (File. dirname))
        (map (speced/fn [^File f]
               (-> f .getCanonicalPath)))
-       (some #{(-> filename .getCanonicalPath)})
+       (some #{(-> file .getCanonicalPath)})
        (boolean)))

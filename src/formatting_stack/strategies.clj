@@ -122,7 +122,7 @@
   "This strategy excludes the files that are Clojure/Script namespaces
   but are placed outside `#'clojure.tools.namespace.repl/refresh-dirs`.
 
-  This variable must be set beforehand, and all its values must correspond to existing folders (relative to the project root).
+  This variable must be set beforehand, and all its values should correspond to existing folders (relative to the project root).
 
   Files such as project.clj, or .edn files, etc are not excluded, since they aren't namespaces.
 

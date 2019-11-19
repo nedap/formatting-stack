@@ -1,14 +1,14 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "1.0.0-alpha11"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[cljfmt "0.6.5" :exclusions [rewrite-clj]]
+  :dependencies [[clj-kondo "2019.05.19-alpha"]
+                 [cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "1.1.1"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
-                 [clj-kondo "2019.05.19-alpha"]
                  [jonase/eastwood "0.3.5"]
                  [lein-bikeshed "0.5.1"]
                  [medley "1.1.0"]

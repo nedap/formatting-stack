@@ -21,14 +21,12 @@
 (deftest ns-form-of
   (are [input expected] (= expected
                            (sut/ns-form-of input))
-    "project.clj"                                                   nil
-    "test/functional/formatting_stack/formatters/clean_ns/impl.clj" '(ns functional.formatting-stack.formatters.clean-ns.impl
-                                                                       (:require
-                                                                        [clojure.java.io :as io]
-                                                                        [clojure.test :refer :all]
-                                                                        [formatting-stack.formatters.clean-ns.impl :as sut]))
-    "test-resources/sample_cljs_ns.cljs"                            '(ns sample-cljs-ns
-                                                                       (:require
-                                                                        [foo.bar.baz :as baz])
-                                                                       (:require-macros
-                                                                        [sample-cljs-ns :refer [the-macro]]))))
+    "test-resources/sample_clj_ns.clj"   '(ns sample-clj-ns
+                                            (:require [foo.bar.baz :as baz])
+                                            (:import (java.util UUID)))
+    "test-resources/sample_cljc_ns.cljc" '(ns sample-cljc-ns
+                                            (:require [foo.bar.baz :as baz-clj])
+                                            (:import (java.util UUID)))
+    "test-resources/sample_cljs_ns.cljs" '(ns sample-cljs-ns
+                                            (:require [foo.bar.baz :as baz])
+                                            (:require-macros [sample-cljs-ns :refer [the-macro]]))))
