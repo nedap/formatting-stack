@@ -1,30 +1,29 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
-   [com.gfredericks.how-to-ns :as how-to-ns]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter]
-   [formatting-stack.util :refer [process-in-parallel! try-require without-aliases]]
+   [formatting-stack.util :refer [process-in-parallel! try-require]]
+   [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
+   [nedap.speced.def :as speced]
    [refactor-nrepl.config]))
 
+(defn make-cleaner [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
+  (speced/fn ^{::speced/spec (complement #{"nil"})} [original-ns-form]
+    (some-> (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
+                                 :refactor-nrepl-opts                  refactor-nrepl-opts
+                                 :filename                             filename
+                                 :original-ns-form                     original-ns-form
+                                 :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
+                                 :libspec-whitelist                    libspec-whitelist})
+            pr-str)))
+
 (defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
-  (let [buffer (slurp filename)
-        original-ns-form (how-to-ns/slurp-ns-from-string buffer)]
-    (when-let [clean-ns-form (without-aliases
-                               (impl/clean-ns-form {:how-to-ns-opts                       how-to-ns-opts
-                                                    :refactor-nrepl-opts                  refactor-nrepl-opts
-                                                    :filename                             filename
-                                                    :original-ns-form                     (read-string original-ns-form)
-                                                    :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
-                                                    :libspec-whitelist                    libspec-whitelist}))]
-      (when-not (= original-ns-form clean-ns-form)
-        (println "Cleaning unused imports:" filename)
-        (->> original-ns-form
-             count
-             (subs buffer)
-             (str clean-ns-form)
-             (spit filename))))))
+  (replace-ns-form! filename
+                    (make-cleaner how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename)
+                    "Cleaning unused imports:"
+                    how-to-ns-opts))
 
 (def default-libspecs
   ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load" "migration" "migrations"])

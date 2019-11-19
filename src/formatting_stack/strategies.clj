@@ -11,9 +11,14 @@
   A strategy may not return nil."
   (:require
    [clojure.string :as str]
+   [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.formatters.clean-ns.impl]
    [formatting-stack.strategies.impl :as impl]
-   [formatting-stack.util :refer [try-require]]))
+   [formatting-stack.util :refer [try-require]]
+   [nedap.speced.def :as speced]
+   [nedap.utils.spec.api :refer [check!]])
+  (:import
+   (java.io File)))
 
 (defn all-files
   "This strategy unconditionally processes all files."
@@ -112,3 +117,34 @@
   You can find a detailed explanation/example in https://git.io/fh7E0 ."
   [& {:keys [files]}]
   files)
+
+(defn namespaces-within-refresh-dirs-only
+  "This strategy excludes the files that are Clojure/Script namespaces
+  but are placed outside `#'clojure.tools.namespace.repl/refresh-dirs`.
+
+  This variable must be set beforehand, and all its values should correspond to existing folders (relative to the project root).
+
+  Files such as project.clj, or .edn files, etc are not excluded, since they aren't namespaces.
+
+  The rationale for this strategy is allowing you to create clj namespace directories that are excluded from `refresh-dirs`.
+  e.g. protocol definitions,
+  and then ensuring that code-evaluating tools such as refactor-nrepl or Eastwood also respect that exclusion.
+
+  That can avoid some code-reloading issues related to duplicate `defprotocol` definitions, etc."
+  [& {:keys [files]}]
+  {:pre [(check! seq                            refresh-dirs
+                 (partial every? (speced/fn [^string? refresh-dir]
+                                   (let [file (-> refresh-dir File.)]
+                                     (if (-> file .exists)
+                                       (-> file .isDirectory)
+                                       ;; allow non-existing directories.
+                                       ;; Temporary, until https://git.io/Jeaah is a thing:
+                                       true)))) refresh-dirs)]}
+  (->> files
+       (filter (speced/fn [^string? filename]
+                 (if-not (formatting-stack.formatters.clean-ns.impl/ns-form-of filename)
+                   true
+                   (let [file (-> filename File.)]
+                     (->> refresh-dirs
+                          (some (fn [dir]
+                                  (impl/dir-contains? dir file))))))))))

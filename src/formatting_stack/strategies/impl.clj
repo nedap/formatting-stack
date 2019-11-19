@@ -56,3 +56,11 @@
                                        (-> f File. .exists)))
     true                     (remove #(str/ends-with? % "project.clj"))
     true                     (filter readable?)))
+
+(speced/defn ^boolean? dir-contains?
+  [^string? dirname, ^File file]
+  (->> (file-seq (File. dirname))
+       (map (speced/fn [^File f]
+              (-> f .getCanonicalPath)))
+       (some #{(-> file .getCanonicalPath)})
+       (boolean)))

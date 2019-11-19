@@ -8,6 +8,7 @@
    [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
    [formatting-stack.formatters.newlines :as formatters.newlines]
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
+   [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
    [formatting-stack.indent-specs]
    [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
@@ -28,11 +29,15 @@
                                                                             strategies/files-with-a-namespace))))
      (formatters.no-extra-blank-lines/map->Formatter {})
      (formatters.newlines/map->Formatter opts)
+     (formatters.trivial-ns-duplicates/map->Formatter (-> opts (assoc :strategies (conj default-strategies
+                                                                                        strategies/files-with-a-namespace
+                                                                                        strategies/exclude-edn))))
      (formatters.clean-ns/map->Formatter (-> opts (assoc :strategies (conj default-strategies
                                                                            strategies/files-with-a-namespace
                                                                            strategies/exclude-cljc
                                                                            strategies/exclude-cljs
                                                                            strategies/exclude-edn
+                                                                           strategies/namespaces-within-refresh-dirs-only
                                                                            strategies/do-not-use-cached-results!))))]))
 
 (def default-linters [(linters.ns-aliases/map->Linter {:strategies (conj default-strategies
@@ -47,7 +52,8 @@
                                                                          strategies/exclude-edn)})
                       (linters.eastwood/map->Eastwood {:strategies (conj default-strategies
                                                                          strategies/exclude-cljs
-                                                                         strategies/jvm-requirable-files)})
+                                                                         strategies/jvm-requirable-files
+                                                                         strategies/namespaces-within-refresh-dirs-only)})
                       (linters.kondo/map->Linter {:strategies (conj default-strategies
                                                                     strategies/exclude-edn
                                                                     strategies/exclude-clj

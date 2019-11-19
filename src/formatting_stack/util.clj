@@ -2,8 +2,8 @@
   (:require
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
-   [formatting-stack.project-parsing :refer [project-namespaces]]
    [medley.core :refer [find-first]]
+   [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
    [nedap.utils.collections.seq :refer [distribute-evenly-by]])
   (:import
@@ -93,20 +93,7 @@
     (catch Exception _
       false)))
 
-(defmacro without-aliases
-  "Removes all ns aliases from the project, so `body` can perform arbitrary code reloading"
-  {:style/indent 0}
-  [& body]
-  `(let [namespaces# (project-namespaces)
-         aliases-per-ns# (map ns-aliases namespaces#)]
-     (doseq [aliases# aliases-per-ns#
-             [alias# namespace#] aliases#]
-       (ns-unalias namespace# alias#))
-     (try
-       ~@body
-       (finally
-         (doseq [aliases# aliases-per-ns#
-                 [alias# namespace#] aliases#]
-           (try
-             (alias alias# namespace#)
-             (catch Exception _#)))))))
+(speced/defn ensure-coll [^some? x]
+  (if (coll? x)
+    x
+    [x]))

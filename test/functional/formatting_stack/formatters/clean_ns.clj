@@ -4,6 +4,7 @@
    [formatting-stack.formatters.clean-ns :as sut]
    [formatting-stack.formatters.clean-ns.impl :as impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
+   [formatting-stack.util.ns :as util.ns]
    [functional.formatting-stack.formatters.clean-ns.should-be-cleaned]
    [functional.formatting-stack.formatters.clean-ns.should-not-be-cleaned]
    [functional.formatting-stack.formatters.clean-ns.should-not-be-cleaned-2]
@@ -52,12 +53,12 @@
 
 (deftest clean-ns-form
   (are [op filename ns-form libspec-whitelist namespaces-that-should-never-cleaned]
-       (let [v (impl/clean-ns-form {:how-to-ns-opts formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                    :refactor-nrepl-opts sut/default-nrepl-opts
-                                    :filename filename
-                                    :original-ns-form ns-form
-                                    :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
-                                    :libspec-whitelist libspec-whitelist})]
+       (let [cleaner (sut/make-cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
+                                       sut/default-nrepl-opts
+                                       namespaces-that-should-never-cleaned
+                                       libspec-whitelist
+                                       filename)
+             v (util.ns/replaceable-ns-form filename cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts)]
          (op v))
     some? should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{}
     nil?  should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{'functional.formatting-stack.formatters.clean-ns.should-be-cleaned}
