@@ -3,6 +3,7 @@
 
   Compensates for some `refactor-nrepl.clean-ns` intricacies, and also provides .cljs compatibility."
   (:require
+   [clojure.set :as set]
    [clojure.spec.alpha :as spec]
    [clojure.walk :as walk]
    [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of]]
@@ -11,9 +12,33 @@
    [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.spec.api :refer [check!]]))
 
-(spec/def ::libspecs (spec/coll-of coll?))
+(spec/def ::libspec coll?)
+
+(spec/def ::libspecs (spec/coll-of ::libspec))
+
+(speced/defn remove-refer [^::libspec libspec]
+  (let [libspec (vec libspec)
+        index-a (->> libspec
+                     (keep-indexed (fn [i x]
+                                     (when (#{:refer} x)
+                                       i)))
+                     (first))
+        index-b (some-> index-a inc)]
+    (if-not index-b
+      libspec
+      (->> (-> libspec
+               (assoc index-a nil)
+               (assoc index-b nil))
+           (keep identity)
+           (vec)))))
+
+(speced/defn without-refer= [^::libspec x, ^::libspec y]
+  (->> [x y]
+       (map remove-refer)
+       (apply =)))
 
 (speced/defn ^::libspecs maybe-remove-optionless-libspecs [^::libspecs libspecs]
   (if (->> libspecs count #{0 1})
@@ -25,6 +50,51 @@
       (if (-> optionful count pos?)
         (distinct optionful)
         [(first optionless)]))))
+
+(speced/defn ^::speced/nilable ^set? extract-refers [^::libspec libspec]
+  (let [libspec (vec libspec)
+        index (some->> libspec
+                       (keep-indexed (fn [i x]
+                                       (when (#{:refer} x)
+                                         i)))
+                       (first)
+                       (inc))
+        refers (when index
+                 (get libspec index))]
+    (when (coll? refers)
+      (set refers))))
+
+(speced/defn ^::libspecs maybe-remove-libspec-subsets [^::libspecs libspecs]
+  {:pre [(let [lib (ffirst libspecs)]
+           (check! (partial every? #{lib}) (map first libspecs)))
+         (check! (partial not-any? set?) libspecs)]}
+  (if (->> libspecs count #{0 1})
+    libspecs
+    (let [the-sets (atom [] :validator (fn [s]
+                                         (check! (spec/coll-of set?) s)))]
+      (->> libspecs
+           ;; mapv, for ensuring `the-sets` is completely built:
+           (mapv (fn [libspec]
+                   (when-let [refers (extract-refers libspec)]
+                     (swap! the-sets conj refers))
+                   libspec))
+           (filterv (fn [libspec]
+                      (let [refers (extract-refers libspec)]
+                        (cond
+                          (not refers)
+                          true
+
+                          (and (->> @the-sets
+                                    (remove #{refers})
+                                    (some (fn [candidate]
+                                            (set/subset? refers candidate))))
+                               (->> libspecs
+                                    (remove #{libspec})
+                                    (some (partial without-refer= libspec))))
+                          false
+
+                          true
+                          true))))))))
 
 (speced/defn ^boolean? is-or-has-reader-conditional? [x]
   (or (reader-conditional? x)
@@ -56,7 +126,8 @@
                                                                     (mapcat (fn [[_ libspecs]]
                                                                               (->> libspecs
                                                                                    distinct
-                                                                                   maybe-remove-optionless-libspecs))))
+                                                                                   maybe-remove-optionless-libspecs
+                                                                                   maybe-remove-libspec-subsets))))
                                                   all-forms (concat normal-forms reader-conditionals)]
                                               (apply list (first x) all-forms))))))]
     (when-not (= replacement ns-form)

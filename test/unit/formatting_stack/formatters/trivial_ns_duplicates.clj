@@ -12,6 +12,23 @@
     '[[a :as foo] [a]]              '[[a :as foo]]
     '[[a :as foo] [a :refer [bar]]] '[[a :as foo] [a :refer [bar]]]))
 
+(deftest remove-refer
+  (are [input expected] (= expected
+                           (sut/remove-refer input))
+    '[]                   '[]
+    '[a]                  '[a]
+    '[a :refer [a]]       '[a]
+    '[a :refer [a] :as b] '[a :as b]
+    '[a :as b :refer [a]] '[a :as b]))
+
+(deftest maybe-remove-libspec-subsets
+  (are [input expected] (= expected
+                           (sut/maybe-remove-libspec-subsets input))
+    '[]                                    '[]
+    '[[a]]                                 '[[a]]
+    '[[a] [a]]                             '[[a] [a]]
+    '[[a :refer [b c]] [a :refer [b c d]]] '[[a :refer [b c d]]]))
+
 (deftest remove-exact-duplicates
   (are [desc input expected] (= expected
                                 (sut/remove-exact-duplicates input))
@@ -50,6 +67,22 @@
 
     "Does not remove non-exact duplicates, returning nil instead (mixed `:as` and `:refer` clause)"
     '(ns foo (:require [a :as foo] [a :refer [bar]]))
+    nil
+
+    "Removes libspecs that are strict subsets of others"
+    '(ns foo (:require [a :refer [a b]] [a :refer [a]]))
+    '(ns foo (:require [a :refer [a b]]))
+
+    "Removes libspecs that are strict subsets of others"
+    '(ns foo (:require [a :refer [a b]] [a :refer [a]] [d]))
+    '(ns foo (:require [a :refer [a b]] [d]))
+
+    "Keeps libspecs which have :refer clauses that are a subset of others, but other different properties (like `:as`)"
+    '(ns foo (:require [a :refer [a b]] [a :as b :refer [a]]))
+    nil
+
+    "Keeps libspecs which have :refer clauses that are a subset of others, but other different properties (like `:as`)"
+    '(ns foo (:require [a :refer [a b]] [a :refer [a] :as b]))
     nil))
 
 (deftest cljc-handling
