@@ -30,7 +30,8 @@
     (reset! eastwood.util/warning-enable-config-atom []) ;; https://github.com/jonase/eastwood/issues/317
     (let [namespaces (->> filenames
                           (remove #(str/ends-with? % ".edn"))
-                          (map ns-name-from-filename))
+                          (map ns-name-from-filename)
+                          (filter some?))
           options (deep-merge default-eastwood-options
                               (or eastwood-options {}))
           warnings-to-silence (or warnings-to-silence default-warnings-to-silence)
