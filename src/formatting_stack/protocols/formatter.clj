@@ -1,5 +1,8 @@
-(ns formatting-stack.protocols.formatter)
+(ns formatting-stack.protocols.formatter
+  (:require
+   [nedap.speced.def :as speced]))
 
-(defprotocol Formatter
-  (format! [this filenames]
+(speced/defprotocol Formatter
+  "" ;; FIXME
+  (format! [this ^coll? filenames]
     "Formats `filenames` according to a formatter of your choice."))

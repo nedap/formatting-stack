@@ -2,10 +2,11 @@
   (:require
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
-   [formatting-stack.protocols.formatter]
+   [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.util :refer [process-in-parallel! try-require]]
    [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
+   [nedap.utils.modular.api :refer [implement]]
    [nedap.speced.def :as speced]
    [refactor-nrepl.config]))
 
@@ -48,22 +49,26 @@
 (def default-namespaces-that-should-never-cleaned
   #{'user 'dev})
 
-(defrecord Formatter [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]
-  formatting-stack.protocols.formatter/Formatter
-  (format! [this files]
-    (let [refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config*
-                                          (or refactor-nrepl-opts default-nrepl-opts))
-          how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                     (or how-to-ns-opts {}))
-          namespaces-that-should-never-cleaned (or namespaces-that-should-never-cleaned
-                                                   default-namespaces-that-should-never-cleaned)
-          libspec-whitelist (or libspec-whitelist default-libspec-whitelist)]
-      (->> files
-           (process-in-parallel! (fn [filename]
-                                   (when (and (try-require filename)
-                                              (not (impl/has-duplicate-requires? filename)))
-                                     (clean! how-to-ns-opts
-                                             refactor-nrepl-opts
-                                             namespaces-that-should-never-cleaned
-                                             libspec-whitelist
-                                             filename))))))))
+(defn format!
+  [{:keys [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]}
+   files]
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (when (and (try-require filename)
+                                          (not (impl/has-duplicate-requires? filename)))
+                                 (clean! how-to-ns-opts
+                                         refactor-nrepl-opts
+                                         namespaces-that-should-never-cleaned
+                                         libspec-whitelist
+                                         filename))))))
+
+(defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
+            :or {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned
+                 libspec-whitelist                    default-libspec-whitelist
+                 refactor-nrepl-opts                  default-nrepl-opts
+                 how-to-ns-opts                       {}}}]
+  (implement {:refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config* refactor-nrepl-opts)
+              :how-to-ns-opts      (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)
+              :libspec-whitelist   libspec-whitelist
+              :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned}
+    formatter/--format! format!))
