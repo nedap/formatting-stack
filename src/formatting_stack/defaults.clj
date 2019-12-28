@@ -1,6 +1,6 @@
 (ns formatting-stack.defaults
   (:require
-   [formatting-stack.formatters.cider :as formatters.cider]
+   [formatting-stack.compilers.cider :as compilers.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
@@ -26,39 +26,38 @@
         ;; making usage more awkward.
         ;; the strategies mechanism needs some rework to avoid this limitation.
         cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies default-strategies))]
-    [(formatters.cider/map->Formatter (assoc opts :strategies extended-strategies))
-     (formatters.cljfmt/map->Formatter cljfmt-and-how-to-ns-opts)
-     (formatters.how-to-ns/map->Formatter cljfmt-and-how-to-ns-opts)
-     (formatters.no-extra-blank-lines/map->Formatter {})
-     (formatters.newlines/map->Formatter opts)
-     (formatters.trivial-ns-duplicates/map->Formatter (assoc opts :strategies (conj default-strategies
-                                                                                    strategies/files-with-a-namespace
-                                                                                    strategies/exclude-edn)))
-     (formatters.clean-ns/map->Formatter (assoc opts :strategies (conj default-strategies
-                                                                       strategies/files-with-a-namespace
-                                                                       strategies/exclude-cljc
-                                                                       strategies/exclude-cljs
-                                                                       strategies/exclude-edn
-                                                                       strategies/namespaces-within-refresh-dirs-only
-                                                                       strategies/do-not-use-cached-results!)))]))
-
-(def default-linters [(linters.ns-aliases/map->Linter {:strategies (conj extended-strategies
+    [(formatters.cljfmt/new cljfmt-and-how-to-ns-opts)
+     (formatters.how-to-ns/new cljfmt-and-how-to-ns-opts)
+     (formatters.no-extra-blank-lines/new)
+     (formatters.newlines/new opts)
+     (formatters.trivial-ns-duplicates/new (assoc opts :strategies (conj default-strategies
                                                                          strategies/files-with-a-namespace
-                                                                         ;; reader conditionals may confuse `linters.ns-aliases`
-                                                                         strategies/exclude-cljc
-                                                                         ;; string requires may confuse clojure.tools.*
-                                                                         strategies/exclude-cljs)})
-                      (linters.loc-per-ns/map->Linter {:strategies (conj extended-strategies
-                                                                         strategies/exclude-edn)})
-                      (linters.bikeshed/map->Bikeshed {:strategies (conj extended-strategies
-                                                                         strategies/exclude-edn)})
-                      (linters.eastwood/map->Eastwood {:strategies (conj extended-strategies
-                                                                         strategies/exclude-cljs
-                                                                         strategies/jvm-requirable-files
-                                                                         strategies/namespaces-within-refresh-dirs-only)})
-                      (linters.kondo/map->Linter {:strategies (conj extended-strategies
-                                                                    strategies/exclude-edn
-                                                                    strategies/exclude-clj
-                                                                    strategies/exclude-cljc)})])
+                                                                         strategies/exclude-edn)))
+     (formatters.clean-ns/new (assoc opts :strategies (conj default-strategies
+                                                            strategies/files-with-a-namespace
+                                                            strategies/exclude-cljc
+                                                            strategies/exclude-cljs
+                                                            strategies/exclude-edn
+                                                            strategies/namespaces-within-refresh-dirs-only
+                                                            strategies/do-not-use-cached-results!)))]))
 
-(def default-compilers [])
+(def default-linters [(linters.ns-aliases/new {:strategies (conj extended-strategies
+                                                                 strategies/files-with-a-namespace
+                                                                 ;; reader conditionals may confuse `linters.ns-aliases`
+                                                                 strategies/exclude-cljc
+                                                                 ;; string requires may confuse clojure.tools.*
+                                                                 strategies/exclude-cljs)})
+                      (linters.loc-per-ns/new {:strategies (conj extended-strategies
+                                                                 strategies/exclude-edn)})
+                      (linters.bikeshed/new {:strategies (conj extended-strategies
+                                                               strategies/exclude-edn)})
+                      (linters.eastwood/new {:strategies (conj extended-strategies
+                                                               strategies/exclude-cljs
+                                                               strategies/jvm-requirable-files
+                                                               strategies/namespaces-within-refresh-dirs-only)})
+                      (linters.kondo/new)])
+
+(defn default-compilers [third-party-indent-specs]
+  [(compilers.cider/new {:third-party-indent-specs third-party-indent-specs
+                         :strategies extended-strategies})])
+
