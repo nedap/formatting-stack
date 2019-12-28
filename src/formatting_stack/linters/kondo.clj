@@ -1,21 +1,20 @@
 (ns formatting-stack.linters.kondo
   (:require
-   [formatting-stack.linters.kondo.impl :as impl]
+   [clj-kondo.core :as clj-kondo]
    [formatting-stack.protocols.linter :as linter]
    [nedap.utils.modular.api :refer [implement]]))
 
 (def off {:level :off})
 
 (def default-options
-  (list "--config" (pr-str {:linters {:invalid-arity     off
-                                      :cond-without-else off}})))
+  {:linters {:invalid-arity     off
+             :cond-without-else off}})
 
 (defn lint! [this filenames]
-  (->> filenames
-       (cons "--lint")
-       (concat default-options)
-       (impl/parse-opts)
-       impl/lint!))
+  (-> (clj-kondo/run! {:lint filenames
+                       :config default-options})
+      (select-keys [:findings])
+      clj-kondo/print!))
 
 (defn new []
   (implement {}
