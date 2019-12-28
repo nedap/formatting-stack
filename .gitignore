@@ -8,6 +8,7 @@
 *~
 .*.swo
 .*.swp
+.clj-kondo/
 .DS_Store
 .eastwood
 .idea/
