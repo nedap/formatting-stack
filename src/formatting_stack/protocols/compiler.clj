@@ -2,9 +2,9 @@
   (:require
    [nedap.speced.def :as speced]))
 
-(ns-unmap *ns* 'Compiler)
-
-(speced/defprotocol Compiler
+;; using #'Compiler yielded this warning;
+;; Warning: protocol #'formatting-stack.protocols.compiler/Compiler is overwriting method --compile! of protocol Compiler
+(speced/defprotocol CompilerVar
   "" ;; FIXME
   (compile! [this ^coll? filenames]
     "Performs a compilation according to a compiler of your choice: e.g. the ClojureScript compiler, or Garden, Stefon, etc.
