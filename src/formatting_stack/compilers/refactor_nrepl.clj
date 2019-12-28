@@ -11,15 +11,15 @@
    [refactor-nrepl.analyzer]))
 
 (defn compile! [_ _]
-    (let [result (refactor-nrepl.analyzer/warm-ast-cache)
-          ok? (->> result
-                   (partition-all 2)
-                   (map second)
-                   (distinct)
-                   (every? #{"OK"}))]
-      (when-not ok?
-        (println ::Compiler "AST cache warming failed:")
-        (pprint/pprint result))))
+  (let [result (refactor-nrepl.analyzer/warm-ast-cache)
+        ok? (->> result
+                 (partition-all 2)
+                 (map second)
+                 (distinct)
+                 (every? #{"OK"}))]
+    (when-not ok?
+      (println ::Compiler "AST cache warming failed:")
+      (pprint/pprint result))))
 
 (defn new []
   (implement {}

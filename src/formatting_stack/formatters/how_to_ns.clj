@@ -23,4 +23,4 @@
 (defn new [{:keys [how-to-ns-options]
             :or {how-to-ns-options {}}}]
   (implement {:how-to-ns-options (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-options)}
-   formatter/--format! format!))
+    formatter/--format! format!))

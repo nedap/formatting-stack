@@ -22,9 +22,9 @@
 
 (def newliner
   (implement {}
-   protocols.linter/--lint!      print-newline
-   protocols.compiler/--compile! print-newline
-   protocols.formatter/--format! print-newline))
+    protocols.linter/--lint!      print-newline
+    protocols.compiler/--compile! print-newline
+    protocols.formatter/--format! print-newline))
 
 (defn process! [method members category-strategies default-strategies intersperse-newlines?]
   ;; `memoize` rationale: results are cached not for performance,
@@ -61,7 +61,7 @@
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
-        compilers                (or compilers default-compilers)
+        compilers                (or compilers (default-compilers third-party-indent-specs))
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)

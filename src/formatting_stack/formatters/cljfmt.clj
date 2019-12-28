@@ -4,9 +4,9 @@
    [formatting-stack.formatters.cljfmt.impl :as impl]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.util :refer [process-in-parallel!]]
-   [nedap.utils.modular.api :refer [implement]]
    [medley.core :refer [deep-merge]]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn format! [{:keys [third-party-indent-specs]} files]
   (->> files

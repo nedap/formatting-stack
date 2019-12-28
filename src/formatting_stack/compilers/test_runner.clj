@@ -8,8 +8,8 @@
    [clojure.test]
    [formatting-stack.compilers.test-runner.impl :refer :all]
    [formatting-stack.protocols.compiler :as compiler]
-   [nedap.utils.modular.api :refer [implement]]
-   [formatting-stack.strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]))
+   [formatting-stack.strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]
+   [nedap.utils.modular.api :refer [implement]]))
 
 ;; Not provided into any default stack, as it would be overly assuming about users' practices
 (defn compile! [_ filenames]

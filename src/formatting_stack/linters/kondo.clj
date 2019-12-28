@@ -1,8 +1,8 @@
 (ns formatting-stack.linters.kondo
   (:require
    [formatting-stack.linters.kondo.impl :as impl]
-   [nedap.utils.modular.api :refer [implement]]
-   [formatting-stack.protocols.linter :as linter]))
+   [formatting-stack.protocols.linter :as linter]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (def off {:level :off})
 

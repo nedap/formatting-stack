@@ -6,8 +6,8 @@
    [formatting-stack.util :refer [process-in-parallel! try-require]]
    [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
-   [nedap.utils.modular.api :refer [implement]]
    [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]
    [refactor-nrepl.config]))
 
 (defn make-cleaner [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
