@@ -1,17 +1,17 @@
-(ns formatting-stack.background)
+(ns formatting-stack.background
+  (:import
+   (java.util.concurrent LinkedBlockingQueue ThreadPoolExecutor ThreadPoolExecutor$DiscardOldestPolicy TimeUnit)))
 
 (defonce workload (atom nil))
 
-(defonce runner
-  (future
-    (while (not (-> (Thread/currentThread) .isInterrupted))
-      (if-let [job @workload]
-        (when (compare-and-set! workload job nil)
-          (try
-            (job)
-            (catch Exception e
-              (-> e .printStackTrace))))
-        (Thread/sleep 50)))))
+;; executor which drops > 1 items in the queue
+(defonce executor
+  (ThreadPoolExecutor.
+   1 1 0 TimeUnit/MILLISECONDS
+   (LinkedBlockingQueue. 1)
+   (ThreadPoolExecutor$DiscardOldestPolicy.)))
 
-(comment ;; perform the following before `refresh`ing this ns:
-  (future-cancel runner))
+(add-watch workload ::scheduler
+           (fn [_ _ _ current]
+             (when (fn? current)
+               (.execute executor current))))
