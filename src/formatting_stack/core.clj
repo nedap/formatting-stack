@@ -7,7 +7,8 @@
    [formatting-stack.protocols.compiler :as protocols.compiler]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
-   [formatting-stack.util :refer [with-serialized-output]]))
+   [formatting-stack.util :refer [with-serialized-output]]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn files-from-strategies [strategies]
   (->> strategies
@@ -16,19 +17,14 @@
                [])
        distinct))
 
+(defn print-newline [_this _files]
+  (println))
+
 (def newliner
-  (reify
-    protocols.formatter/Formatter
-    (format! [_ _]
-      (println))
-
-    protocols.linter/Linter
-    (lint! [_ _]
-      (println))
-
-    protocols.compiler/Compiler
-    (compile! [_ _]
-      (println))))
+  (implement {}
+   protocols.linter/--lint!      print-newline
+   protocols.compiler/--compile! print-newline
+   protocols.formatter/--format! print-newline))
 
 (defn process! [method members category-strategies default-strategies intersperse-newlines?]
   ;; `memoize` rationale: results are cached not for performance,

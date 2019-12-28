@@ -1,9 +1,12 @@
-(ns formatting-stack.formatters.cider
+(ns formatting-stack.compilers.cider
   (:require
-   [formatting-stack.protocols.formatter]))
+   [formatting-stack.protocols.compiler :as compiler]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(defrecord Formatter [options third-party-indent-specs]
-  formatting-stack.protocols.formatter/Formatter
-  (format! [this files]
-    (doseq [[var-sym metadata] third-party-indent-specs]
-      (some-> var-sym resolve (alter-meta! merge metadata)))))
+(defn compile! [{:keys [third-party-indent-specs]} _files]
+  (doseq [[var-sym metadata] third-party-indent-specs]
+    (some-> var-sym resolve (alter-meta! merge metadata))))
+
+(defn new [{:keys [third-party-indent-specs] :as options}]
+  (implement options
+    compiler/--compile! compile!))

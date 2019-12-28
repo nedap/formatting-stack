@@ -6,14 +6,11 @@
   increasing the chances for concurrent (buggy) refreshing of Clojure namespaces."
   (:require
    [clojure.pprint :as pprint]
-   [formatting-stack.protocols.compiler]
+   [formatting-stack.protocols.compiler :as compiler]
+   [nedap.utils.modular.api :refer [implement]]
    [refactor-nrepl.analyzer]))
 
-(ns-unmap *ns* 'Compiler)
-
-(defrecord Compiler []
-  formatting-stack.protocols.compiler/Compiler
-  (compile! [_ _]
+(defn compile! [_ _]
     (let [result (refactor-nrepl.analyzer/warm-ast-cache)
           ok? (->> result
                    (partition-all 2)
@@ -22,4 +19,8 @@
                    (every? #{"OK"}))]
       (when-not ok?
         (println ::Compiler "AST cache warming failed:")
-        (pprint/pprint result)))))
+        (pprint/pprint result))))
+
+(defn new []
+  (implement {}
+    compiler/--compile! compile!))
