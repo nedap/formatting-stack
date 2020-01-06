@@ -6,7 +6,7 @@
   and invokes `#'clojure.test/run-tests` out of that result."
   (:require
    [clojure.test]
-   [formatting-stack.processors.test-runner.impl :refer :all]
+   [formatting-stack.processors.test-runner.impl :refer [ns->sym testable-namespaces]]
    [formatting-stack.protocols.processor :as processor]
    [formatting-stack.strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]
    [nedap.utils.modular.api :refer [implement]]))

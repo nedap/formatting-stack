@@ -4,11 +4,12 @@
    [clojure.tools.reader :as tools.reader]
    [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.walk :as walk]
-   [formatting-stack.util :refer [ensure-coll rcomp try-require]]
+   [formatting-stack.util :refer [ensure-coll rcomp]]
    [nedap.speced.def :as speced]
    [refactor-nrepl.config]
    [refactor-nrepl.ns.clean-ns :refer [clean-ns]])
   (:import
+   (clojure.lang Namespace)
    (java.io File)))
 
 (speced/defn ns-form-of [^string? filename]
@@ -20,7 +21,7 @@
           nil
           (throw e))))))
 
-(speced/defn safely-read-ns-contents [^string? buffer, ^clojure.lang.Namespace ns-obj]
+(speced/defn safely-read-ns-contents [^string? buffer, ^Namespace ns-obj]
   (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
     (tools.reader/read-string {:read-cond :allow
                                :features  #{:clj}}

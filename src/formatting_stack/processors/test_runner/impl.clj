@@ -23,8 +23,7 @@
   "Some projects have the naming convention of prefixing the last segment with `t-`
    to denote a testing namespace."
   [^Namespace n]
-  (let [s (str n)
-        segments (-> n str (string/split #"\."))
+  (let [segments (-> n str (string/split #"\."))
         first-segments (butlast segments)
         last-segment (->> segments last (str "t-"))]
     (->> [last-segment]
