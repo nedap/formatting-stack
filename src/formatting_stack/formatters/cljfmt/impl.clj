@@ -23,7 +23,7 @@
     (locking require-lock
       (require namespace))
     (ns-map namespace)
-    (catch Exception e
+    (catch Exception _
       {})))
 
 (spec/def ::indent-key #{:style/indent :style.cljfmt/indent :style.cljfmt/type})
@@ -106,7 +106,7 @@
     (doseq [[sym var-ref] ns-mappings
             :when (var? var-ref)
             :let [fqn (fully-qualified-name-of var-ref)]
-            :when (some (fn [[k v]]
+            :when (some (fn [[k _]]
                           (= k fqn))
                         @result)
             :let [indent (get @result fqn)]]

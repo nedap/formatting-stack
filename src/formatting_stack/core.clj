@@ -2,7 +2,7 @@
   (:require
    [clojure.main]
    [formatting-stack.background]
-   [formatting-stack.defaults :refer :all]
+   [formatting-stack.defaults :refer [default-processors default-formatters default-linters default-strategies]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
@@ -69,14 +69,9 @@
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)
-        {formatters-strategies
-         :formatters
-         linters-strategies
-         :linters
-         processors-strategies
-         :processors
-         default-strategies
-         :default}               strategies
+        {formatters-strategies :formatters
+         linters-strategies    :linters
+         processors-strategies :processors} strategies
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
                (process! protocols.formatter/format! formatters formatters-strategies strategies intersperse-newlines?)
                (when intersperse-newlines?

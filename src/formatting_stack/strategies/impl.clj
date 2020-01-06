@@ -46,9 +46,9 @@
                  (-> decl parse/deps-from-ns-decl) ;; no exceptions thrown
                  true)
                true)))
-      (catch Exception e
+      (catch Exception _
         false)
-      (catch AssertionError e
+      (catch AssertionError _
         false))))
 
 (defn extract-clj-files [files]

@@ -30,8 +30,10 @@
     '[[a :refer [b c]] [a :refer [b c d]]] '[[a :refer [b c d]]]))
 
 (deftest remove-exact-duplicates
-  (are [desc input expected] (= expected
-                                (sut/remove-exact-duplicates input))
+  (are [desc input expected] (testing desc
+                               (is (= expected
+                                      (sut/remove-exact-duplicates input)))
+                               true)
 
     "returns nil when there's nothing to fix"
     '(ns foo)
