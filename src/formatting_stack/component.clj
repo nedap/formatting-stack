@@ -1,18 +1,14 @@
 (ns formatting-stack.component
   (:require
    [com.stuartsierra.component :as component]
-   [formatting-stack.core :refer [format!]]))
+   [formatting-stack.core :refer [format!]]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(defrecord Formatter [strategies third-party-indent-specs formatters linters processors in-background?]
-  component/Lifecycle
-  (start [this]
-    (format! :strategies strategies
-             :third-party-indent-specs third-party-indent-specs
-             :formatters formatters
-             :linters linters
-             :processors processors
-             :in-background? in-background?)
-    this)
+(defn start [this]
+  (apply format! (mapcat identity this))
+  this)
 
-  (stop [this]
-    this))
+(defn new
+  [{:keys [strategies third-party-indent-specs formatters linters processors in-background?] :as this}]
+  (implement this
+    component/start start))
