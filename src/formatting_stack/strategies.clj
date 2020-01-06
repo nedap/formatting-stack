@@ -108,7 +108,7 @@
        (filter try-require)))
 
 (defn do-not-use-cached-results!
-  "Normally, subsequent 'members' (formatters, linters, compilers)
+  "Normally, subsequent 'members' (formatters, linters, processors)
   using identical strategies will cache the results of those strategies.
   That is apt for formatters that do safe modifications, but not for more dangerous formatters.
 

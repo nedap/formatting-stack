@@ -1,7 +1,6 @@
 (ns formatting-stack.branch-formatter
   "A set of defaults apt for formatting a git branch (namely, the files that a branch has modified, respective to another)."
   (:require
-   [formatting-stack.compilers.cider :as compilers.cider]
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
@@ -15,6 +14,7 @@
    [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
+   [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.strategies :as strategies]
    [medley.core :refer [mapply]]))
 
@@ -65,8 +65,8 @@
                                 strategies/exclude-clj
                                 strategies/exclude-cljc)))])
 
-(def default-compilers
-  [(compilers.cider/new {:third-party-indent-specs third-party-indent-specs})])
+(def default-processors
+  [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (defn format-and-lint-branch! [& {:keys [target-branch in-background?]
                                   :or   {target-branch  "master"
@@ -76,7 +76,7 @@
         formatters (default-formatters default-strategies)
         linters (default-linters default-strategies)]
     (formatting-stack.core/format! :strategies default-strategies
-                                   :compilers default-compilers
+                                   :processors default-processors
                                    :formatters formatters
                                    :linters linters
                                    :in-background? in-background?)))
@@ -88,6 +88,6 @@
         linters (default-linters default-strategies)]
     (formatting-stack.core/format! :strategies default-strategies
                                    :formatters []
-                                   :compilers default-compilers
+                                   :processors default-processors
                                    :linters linters
                                    :in-background? in-background?)))

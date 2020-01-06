@@ -1,7 +1,6 @@
 (ns formatting-stack.project-formatter
   "A set of defaults apt for formatting a whole project."
   (:require
-   [formatting-stack.compilers.cider :as compilers.cider]
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
@@ -15,6 +14,7 @@
    [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
+   [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.strategies :as strategies]))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
@@ -66,15 +66,15 @@
                                 strategies/exclude-clj
                                 strategies/exclude-cljc)))])
 
-(def default-compilers
-  [(compilers.cider/new {:third-party-indent-specs third-party-indent-specs})])
+(def default-processors
+  [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (defn format-and-lint-project! [& {:keys [in-background?]
                                    :or   {in-background? false}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
-                                 :compilers default-compilers
+                                 :processors default-processors
                                  :in-background? in-background?
                                  :intersperse-newlines? true))
 
@@ -82,7 +82,7 @@
                         :or   {in-background? false}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
-                                 :compilers default-compilers
+                                 :processors default-processors
                                  :linters default-linters
                                  :in-background? in-background?
                                  :intersperse-newlines? true))

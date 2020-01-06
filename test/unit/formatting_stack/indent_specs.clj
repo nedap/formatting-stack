@@ -1,10 +1,10 @@
 (ns unit.formatting-stack.indent-specs
   (:require
    [clojure.test :refer :all]
-   [formatting-stack.compilers.cider :as compilers.cider]
    [formatting-stack.formatters.cljfmt.impl :as cljfmt.impl]
    [formatting-stack.indent-specs :as sut]
-   [formatting-stack.protocols.compiler :refer [compile!]]))
+   [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.protocols.processor :refer [process!]]))
 
 (deftest default-third-party-indent-specs
   (testing "They can be processed without throwing errors, i.e. the quoted values are syntactically correct"
@@ -13,6 +13,6 @@
              cljfmt.impl/cljfmt-third-party-indent-specs
              doall))
 
-    (is (do (-> (compilers.cider/new {:third-party-indent-specs sut/default-third-party-indent-specs})
-                (compile! []))
+    (is (do (-> (processors.cider/new {:third-party-indent-specs sut/default-third-party-indent-specs})
+                (process! []))
             true))))

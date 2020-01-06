@@ -1,4 +1,4 @@
-(ns formatting-stack.compilers.test-runner.impl
+(ns formatting-stack.processors.test-runner.impl
   (:require
    [clojure.spec.alpha :as spec]
    [clojure.string :as string]

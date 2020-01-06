@@ -1,4 +1,4 @@
-(ns formatting-stack.compilers.test-runner
+(ns formatting-stack.processors.test-runner
   "A test runner meant to be integrated with VCSs. JVM-only, and only `clojure.test` is targeted.
 
   This test runner gathers Clojure ns's out of filenames, derives _even more_ testing ns's out of them
@@ -6,13 +6,13 @@
   and invokes `#'clojure.test/run-tests` out of that result."
   (:require
    [clojure.test]
-   [formatting-stack.compilers.test-runner.impl :refer :all]
-   [formatting-stack.protocols.compiler :as compiler]
+   [formatting-stack.processors.test-runner.impl :refer :all]
+   [formatting-stack.protocols.processor :as processor]
    [formatting-stack.strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]
    [nedap.utils.modular.api :refer [implement]]))
 
 ;; Not provided into any default stack, as it would be overly assuming about users' practices
-(defn compile! [_ filenames]
+(defn process! [_ filenames]
   (assert clojure.test/*load-tests*)
   (when-let [test-namespaces (->> filenames
                                   (testable-namespaces)
@@ -36,8 +36,8 @@
                        (concat (git-completely-staged))
                        (concat (git-not-completely-staged))
                        (distinct))]
-    (compile! {} filenames)))
+    (process! {} filenames)))
 
 (defn new []
   (implement {}
-    compiler/--compile! compile!))
+    processor/--process! process!))

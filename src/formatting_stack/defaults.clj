@@ -1,6 +1,5 @@
 (ns formatting-stack.defaults
   (:require
-   [formatting-stack.compilers.cider :as compilers.cider]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
    [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
@@ -12,6 +11,7 @@
    [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
+   [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.strategies :as strategies]))
 
 (def default-strategies [strategies/git-completely-staged])
@@ -57,7 +57,6 @@
                                                                strategies/namespaces-within-refresh-dirs-only)})
                       (linters.kondo/new)])
 
-(defn default-compilers [third-party-indent-specs]
-  [(compilers.cider/new {:third-party-indent-specs third-party-indent-specs
-                         :strategies extended-strategies})])
-
+(defn default-processors [third-party-indent-specs]
+  [(processors.cider/new {:third-party-indent-specs third-party-indent-specs
+                          :strategies                extended-strategies})])
