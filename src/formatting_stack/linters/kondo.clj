@@ -7,8 +7,12 @@
 (def off {:level :off})
 
 (def default-options
-  {:linters {:invalid-arity     off
-             :cond-without-else off}})
+  {:linters {:cond-else off
+             :consistent-alias off
+             :deprecated-var off
+             :duplicate-require off
+             :redefined-var off
+             :unused-import off}})
 
 (defn lint! [this filenames]
   (-> (clj-kondo/run! {:lint filenames
