@@ -8,19 +8,16 @@
 (def off {:level :off})
 
 (def default-options
-  {:linters {:cond-else            off ;; undesired
-             :missing-docstring    off ;; undesired
-             :unused-symbol        off ;; undesired because unreliable
-             :unused-private-var   off ;; undesired because unreliable
-             :consistent-alias     off ;; duped by how-to-ns
-             :duplicate-require    off ;; duped by clean-ns
-             :unused-import        off ;; duped by clean-ns
-             :unused-namespace     off ;; duped by clean-ns
-             :unused-referred-var  off ;; duped by clean-ns
-             :unresolved-namespace off ;; duped by clean-ns
-             :misplaced-docstring  off ;; duped by Eastwood
-             :deprecated-var       off ;; duped by Eastwood
-             :redefined-var        off};; duped by Eastwood
+  {:linters {:cond-else            off  ;; undesired
+             :missing-docstring    off  ;; undesired
+             :unused-symbol        off  ;; undesired because potentially unreliable
+             :unused-private-var   off  ;; undesired because potentially unreliable
+             :consistent-alias     off  ;; duped by how-to-ns
+             :duplicate-require    off  ;; duped by clean-ns
+             :unused-import        off  ;; duped by clean-ns
+             :unused-namespace     off  ;; duped by clean-ns
+             :unused-referred-var  off  ;; duped by clean-ns
+             :unresolved-namespace off} ;; duped by clean-ns
    :lint-as '{clojure.core/bound-fn         clojure.core/fn ;; see https://git.io/JejbK
               nedap.speced.def/def-with-doc clojure.core/defonce
               nedap.speced.def/defn         clojure.core/defn
@@ -32,11 +29,21 @@
    :output {:exclude-files ["test-resources/*"
                             "test/unit/formatting_stack/formatters/cljfmt/impl/sample_data.clj"]}})
 
+(def clj-options
+  "CLJ files are also linted by eastwood, disable duplicate linters"
+  {:linters {:misplaced-docstring  off
+             :deprecated-var       off
+             :redefined-var        off}})
+
 (defn lint! [{:keys [kondo-options]} filenames]
-  (-> (clj-kondo/run! {:lint filenames
-                       :config  (deep-merge kondo-options default-options)})
-      (select-keys [:findings])
-      clj-kondo/print!))
+  (let [{clj-files true
+         cljs-files false} (group-by (fn [f] (boolean (re-find #"\.clj$" f))) filenames)
+        findings (->> [(clj-kondo/run! {:lint clj-files
+                                        :config (deep-merge default-options clj-options (or kondo-options {}))})
+                       (clj-kondo/run! {:lint cljs-files
+                                        :config (deep-merge default-options (or kondo-options {}))})]
+                      (reduce (fn [memo {:keys [findings]}] (into memo findings)) []))]
+    (clj-kondo/print! {:findings findings})))
 
 (defn new []
   (implement {}
