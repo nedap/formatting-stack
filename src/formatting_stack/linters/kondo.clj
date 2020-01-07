@@ -2,6 +2,7 @@
   (:require
    [clj-kondo.core :as clj-kondo]
    [formatting-stack.protocols.linter :as linter]
+   [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
 (def off {:level :off})
@@ -31,9 +32,9 @@
    :output  {:exclude-files ["test-resources/*"
                              "test/unit/formatting_stack/formatters/cljfmt/impl/sample_data.clj"]}})
 
-(defn lint! [this filenames]
+(defn lint! [{:keys [kondo-options]} filenames]
   (-> (clj-kondo/run! {:lint   filenames
-                       :config default-options})
+                       :config (deep-merge kondo-options default-options)})
       (select-keys [:findings])
       clj-kondo/print!))
 
