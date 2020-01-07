@@ -18,9 +18,6 @@
              :unused-namespace     off ;; already offered by clean-ns
              :unused-referred-var  off ;; already offered by clean-ns
              :unresolved-namespace off ;; already offered by clean-ns
-             :misplaced-docstring  off ;; already offered by Eastwood
-             :deprecated-var       off ;; already offered by Eastwood
-             :redefined-var        off ;; already offered by Eastwood
              }
    :lint-as '{nedap.speced.def/def-with-doc clojure.core/defonce
               nedap.speced.def/defn         clojure.core/defn
@@ -32,11 +29,22 @@
    :output  {:exclude-files ["test-resources/*"
                              "test/unit/formatting_stack/formatters/cljfmt/impl/sample_data.clj"]}})
 
+(def clj-options
+  "CLJ files are also linted by eastwood, disable duplicate linters"
+  {:linters {:misplaced-docstring off
+             :deprecated-var      off
+             :redefined-var       off}})
+
 (defn lint! [{:keys [kondo-options]} filenames]
-  (-> (clj-kondo/run! {:lint   filenames
-                       :config (deep-merge kondo-options default-options)})
-      (select-keys [:findings])
-      clj-kondo/print!))
+  (let [{cljs-files true
+         clj-files  false} (group-by (fn [f] (boolean (re-find #"\.cljs$" f))) filenames)
+        findings (->> [(clj-kondo/run! {:lint   clj-files
+                                        :config (deep-merge default-options clj-options (or kondo-options {}))})
+                       (clj-kondo/run! {:lint   cljs-files
+                                        :config (deep-merge default-options (or kondo-options {}))})]
+                      (map :findings)
+                      (reduce into))]
+    (clj-kondo/print! {:findings findings})))
 
 (defn new []
   (implement {}
