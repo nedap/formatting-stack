@@ -8,6 +8,7 @@
                  [com.nedap.staffing-solutions/speced.def "1.1.1"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
@@ -60,7 +61,6 @@
 
   ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
   :profiles {:dev         {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
-                                          [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                                           [com.stuartsierra/component "0.4.0"]
                                           [com.taoensso/timbre "4.10.0"]
                                           [criterium "0.4.5"]
