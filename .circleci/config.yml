@@ -9,7 +9,7 @@ commands:
             - v1-dependencies-{{ checksum "project.clj" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: lein with-profile -dev,+test,+ci deps
+      - run: lein with-profile -dev,+test,+ci,+cider-nrepl deps
       - save_cache:
           paths:
             - ~/.m2
@@ -18,7 +18,7 @@ commands:
 executors:
   lein-executor:
     docker:
-      - image: circleci/clojure:openjdk-8-lein-2.9.1-node
+      - image: circleci/clojure:openjdk-8-lein-2.9.1
     working_directory: ~/repo
     environment:
       LEIN_ROOT: "true"
@@ -31,7 +31,7 @@ jobs:
       - setup-env
       - run:
           name: 'Run JVM tests'
-          command: lein with-profile -dev,+ci test
+          command: lein with-profile -dev,+ci,+cider-nrepl test
   deploy:
     executor: lein-executor
     steps:
