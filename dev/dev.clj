@@ -9,6 +9,7 @@
    [criterium.core :refer [quick-bench]]
    [lambdaisland.deep-diff]))
 
+;; the "worker" source-path must be excluded.
 (set-refresh-dirs "src" "test" "dev")
 
 (defn suite []

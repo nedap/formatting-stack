@@ -9,9 +9,6 @@
         (when (compare-and-set! workload job nil)
           (try
             (job)
-            (catch Exception e
+            (catch Throwable e
               (-> e .printStackTrace))))
         (Thread/sleep 50)))))
-
-(comment ;; perform the following before `refresh`ing this ns:
-  (future-cancel runner))

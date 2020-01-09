@@ -42,6 +42,8 @@
                                    :username :env/clojars_user
                                    :password :env/clojars_pass}}
 
+  :source-paths ["src" "worker"]
+
   :target-path "target/%s"
 
   :monkeypatch-clojure-test false
