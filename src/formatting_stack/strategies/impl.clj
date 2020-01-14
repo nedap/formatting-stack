@@ -47,6 +47,8 @@
                  true)
                true)))
       (catch Exception e
+        false)
+      (catch AssertionError e
         false))))
 
 (defn extract-clj-files [files]

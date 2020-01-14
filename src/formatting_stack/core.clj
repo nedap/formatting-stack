@@ -47,6 +47,10 @@
             (catch Exception e
               (println "Encountered an exception, which will be printed in the next line."
                        "formatting-stack execution has *not* been aborted.")
+              (-> e .printStackTrace))
+            (catch AssertionError e
+              (println "Encountered an exception, which will be printed in the next line."
+                       "formatting-stack execution has *not* been aborted.")
               (-> e .printStackTrace))))))))
 
 (defn format! [& {:keys [strategies

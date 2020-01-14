@@ -1,4 +1,6 @@
-(ns formatting-stack.background)
+(ns formatting-stack.background
+  "This file live in a distinct source-paths so it's not affected by the Reloaded workflow,
+  while developing formatting-stack itself.")
 
 (defonce workload (atom nil))
 
@@ -9,6 +11,8 @@
         (when (compare-and-set! workload job nil)
           (try
             (job)
-            (catch Throwable e
+            (catch Exception e
+              (-> e .printStackTrace))
+            (catch AssertionError e
               (-> e .printStackTrace))))
         (Thread/sleep 50)))))

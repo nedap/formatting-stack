@@ -53,6 +53,21 @@
              *flush-on-newline* true]
      ~@forms))
 
+(defn report-processing-error [^Throwable e filename]
+  (let [s (->> e
+               .getStackTrace
+               (map (fn [x]
+                      (str "    " x)))
+               (interpose "\n"))]
+    (println (apply str
+                    "Encountered an exception, processing file: "
+                    filename
+                    ". The exception will be printed in the next line. "
+                    "formatting-stack execution has *not* been aborted.\n"
+                    (-> e .getMessage)
+                    "\n"
+                    s))))
+
 (defn process-in-parallel! [f files]
   (->> files
        (distribute-evenly-by {:f (fn [^String filename]
@@ -61,19 +76,10 @@
                             (try
                               (f filename)
                               (catch Exception e
-                                (let [s (->> e
-                                             .getStackTrace
-                                             (map (fn [x]
-                                                    (str "    " x)))
-                                             (interpose "\n"))]
-                                  (println (apply str
-                                                  "Encountered an exception, processing file: "
-                                                  filename
-                                                  ". The exception will be printed in the next line. "
-                                                  "formatting-stack execution has *not* been aborted.\n"
-                                                  (-> e .getMessage)
-                                                  "\n"
-                                                  s)))))))))
+                                (report-processing-error e filename))
+                              (catch AssertionError e
+                                (report-processing-error e filename)))))))
+
 (defn require-from-ns-decl [ns-decl]
   (->> ns-decl
        (find-first (fn [x]
