@@ -22,11 +22,11 @@
 
 (defn default-formatters [default-strategies]
   [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
-   (formatters.no-extra-blank-lines/new)
-   (formatters.newlines/new {})
    (-> (formatters.how-to-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace)))
+   (formatters.no-extra-blank-lines/new)
+   (formatters.newlines/new {})
    (-> (formatters.trivial-ns-duplicates/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace

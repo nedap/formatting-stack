@@ -22,9 +22,9 @@
 
 (def newliner
   (implement {}
-    protocols.linter/--lint!      print-newline
+    protocols.linter/--lint!       print-newline
     protocols.processor/--process! print-newline
-    protocols.formatter/--format! print-newline))
+    protocols.formatter/--format!  print-newline))
 
 (defn process! [method members category-strategies default-strategies intersperse-newlines?]
   ;; `memoize` rationale: results are cached not for performance,
