@@ -35,13 +35,14 @@
              :redefined-var        off}})
 
 (defn lint! [{:keys [kondo-options]} filenames]
-  (let [{clj-files true
-         cljs-files false} (group-by (fn [f] (boolean (re-find #"\.clj$" f))) filenames)
+  (let [{cljs-files true
+         clj-files false} (group-by (fn [f] (boolean (re-find #"\.cljs$" f))) filenames)
         findings (->> [(clj-kondo/run! {:lint clj-files
                                         :config (deep-merge default-options clj-options (or kondo-options {}))})
                        (clj-kondo/run! {:lint cljs-files
                                         :config (deep-merge default-options (or kondo-options {}))})]
-                      (reduce (fn [memo {:keys [findings]}] (into memo findings)) []))]
+                      (map :findings)
+                      (reduce into))]
     (clj-kondo/print! {:findings findings})))
 
 (defn new []
