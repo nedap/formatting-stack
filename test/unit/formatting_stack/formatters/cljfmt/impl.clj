@@ -33,16 +33,18 @@
 
   (testing "`:defn` resolves as a known-good rule"
     (let [key (gensym)
-          rule (get (sut/cljfmt-indents-for nil {key :defn})
+          rule (get (sut/cljfmt-indents-for nil {key {:style/indent :defn}})
                     key)]
-      (is (= [[:inner 0] rule]))))
+      (is (= [[:inner 0]]
+             rule))))
 
   (testing "Nonsensical rules are omitted"
     (let [key (gensym)
-          rule (get (sut/cljfmt-indents-for nil {key :sdlkfjdslfj})
+          rule (get (sut/cljfmt-indents-for nil {key {:style/indent :sdlkfjdslfj}})
                     key
                     ::not-found)]
-      (is (= ::not-found rule))))
+      (is (= ::not-found
+             rule))))
 
   (testing "`def`s and `:refer`s are understood"
     (are [file e] (let [{u 'foo
