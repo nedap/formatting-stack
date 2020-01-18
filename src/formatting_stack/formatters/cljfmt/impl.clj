@@ -1,12 +1,14 @@
 (ns formatting-stack.formatters.cljfmt.impl
   (:require
    [cljfmt.core]
+   [clojure.spec.alpha :as spec]
    [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.indent-specs]
    [formatting-stack.project-parsing :refer [project-namespaces]]
-   [formatting-stack.util :refer [dissoc-by rcomp require-lock]]))
+   [formatting-stack.util :refer [dissoc-by rcomp require-lock]]
+   [nedap.speced.def :as speced]))
 
 (def ^:dynamic *cache* nil)
 
@@ -24,12 +26,19 @@
     (catch Exception e
       {})))
 
+(spec/def ::indent-key #{:style/indent :style.cljfmt/indent :style.cljfmt/type})
+
+(spec/def ::indent-spec (spec/map-of ::indent-key any?))
+
+(spec/def ::indent-mapping (spec/map-of symbol? ::indent-spec))
+
 ;; :block is for things like do, with*, ->
 ;; :inner is for things like def (and for workarounding multi-arity defns with some sort of "body" argument)
 ;; see https://git.io/fhMtH for examples
-(defn to-cljfmt-indent [{cider-indent  :style/indent
-                         cljfmt-indent :style.cljfmt/indent
-                         cljfmt-type   :style.cljfmt/type}]
+(speced/defn to-cljfmt-indent [{cider-indent  :style/indent
+                                cljfmt-indent :style.cljfmt/indent
+                                cljfmt-type   :style.cljfmt/type
+                                :as           ^::speced/nilable ^::indent-spec _}]
   (or cljfmt-indent
       (and (number? cider-indent) [[(or cljfmt-type :block)
                                     cider-indent]])
@@ -63,13 +72,13 @@
         (some-> *cache* (swap! assoc ::project-macro-mappings v))
         v)))
 
-(defn cljfmt-indents-for
+(speced/defn cljfmt-indents-for
   "Returns a value derived from `#'cljfmt.core/default-indents`, with:
   * the indentation specs defined in your project (and its dependencies) via metadata; and
   * the specs explicitly passed as an argument to this defn.
 
   The ns of `file` is analysed, for resolving `:def`-ed and `:refer`-ed symbols accurately."
-  [file third-party-intent-specs]
+  [file, ^::indent-mapping third-party-intent-specs]
   (let [macro-mappings (project-macro-mappings)
         ns-mappings (if (some-> file (string/ends-with? ".cljs"))
                       {}
