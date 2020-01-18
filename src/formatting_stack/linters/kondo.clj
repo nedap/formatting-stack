@@ -18,8 +18,7 @@
              :unused-namespace     off  ;; duped by clean-ns
              :unused-referred-var  off  ;; duped by clean-ns
              :unresolved-namespace off} ;; duped by clean-ns
-   :lint-as '{clojure.core/bound-fn         clojure.core/fn ;; see https://git.io/JejbK
-              nedap.speced.def/def-with-doc clojure.core/defonce
+   :lint-as '{nedap.speced.def/def-with-doc clojure.core/defonce
               nedap.speced.def/defn         clojure.core/defn
               nedap.speced.def/defprotocol  clojure.core/defprotocol
               nedap.speced.def/doc          clojure.repl/doc
