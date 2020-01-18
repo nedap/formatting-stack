@@ -9,9 +9,9 @@
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
    [formatting-stack.indent-specs]
-   [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
    [formatting-stack.linters.kondo :as linters.kondo]
+   [formatting-stack.linters.line-length :as linters.line-length]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
@@ -57,7 +57,7 @@
    (-> (linters.loc-per-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
-   (-> (linters.bikeshed/new {})
+   (-> (linters.line-length/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
    (-> (linters.eastwood/new {})
