@@ -3,7 +3,8 @@
    [clj-kondo.core :as clj-kondo]
    [formatting-stack.protocols.linter :as linter]
    [medley.core :refer [deep-merge]]
-   [nedap.utils.modular.api :refer [implement]]))
+   [nedap.utils.modular.api :refer [implement]]
+   [clojure.set :as set]))
 
 (def off {:level :off})
 
@@ -37,14 +38,18 @@
 
 (defn lint! [{:keys [kondo-options]} filenames]
   (let [{cljs-files true
-         clj-files  false} (group-by (fn [f] (boolean (re-find #"\.cljs$" f))) filenames)
-        findings (->> [(clj-kondo/run! {:lint   clj-files
-                                        :config (deep-merge default-options clj-options (or kondo-options {}))})
-                       (clj-kondo/run! {:lint   cljs-files
-                                        :config (deep-merge default-options (or kondo-options {}))})]
-                      (map :findings)
-                      (reduce into))]
-    (clj-kondo/print! {:findings findings})))
+         clj-files  false} (group-by (fn [f] (boolean (re-find #"\.cljs$" f))) filenames)]
+    (->> [(clj-kondo/run! {:lint   clj-files
+                           :config (deep-merge default-options clj-options (or kondo-options {}))})
+          (clj-kondo/run! {:lint   cljs-files
+                           :config (deep-merge default-options (or kondo-options {}))})]
+         (mapcat :findings)
+         (map (fn [m]
+                (-> (set/rename-keys m {:row     :line
+                                        :message :msg
+                                        :type    :linter
+                                        :col     :column})
+                    (update :linter (fn [k] (keyword "kondo" (name k))))))))))
 
 (defn new []
   (implement {}
