@@ -41,21 +41,29 @@
                                                             strategies/namespaces-within-refresh-dirs-only
                                                             strategies/do-not-use-cached-results!)))]))
 
-(def default-linters [(linters.ns-aliases/new {:strategies (conj extended-strategies
-                                                                 strategies/files-with-a-namespace
-                                                                 ;; reader conditionals may confuse `linters.ns-aliases`
-                                                                 strategies/exclude-cljc
-                                                                 ;; string requires may confuse clojure.tools.*
-                                                                 strategies/exclude-cljs)})
-                      (linters.loc-per-ns/new {:strategies (conj extended-strategies
-                                                                 strategies/exclude-edn)})
-                      (linters.bikeshed/new {:strategies (conj extended-strategies
-                                                               strategies/exclude-edn)})
-                      (linters.eastwood/new {:strategies (conj extended-strategies
-                                                               strategies/exclude-cljs
-                                                               strategies/jvm-requirable-files
-                                                               strategies/namespaces-within-refresh-dirs-only)})
-                      (linters.kondo/new)])
+(def default-linters [(-> (linters.ns-aliases/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/files-with-a-namespace
+                                                   ;; reader conditionals may confuse `linters.ns-aliases`
+                                                   strategies/exclude-cljc
+                                                   ;; string requires may confuse clojure.tools.*
+                                                   strategies/exclude-cljs)))
+                      (-> (linters.loc-per-ns/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-edn)))
+                      (-> (linters.bikeshed/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-edn)))
+                      (-> (linters.eastwood/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-cljs
+                                                   strategies/jvm-requirable-files
+                                                   strategies/namespaces-within-refresh-dirs-only)))
+                      (-> (linters.kondo/new)
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-edn
+                                                   strategies/exclude-clj
+                                                   strategies/exclude-cljc)))])
 
 (defn default-processors [third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs

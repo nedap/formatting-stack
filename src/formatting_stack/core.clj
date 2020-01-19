@@ -17,8 +17,8 @@
                [])
        distinct))
 
-(defn print-newline [_this _files]
-  (println))
+(def print-newline
+  (constantly println))
 
 (def newliner
   (implement {}
@@ -65,7 +65,7 @@
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
-        processors                (or processors (default-processors third-party-indent-specs))
+        processors               (or processors (default-processors third-party-indent-specs))
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)

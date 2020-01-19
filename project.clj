@@ -5,7 +5,7 @@
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
-                 [com.nedap.staffing-solutions/speced.def "1.2.0"]
+                 [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.0.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
