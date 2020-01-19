@@ -1,11 +1,15 @@
 (ns formatting-stack.linters.ns-aliases
   "Observes these guidelines: https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as string]
-   [clojure.tools.namespace.file :as file]
+   [clojure.tools.namespace.parse :as parse]
+   [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [process-in-parallel!]]
-   [nedap.utils.modular.api :refer [implement]]))
+   [nedap.utils.modular.api :refer [implement]])
+  (:import
+   (java.io PushbackReader)))
 
 (defn clause= [a b]
   (->> [a b]
@@ -69,27 +73,29 @@
                 (derived? alias :from ns-name))
             (boolean))))))
 
+(defn read-ns-decl
+  "Reads file with line/column metadata"
+  [filename]
+  (with-open [rdr (-> (io/reader filename) PushbackReader. indexing-push-back-reader)]
+    (parse/read-ns-decl rdr)))
+
 (defn lint! [{:keys [acceptable-aliases-whitelist]} filenames]
   (->> filenames
        (process-in-parallel! (fn [filename]
-                               (let [bad-require-clauses (->> filename
-                                                              file/read-file-ns-decl
-                                                              formatting-stack.util/require-from-ns-decl
-                                                              (rest)
-                                                              (remove (partial acceptable-require-clause?
-                                                                               acceptable-aliases-whitelist)))]
-                                 (when (seq bad-require-clauses)
-                                   (let [formatted-bad-requires (->> bad-require-clauses
-                                                                     (map (fn [x]
-                                                                            (str "    " x)))
-                                                                     (string/join "\n"))]
-                                     (-> (str "Warning for "
-                                              filename
-                                              ": the following :require aliases are not derived from their refered namespace:"
-                                              "\n"
-                                              formatted-bad-requires
-                                              ". See https://stuartsierra.com/2015/05/10/clojure-namespace-aliases\n")
-                                         (println)))))))))
+                               (->> filename
+                                    read-ns-decl
+                                    formatting-stack.util/require-from-ns-decl
+                                    (rest)
+                                    (remove (partial acceptable-require-clause?
+                                                     acceptable-aliases-whitelist))
+                                    (map (fn [bad-alias]
+                                           {:filename filename
+                                            :line   (:line (meta bad-alias))
+                                            :column (:column (meta bad-alias))
+                                            :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
+                                            :msg (str bad-alias " is not a derived alias")
+                                            :linter :formatting-stack/ns-aliases})))))
+       (mapcat identity)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]
             :or {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
