@@ -8,11 +8,12 @@
    [clojure.walk :as walk]
    [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
-   [formatting-stack.protocols.formatter]
+   [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]
    [nedap.utils.spec.api :refer [check!]]))
 
 (spec/def ::libspec coll?)
@@ -133,16 +134,17 @@
     (when-not (= replacement ns-form)
       replacement)))
 
-(defrecord Formatter [how-to-ns-opts]
-  formatting-stack.protocols.formatter/Formatter
-  (format! [this files]
-    (let [how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                     (or how-to-ns-opts {}))]
-      (->> files
-           (process-in-parallel! (fn [filename]
-                                   (when (ns-form-of filename)
-                                     (replace-ns-form! filename
-                                                       (speced/fn ^{::speced/spec (complement #{"nil"})} [ns-form]
-                                                         (some-> ns-form remove-exact-duplicates pr-str))
-                                                       "Removing trivial duplicates in `ns` form:"
-                                                       how-to-ns-opts))))))))
+(defn format! [{:keys [how-to-ns-opts]} files]
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (when (ns-form-of filename)
+                                 (replace-ns-form! filename
+                                                   (speced/fn ^{::speced/spec (complement #{"nil"})} [ns-form]
+                                                     (some-> ns-form remove-exact-duplicates pr-str))
+                                                   "Removing trivial duplicates in `ns` form:"
+                                                   how-to-ns-opts))))))
+
+(defn new [{:keys [how-to-ns-opts]
+            :or {how-to-ns-opts {}}}]
+  (implement {:how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)}
+    formatter/--format! format!))

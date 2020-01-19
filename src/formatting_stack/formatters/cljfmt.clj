@@ -1,20 +1,18 @@
 (ns formatting-stack.formatters.cljfmt
   (:require
    [cljfmt.main]
-   [clojure.java.io :as io]
    [formatting-stack.formatters.cljfmt.impl :as impl]
-   [formatting-stack.protocols.formatter]
+   [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.util :refer [process-in-parallel!]]
-   [medley.core :refer [deep-merge]]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(defrecord Formatter [options third-party-indent-specs]
-  formatting-stack.protocols.formatter/Formatter
-  (format! [this files]
-    (let [cljfmt-opts (deep-merge cljfmt.main/default-options
-                                  (or options {}))
-          cljfmt-files (map io/file files)]
+(defn format! [{:keys [third-party-indent-specs]} files]
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (let [indents (impl/cljfmt-indents-for filename third-party-indent-specs)]
+                                 (cljfmt.main/fix [filename] {:indents indents}))))))
 
-      (->> files
-           (process-in-parallel! (fn [filename]
-                                   (let [indents (impl/cljfmt-indents-for filename third-party-indent-specs)]
-                                     (cljfmt.main/fix [filename] {:indents indents}))))))))
+(speced/defn new [{:keys [third-party-indent-specs] :as options}]
+  (implement options
+    formatter/--format! format!))

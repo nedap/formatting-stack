@@ -3,8 +3,9 @@
   (:require
    [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
-   [formatting-stack.protocols.linter]
-   [formatting-stack.util :refer [process-in-parallel!]]))
+   [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.util :refer [process-in-parallel!]]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn clause= [a b]
   (->> [a b]
@@ -68,28 +69,29 @@
                 (derived? alias :from ns-name))
             (boolean))))))
 
-(defrecord Linter [acceptable-aliases-whitelist]
-  formatting-stack.protocols.linter/Linter
-  (lint! [this filenames]
-    (let [acceptable-aliases-whitelist (or acceptable-aliases-whitelist
-                                           default-acceptable-aliases-whitelist)]
-      (->> filenames
-           (process-in-parallel! (fn [filename]
-                                   (let [bad-require-clauses (->> filename
-                                                                  file/read-file-ns-decl
-                                                                  formatting-stack.util/require-from-ns-decl
-                                                                  (rest)
-                                                                  (remove (partial acceptable-require-clause?
-                                                                                   acceptable-aliases-whitelist)))]
-                                     (when (seq bad-require-clauses)
-                                       (let [formatted-bad-requires (->> bad-require-clauses
-                                                                         (map (fn [x]
-                                                                                (str "    " x)))
-                                                                         (string/join "\n"))]
-                                         (-> (str "Warning for "
-                                                  filename
-                                                  ": the following :require aliases are not derived from their refered namespace:"
-                                                  "\n"
-                                                  formatted-bad-requires
-                                                  ". See https://stuartsierra.com/2015/05/10/clojure-namespace-aliases\n")
-                                             (println)))))))))))
+(defn lint! [{:keys [acceptable-aliases-whitelist]} filenames]
+  (->> filenames
+       (process-in-parallel! (fn [filename]
+                               (let [bad-require-clauses (->> filename
+                                                              file/read-file-ns-decl
+                                                              formatting-stack.util/require-from-ns-decl
+                                                              (rest)
+                                                              (remove (partial acceptable-require-clause?
+                                                                               acceptable-aliases-whitelist)))]
+                                 (when (seq bad-require-clauses)
+                                   (let [formatted-bad-requires (->> bad-require-clauses
+                                                                     (map (fn [x]
+                                                                            (str "    " x)))
+                                                                     (string/join "\n"))]
+                                     (-> (str "Warning for "
+                                              filename
+                                              ": the following :require aliases are not derived from their refered namespace:"
+                                              "\n"
+                                              formatted-bad-requires
+                                              ". See https://stuartsierra.com/2015/05/10/clojure-namespace-aliases\n")
+                                         (println)))))))))
+
+(defn new [{:keys [acceptable-aliases-whitelist]
+            :or {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
+  (implement {:acceptable-aliases-whitelist acceptable-aliases-whitelist}
+    linter/--lint! lint!))

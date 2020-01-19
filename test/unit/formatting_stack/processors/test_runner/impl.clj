@@ -1,8 +1,8 @@
-(ns unit.formatting-stack.compilers.test-runner.impl
+(ns unit.formatting-stack.processors.test-runner.impl
   (:require
    [clojure.string :as string]
    [clojure.test :refer :all]
-   [formatting-stack.compilers.test-runner.impl :as sut]
+   [formatting-stack.processors.test-runner.impl :as sut]
    [formatting-stack.project-parsing :refer [project-namespaces]]
    [nedap.speced.def :as speced]))
 
@@ -17,8 +17,8 @@
 (deftest add-t
   (are [input expected] (= expected
                            (-> input make-ns sut/add-t))
-    ::foo     "unit.formatting-stack.compilers.test-runner.impl.t-foo"
-    ::foo.bar "unit.formatting-stack.compilers.test-runner.impl.foo.t-bar"))
+    ::foo     "unit.formatting-stack.processors.test-runner.impl.t-foo"
+    ::foo.bar "unit.formatting-stack.processors.test-runner.impl.foo.t-bar"))
 
 (deftest sut-consumers
   (let [corpus (project-namespaces)]
@@ -60,9 +60,9 @@
 
     ;; `:test` metadata detection
     ["project.clj"
-     "test/unit/formatting_stack/compilers/test_runner/impl.clj"
+     "test/unit/formatting_stack/processors/test_runner/impl.clj"
      "/"]
-    [(the-ns 'unit.formatting-stack.compilers.test-runner.impl)]
+    [(the-ns 'unit.formatting-stack.processors.test-runner.impl)]
 
     ;; `sut` alias detection
     ["src/formatting_stack/strategies.clj"]

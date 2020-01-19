@@ -4,10 +4,11 @@
    [formatting-stack.background]
    [formatting-stack.defaults :refer :all]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
-   [formatting-stack.protocols.compiler :as protocols.compiler]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
-   [formatting-stack.util :refer [with-serialized-output]]))
+   [formatting-stack.protocols.processor :as protocols.processor]
+   [formatting-stack.util :refer [with-serialized-output]]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn files-from-strategies [strategies]
   (->> strategies
@@ -16,19 +17,14 @@
                [])
        distinct))
 
+(def print-newline
+  (constantly println))
+
 (def newliner
-  (reify
-    protocols.formatter/Formatter
-    (format! [_ _]
-      (println))
-
-    protocols.linter/Linter
-    (lint! [_ _]
-      (println))
-
-    protocols.compiler/Compiler
-    (compile! [_ _]
-      (println))))
+  (implement {}
+    protocols.linter/--lint!       print-newline
+    protocols.processor/--process! print-newline
+    protocols.formatter/--format!  print-newline))
 
 (defn process! [method members category-strategies default-strategies intersperse-newlines?]
   ;; `memoize` rationale: results are cached not for performance,
@@ -51,13 +47,17 @@
             (catch Exception e
               (println "Encountered an exception, which will be printed in the next line."
                        "formatting-stack execution has *not* been aborted.")
+              (-> e .printStackTrace))
+            (catch AssertionError e
+              (println "Encountered an exception, which will be printed in the next line."
+                       "formatting-stack execution has *not* been aborted.")
               (-> e .printStackTrace))))))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
                          formatters
                          linters
-                         compilers
+                         processors
                          in-background?
                          intersperse-newlines?]}]
   ;; the following `or` clauses ensure that Components don't pass nil values
@@ -65,7 +65,7 @@
         third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
-        compilers                (or compilers default-compilers)
+        processors               (or processors (default-processors third-party-indent-specs))
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)
@@ -73,8 +73,8 @@
          :formatters
          linters-strategies
          :linters
-         compilers-strategies
-         :compilers
+         processors-strategies
+         :processors
          default-strategies
          :default}               strategies
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
@@ -84,7 +84,7 @@
                (process! protocols.linter/lint!      linters    linters-strategies    strategies intersperse-newlines?)
                (when intersperse-newlines?
                  (println))
-               (process! protocols.compiler/compile! compilers  compilers-strategies  strategies intersperse-newlines?))]
+               (process! protocols.processor/process! processors  processors-strategies  strategies intersperse-newlines?))]
     (if in-background?
       (do
         (reset! formatting-stack.background/workload impl)

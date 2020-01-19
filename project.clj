@@ -5,15 +5,17 @@
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
-                 [com.nedap.staffing-solutions/speced.def "1.1.1"]
+                 [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.modular "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
                  [lein-bikeshed "0.5.1"]
-                 [medley "1.1.0"]
+                 [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
-                 [org.clojure/tools.namespace "0.3.0-alpha4"]
+                 [org.clojure/tools.namespace "0.3.1"]
                  [org.clojure/tools.reader "1.3.2"]
                  [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
@@ -41,6 +43,8 @@
                                    :username :env/clojars_user
                                    :password :env/clojars_pass}}
 
+  :source-paths ["src" "worker"]
+
   :target-path "target/%s"
 
   :monkeypatch-clojure-test false
@@ -56,26 +60,28 @@
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
   ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
-  :profiles {:dev  {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
-                                   [com.nedap.staffing-solutions/utils.modular "2.0.0"]
-                                   [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
-                                   [com.taoensso/timbre "4.10.0"]
-                                   [criterium "0.4.4"]
-                                   [lambdaisland/deep-diff "0.0-29"]
-                                   [medley "1.2.0"]
-                                   [org.clojure/core.async "0.5.527"]
-                                   [org.clojure/math.combinatorics "0.1.1"]
-                                   [org.clojure/test.check "0.10.0-alpha3"]]
-                    :source-paths ["dev"]}
+  :profiles {:dev         {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
+                                          [com.stuartsierra/component "0.4.0"]
+                                          [com.taoensso/timbre "4.10.0"]
+                                          [criterium "0.4.5"]
+                                          [lambdaisland/deep-diff "0.0-29"]
+                                          [org.clojure/core.async "0.5.527"]
+                                          [org.clojure/math.combinatorics "0.1.1"]
+                                          [org.clojure/test.check "0.10.0-alpha3"]]
+                           :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
+                           :source-paths ["dev"]
+                           :repl-options {:init-ns dev}}
 
              ;; `dev` in :test is important - a test depends on it:
-             :test {:source-paths   ["dev"]
-                    :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.1"]]
-                    :jvm-opts       ["-Dclojure.core.async.go-checking=true"]
-                    :resource-paths ["test-resources"]}
+             :test        {:source-paths   ["dev"]
+                           :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]]
+                           :jvm-opts       ["-Dclojure.core.async.go-checking=true"
+                                            "-Duser.language=en-US"]
+                           :resource-paths ["test-resources"]}
 
-             :ci   {:plugins      [[cider/cider-nrepl "0.21.1"]]
-                    :pedantic?    :abort
-                    :jvm-opts     ["-Dclojure.main.report=stderr"]
-                    :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                    :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
+             :cider-nrepl {:plugins [[cider/cider-nrepl "0.21.1"]]}
+
+             :ci          {:pedantic?    :abort
+                           :jvm-opts     ["-Dclojure.main.report=stderr"]
+                           :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                           :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})

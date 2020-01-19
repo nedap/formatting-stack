@@ -1,4 +1,6 @@
-(ns formatting-stack.background)
+(ns formatting-stack.background
+  "This file live in a distinct source-paths so it's not affected by the Reloaded workflow,
+  while developing formatting-stack itself.")
 
 (defonce workload (atom nil))
 
@@ -10,8 +12,7 @@
           (try
             (job)
             (catch Exception e
+              (-> e .printStackTrace))
+            (catch AssertionError e
               (-> e .printStackTrace))))
         (Thread/sleep 50)))))
-
-(comment ;; perform the following before `refresh`ing this ns:
-  (future-cancel runner))
