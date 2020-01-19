@@ -83,8 +83,7 @@
                                  :formatters default-formatters
                                  :linters default-linters
                                  :processors default-processors
-                                 :in-background? in-background?
-                                 :intersperse-newlines? true))
+                                 :in-background? in-background?))
 
 (defn lint-project! [& {:keys [in-background?]
                         :or   {in-background? false}}]
@@ -92,5 +91,4 @@
                                  :formatters []
                                  :processors default-processors
                                  :linters default-linters
-                                 :in-background? in-background?
-                                 :intersperse-newlines? true))
+                                 :in-background? in-background?))
