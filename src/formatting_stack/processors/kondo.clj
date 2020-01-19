@@ -7,15 +7,18 @@
    [nedap.utils.modular.api :refer [implement]])
   (:import (java.io File)))
 
-(defn process! [_ _]
-  (let [files (-> (System/getProperty "java.class.path")
-                  (str/split #"\:"))
-        cache-dir ".clj-kondo"]
-    (-> ".clj-kondo" File. .mkdirs)
+(defn process! [{:keys [initialized?]} files]
+  (let [cache-dir ".clj-kondo"]
+    (-> cache-dir File. .mkdirs)
+    (when-not @initialized?
+      (reset! initialized? true)
+      (clj-kondo/run! {:lint (-> (System/getProperty "java.class.path")
+                                 (str/split #"\:"))
+                       :cache-dir cache-dir}))
     (clj-kondo/run! {:lint files
                      :cache-dir cache-dir}))
   nil)
 
 (defn new []
-  (implement {}
+  (implement {:initialized? (atom false)}
     processor/--process! process!))
