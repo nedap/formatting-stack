@@ -45,6 +45,6 @@
                       (reduce into))]
     (clj-kondo/print! {:findings findings})))
 
-(defn new []
-  (implement {}
+(defn new [{:keys [kondo-options] :as options}]
+  (implement options
     linter/--lint! lint!))
