@@ -7,7 +7,7 @@
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.protocols.processor :as protocols.processor]
-   [formatting-stack.reporter :as reporter]
+   [formatting-stack.protocols.reporter :refer [report]]
    [formatting-stack.util :refer [with-serialized-output]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -50,6 +50,7 @@
                          formatters
                          linters
                          processors
+                         reporter
                          in-background?]}]
   ;; the following `or` clauses ensure that Components don't pass nil values
   (let [strategies               (or strategies default-strategies)
@@ -66,7 +67,7 @@
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
                (process! protocols.formatter/format! formatters formatters-strategies strategies)
                (->> (process! protocols.linter/lint! linters    linters-strategies    strategies)
-                    reporter/print-report)
+                    (report reporter))
                (process! protocols.processor/process! processors  processors-strategies  strategies))]
     (if in-background?
       (do
