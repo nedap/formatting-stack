@@ -18,22 +18,18 @@
         (pos-int? x))))
 
 (spec/def ::line ::column)
-(spec/def ::level #{:warning :error :exception :info})
+(spec/def ::level #{:warning :error :exception})
 
 (defmulti reportmm :level)
 (defmethod reportmm :exception [_]
   (spec/keys :req-un [::msg
-                      ::level]
-             :opt-un [::column
-                      ::linter
-                      ::filename
-                      ::line]))
+                      ::level]))
 (defmethod reportmm :default [_]
   (spec/keys :req-un [::filename
                       ::linter
                       ::msg
-                      ::level]
-             :opt-un [::column
+                      ::level
+                      ::column
                       ::line]))
 
 (spec/def ::report

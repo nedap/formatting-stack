@@ -35,15 +35,13 @@
                     (try
                       (->> strategies files (method member))
                       (catch Exception e
-                        (println "Encountered an exception, which will be printed in the next line."
-                                 "formatting-stack execution has *not* been aborted.")
-                        (-> e .printStackTrace)
-                        nil)
+                        [{:msg (str "Encountered an exception, which will be printed in the next line.\n"
+                                    (with-out-str (clojure.stacktrace/print-stack-trace e)))
+                          :level :exception}])
                       (catch AssertionError e
-                        (println "Encountered an exception, which will be printed in the next line."
-                                 "formatting-stack execution has *not* been aborted.")
-                        (-> e .printStackTrace)
-                        nil)))))))))
+                        [{:msg (str "Encountered an exception, which will be printed in the next line.\n"
+                                    (with-out-str (clojure.stacktrace/print-stack-trace e)))
+                          :level :exception}])))))))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
@@ -65,10 +63,11 @@
          linters-strategies    :linters
          processors-strategies :processors} strategies
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
-               (process! protocols.formatter/format! formatters formatters-strategies strategies)
-               (->> (process! protocols.linter/lint! linters    linters-strategies    strategies)
-                    (report reporter))
-               (process! protocols.processor/process! processors  processors-strategies  strategies))]
+               (->> [(process! protocols.formatter/format!  formatters  formatters-strategies strategies)
+                     (process! protocols.linter/lint!       linters     linters-strategies    strategies)
+                     (process! protocols.processor/process! processors  processors-strategies strategies)]
+                    (mapcat identity)
+                    (report reporter)))]
     (if in-background?
       (do
         (reset! formatting-stack.background/workload impl)
