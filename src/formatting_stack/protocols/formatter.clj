@@ -8,5 +8,5 @@
 
 Normally it's a wrapper around a formatting library, with extra configuration, performance improvements, etc."
 
-  (format! [this, ^::protocols.spec/filenames filenames]
+  (^nil? format! [this, ^::protocols.spec/filenames filenames]
     "Formats `filenames` according to a formatter of your choice."))

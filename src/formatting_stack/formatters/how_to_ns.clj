@@ -18,7 +18,8 @@
 (defn format! [{:keys [how-to-ns-options]} files]
   (->> (remove #(str/ends-with? % ".edn") files)
        (process-in-parallel! (fn [filename]
-                               (how-to-ns.main/fix [filename] how-to-ns-options)))))
+                               (how-to-ns.main/fix [filename] how-to-ns-options))))
+  nil)
 
 (defn new [{:keys [how-to-ns-options]
             :or {how-to-ns-options {}}}]

@@ -11,7 +11,8 @@
   (->> files
        (process-in-parallel! (fn [filename]
                                (let [indents (impl/cljfmt-indents-for filename third-party-indent-specs)]
-                                 (cljfmt.main/fix [filename] {:indents indents}))))))
+                                 (cljfmt.main/fix [filename] {:indents indents})))))
+  nil)
 
 (speced/defn new [{:keys [third-party-indent-specs] :as options}]
   (implement options

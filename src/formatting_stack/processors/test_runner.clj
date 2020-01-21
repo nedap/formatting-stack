@@ -18,7 +18,8 @@
                                   (testable-namespaces)
                                   (map ns->sym)
                                   (seq))]
-    (apply clojure.test/run-tests test-namespaces)))
+    (apply clojure.test/run-tests test-namespaces))
+  nil)
 
 (defn test!
   "Convenience function provided in case it is desired to leverage this ns's functionality,

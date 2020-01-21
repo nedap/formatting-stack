@@ -20,6 +20,7 @@
 (def extended-strategies [strategies/git-completely-staged
                           strategies/git-not-completely-staged])
 
+;; fixme use assoc because new doesn't allow extra keys
 (defn default-formatters [third-party-indent-specs]
   (let [opts {:third-party-indent-specs third-party-indent-specs}
         ;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.

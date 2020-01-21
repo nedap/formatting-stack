@@ -142,7 +142,8 @@
                                                    (speced/fn ^{::speced/spec (complement #{"nil"})} [ns-form]
                                                      (some-> ns-form remove-exact-duplicates pr-str))
                                                    "Removing trivial duplicates in `ns` form:"
-                                                   how-to-ns-opts))))))
+                                                   how-to-ns-opts)))))
+  nil)
 
 (defn new [{:keys [how-to-ns-opts]
             :or {how-to-ns-opts {}}}]
