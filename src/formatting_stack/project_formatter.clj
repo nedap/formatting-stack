@@ -16,11 +16,15 @@
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
 
 (def default-strategies [strategies/all-files])
+
+(def default-reporter
+  (pretty-printer/new {}))
 
 (def default-formatters
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
@@ -82,6 +86,7 @@
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
+                                 :reporter default-reporter
                                  :processors default-processors
                                  :in-background? in-background?))
 
@@ -90,5 +95,6 @@
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
                                  :processors default-processors
+                                 :reporter default-reporter
                                  :linters default-linters
                                  :in-background? in-background?))

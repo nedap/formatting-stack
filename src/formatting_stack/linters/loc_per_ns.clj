@@ -18,6 +18,7 @@
                                (when (overly-long-ns? filename max-lines-per-ns)
                                  {:filename filename
                                   :linter :formatting-stack/loc-per-ns
+                                  :level :warning
                                   :msg (str "Longer than " max-lines-per-ns " LOC. consider refactoring")
                                   :line (+ 1 max-lines-per-ns) ;; first line after limit is the issue
                                   :column 1})))
