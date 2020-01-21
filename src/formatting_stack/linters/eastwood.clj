@@ -45,7 +45,8 @@
          (map (fn [{:keys [uri-or-file-name] :as m}]
                 (-> m
                   (update :linter (fn [k] (keyword "eastwood" (name k))))
-                  (assoc :filename (if (string? uri-or-file-name)
+                  (assoc :level :warning
+                         :filename (if (string? uri-or-file-name)
                                      uri-or-file-name
                                      (str/replace (-> uri-or-file-name .getPath)
                                                   root-dir
