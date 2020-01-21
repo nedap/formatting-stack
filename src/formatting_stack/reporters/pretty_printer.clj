@@ -27,9 +27,7 @@
                  (println (case level
                             :error   (colorize "ˣ" :red)
                             :warning (colorize "⚠" :yellow))
-                          (if (and line column)
-                            (colorize (format "%3d:%-3d" line column) :grey)
-                            "")
+                          (colorize (format "%3d:%-3d" line column) :grey)
                           (format (str "%-" max-msg-length "." max-msg-length "s") msg)
                           (colorize (str "  " linter) :grey)))
                (println))))
