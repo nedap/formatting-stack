@@ -36,9 +36,13 @@
                       (->> strategies files (method member))
                       (catch Exception e
                         [{:exception e
+                          :source :formatting-stack/process!
+                          :msg  (str "Exception during " member)
                           :level :exception}])
                       (catch AssertionError e
                         [{:exception e
+                          :source :formatting-stack/process!
+                          :msg  (str "Exception during " member)
                           :level :exception}])))))))))
 
 (defn format! [& {:keys [strategies

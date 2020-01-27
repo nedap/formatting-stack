@@ -33,13 +33,13 @@
        (into (sorted-map-by compare)) ;; sort filenames for consistent output
        (run! (fn [[title reports]]
                (println (colorize title :cyan))
-               (doseq [{:keys [msg column line linter level]} (sort-by :line reports)]
+               (doseq [{:keys [msg column line source level]} (sort-by :line reports)]
                  (println (case level
                             :error   (colorize "ˣ" :red)
                             :warning (colorize "⚠" :yellow))
                           (colorize (format "%3d:%-3d" line column) :grey)
                           (format (str "%-" max-msg-length "." max-msg-length "s") msg)
-                          (colorize (str "  " linter) :grey)))
+                          (colorize (str "  " source) :grey)))
                (println))))
 
   ;; fixme dedupe
