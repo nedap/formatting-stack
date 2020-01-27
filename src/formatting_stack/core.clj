@@ -35,12 +35,10 @@
                     (try
                       (->> strategies files (method member))
                       (catch Exception e
-                        [{:msg (str "Encountered an exception, which will be printed in the next line.\n"
-                                    (with-out-str (clojure.stacktrace/print-stack-trace e)))
+                        [{:exception e
                           :level :exception}])
                       (catch AssertionError e
-                        [{:msg (str "Encountered an exception, which will be printed in the next line.\n"
-                                    (with-out-str (clojure.stacktrace/print-stack-trace e)))
+                        [{:exception e
                           :level :exception}])))))))))
 
 (defn format! [& {:keys [strategies

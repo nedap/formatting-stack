@@ -2,7 +2,7 @@
  (:require
   [clojure.string :as string]
   [formatting-stack.protocols.linter :as linter]
-  [formatting-stack.util :refer [process-in-parallel!]]
+  [formatting-stack.util :refer [process-in-parallel! ensure-coll]]
   [nedap.utils.modular.api :refer [implement]]))
 
 (defn exceeding-lines [threshold filename]
@@ -20,7 +20,7 @@
 (defn lint! [{:keys [max-line-length]} filenames]
   (->> filenames
        (process-in-parallel! (partial exceeding-lines max-line-length))
-       (mapcat identity)))
+       (mapcat ensure-coll)))
 
 (defn new [{:keys [max-line-length]
             :or {max-line-length 130}}]

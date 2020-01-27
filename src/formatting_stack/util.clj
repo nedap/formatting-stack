@@ -55,19 +55,10 @@
      ~@forms))
 
 (defn report-processing-error [^Throwable e filename]
-  (let [s (->> e
-               .getStackTrace
-               (map (fn [x]
-                      (str "    " x)))
-               (interpose "\n"))]
-    (println (apply str
-                    "Encountered an exception, processing file: "
-                    filename
-                    ". The exception will be printed in the next line. "
-                    "formatting-stack execution has *not* been aborted.\n"
-                    (-> e .getMessage)
-                    "\n"
-                    s))))
+  {:level :exception
+   :filename filename
+   :msg "Encountered an exception"
+   :exception e})
 
 (defn process-in-parallel! [f files]
   (->> files
@@ -101,6 +92,6 @@
       false)))
 
 (speced/defn ensure-coll [^some? x]
-  (if (coll? x)
+  (if (sequential? x)
     x
     [x]))

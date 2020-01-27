@@ -6,7 +6,7 @@
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [process-in-parallel!]]
+   [formatting-stack.util :refer [process-in-parallel! ensure-coll]]
    [nedap.utils.modular.api :refer [implement]])
   (:import
    (java.io PushbackReader)))
@@ -93,11 +93,10 @@
                                             :line   (:line (meta bad-alias))
                                             :column (:column (meta bad-alias))
                                             :level :warning
-                                            :w (throw (ex-info "wat" {:pa :tat})) ;; fixme remove, testing
                                             :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
                                             :msg (str bad-alias " is not a derived alias")
                                             :linter :formatting-stack/ns-aliases})))))
-       (mapcat identity)))
+       (mapcat ensure-coll)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]
             :or {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
