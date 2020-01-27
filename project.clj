@@ -77,7 +77,8 @@
                            :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]]
                            :jvm-opts       ["-Dclojure.core.async.go-checking=true"
                                             "-Duser.language=en-US"]
-                           :resource-paths ["test-resources"]}
+                           :resource-paths ["test-resources-extra"
+                                            "test-resources"]}
 
              :cider-nrepl {:plugins [[cider/cider-nrepl "0.21.1"]]}
 
