@@ -16,6 +16,7 @@
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
    [medley.core :refer [mapply]]))
 
@@ -76,6 +77,9 @@
 (def default-processors
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
+(def default-reporter
+  (pretty-printer/new {}))
+
 (defn format-and-lint-branch! [& {:keys [target-branch in-background?]
                                   :or   {target-branch  "master"
                                          in-background? (not (System/getenv "CI"))}}]
@@ -86,6 +90,7 @@
     (formatting-stack.core/format! :strategies default-strategies
                                    :processors default-processors
                                    :formatters formatters
+                                   :reporter default-reporter
                                    :linters linters
                                    :in-background? in-background?)))
 
@@ -97,5 +102,6 @@
     (formatting-stack.core/format! :strategies default-strategies
                                    :formatters []
                                    :processors default-processors
+                                   :reporter default-reporter
                                    :linters linters
                                    :in-background? in-background?)))
