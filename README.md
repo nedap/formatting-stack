@@ -22,8 +22,6 @@ As of today, it is integrated with:
     * Defaults to processing .cljs files only, given the overlap with Eastwood.
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
     * Used for "clean unused imports" functionality
-  * [bikeshed](https://github.com/dakrone/lein-bikeshed)
-    * Used for checking max column count
   * [all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
     * Configurable, you can ensure either 0 or 1 ending newlines per file.
 
@@ -32,6 +30,7 @@ And it also bundles a few tiny linters of its own:
   * [loc-per-ns](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/loc_per_ns.clj) warns if a given NS surpasses a targeted LOC count.
   * [ns-aliases](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/ns_aliases.clj) warns if [Sierra's](https://stuartsierra.com/2015/05/10/clojure-namespace-aliases) aliasing guide is disregarded.
   * [one-resource-per-ns](https://github.com/nedap/formatting-stack/blob/master/src/formatting_stack/linters/one_resource_per_ns.clj) warns if a Clojure namespace is defined in more than one file.
+  * [line-length](https://github.com/nedap/formatting-stack/blob/f1cf4206399a77a83fde4140095d4c59c10b1605/src/formatting_stack/linters/line_length.clj) warns if max line length is reached.
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
