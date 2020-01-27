@@ -7,7 +7,7 @@
 (spec/def ::filenames (spec/coll-of ::filename))
 
 (spec/def ::msg present-string?)
-(spec/def ::linter ;; fixme, should be generic. ::source ?
+(spec/def ::source
   (fn [x]
     (and (keyword? x)
          (namespace x))))
@@ -23,10 +23,14 @@
 (defmulti reportmm :level)
 (defmethod reportmm :exception [_]
   (spec/keys :req-un [::msg
-                      ::level]))
+                      ::exception
+                      ::source
+                      ::level]
+             :opt-un [::filename]))
+
 (defmethod reportmm :default [_]
   (spec/keys :req-un [::filename
-                      ::linter
+                      ::source
                       ::msg
                       ::level
                       ::column

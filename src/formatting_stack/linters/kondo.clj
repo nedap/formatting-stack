@@ -1,10 +1,10 @@
 (ns formatting-stack.linters.kondo
   (:require
    [clj-kondo.core :as clj-kondo]
+   [clojure.set :as set]
    [formatting-stack.protocols.linter :as linter]
    [medley.core :refer [deep-merge]]
-   [nedap.utils.modular.api :refer [implement]]
-   [clojure.set :as set]))
+   [nedap.utils.modular.api :refer [implement]]))
 
 (def off {:level :off})
 
@@ -44,12 +44,11 @@
           (clj-kondo/run! {:lint   cljs-files
                            :config (deep-merge default-options (or kondo-options {}))})]
          (mapcat :findings)
-         (map (fn [m]
+         (map (fn [{:keys [type] :as m}]
                 (-> (set/rename-keys m {:row     :line
                                         :message :msg
-                                        :type    :linter
                                         :col     :column})
-                    (update :linter (fn [k] (keyword "kondo" (name k))))))))))
+                    (assoc :source (keyword "kondo" (name type)))))))))
 
 (defn new []
   (implement {}

@@ -95,7 +95,7 @@
                                             :level :warning
                                             :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
                                             :msg (str bad-alias " is not a derived alias")
-                                            :linter :formatting-stack/ns-aliases})))))
+                                            :source :formatting-stack/ns-aliases})))))
        (mapcat ensure-coll)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]

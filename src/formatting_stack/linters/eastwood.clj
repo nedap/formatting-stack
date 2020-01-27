@@ -7,7 +7,8 @@
    [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]])
-  (:import (java.io File)))
+  (:import
+   (java.io File)))
 
 (def default-eastwood-options
   ;; Avoid false positives or more-annoying-than-useful checks:
@@ -42,15 +43,15 @@
                               (->TrackingReporter reports)))
     (->> (:warnings @reports)
          (map :warn-data)
-         (map (fn [{:keys [uri-or-file-name] :as m}]
-                (-> m
-                  (update :linter (fn [k] (keyword "eastwood" (name k))))
-                  (assoc :level :warning
-                         :filename (if (string? uri-or-file-name)
-                                     uri-or-file-name
-                                     (str/replace (-> uri-or-file-name .getPath)
-                                                  root-dir
-                                                  "")))))))))
+         (map (fn [{:keys [uri-or-file-name linter] :as m}]
+                (assoc m
+                  :level    :warning
+                  :source   (keyword "eastwood" (str linter))
+                  :filename (if (string? uri-or-file-name)
+                              uri-or-file-name
+                              (str/replace (-> uri-or-file-name .getPath)
+                                           root-dir
+                                           ""))))))))
 
 (defn new [{:keys [eastwood-options]
             :or {eastwood-options {}}}]

@@ -10,7 +10,7 @@
        (map-indexed (fn [i row]
                       (when (< threshold (count row))
                         {:filename filename
-                         :linter   :formatting-stack/line-length
+                         :source   :formatting-stack/line-length
                          :level    :warning
                          :column   (+ 1 threshold)
                          :line     (+ 1 i)

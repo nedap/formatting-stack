@@ -56,6 +56,7 @@
 
 (defn report-processing-error [^Throwable e filename]
   {:level :exception
+   :source :formatting-stack/report-processing-error
    :filename filename
    :msg "Encountered an exception"
    :exception e})
