@@ -46,7 +46,7 @@
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
                   :level    :warning
-                  :source   (keyword "eastwood" (str linter))
+                  :source   (keyword "eastwood" (name linter))
                   :filename (if (string? uri-or-file-name)
                               uri-or-file-name
                               (str/replace (-> uri-or-file-name .getPath)

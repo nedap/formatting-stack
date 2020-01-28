@@ -34,6 +34,7 @@
   "CLJ files are also linted by eastwood, disable duplicate linters"
   {:linters {:misplaced-docstring off
              :deprecated-var      off
+             :inline-def          off
              :redefined-var       off}})
 
 (defn lint! [{:keys [kondo-options]} filenames]
@@ -50,6 +51,6 @@
                                         :col     :column})
                     (assoc :source (keyword "kondo" (name type)))))))))
 
-(defn new []
-  (implement {}
+(defn new [{:keys [kondo-options]}]
+  (implement {:kondo-options kondo-options}
     linter/--lint! lint!))
