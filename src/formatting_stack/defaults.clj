@@ -11,6 +11,7 @@
    [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
+   [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.strategies :as strategies]))
 
@@ -63,8 +64,11 @@
                           (assoc :strategies (conj extended-strategies
                                                    strategies/exclude-edn
                                                    strategies/exclude-clj
-                                                   strategies/exclude-cljc)))])
+                                                   strategies/exclude-cljc)))
+                      (-> (linters.one-resource-per-ns/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/files-with-a-namespace)))])
 
 (defn default-processors [third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs
-                          :strategies                extended-strategies})])
+                          :strategies               extended-strategies})])
