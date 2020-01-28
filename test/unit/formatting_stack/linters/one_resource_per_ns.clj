@@ -15,7 +15,7 @@
 
 (deftest resource-path->filenames
   (are [input] (testing input
-                 (is (= (-> "test/" (str input) test-helpers/complete-filename vector)
+                 (is (= (-> "test/" (str input) test-helpers/filename-as-resource vector)
                         (sut/resource-path->filenames input)))
                  true)
     "unit/formatting_stack/linters/one_resource_per_ns.clj"

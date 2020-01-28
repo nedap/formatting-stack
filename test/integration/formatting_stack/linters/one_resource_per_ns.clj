@@ -17,9 +17,9 @@
 
   (testing "Sample files are ambiguous (on a per-extension basis)"
     (are [input extension expected] (testing input
-                                      (is (= (->> expected
-                                                  (mapv test-helpers/complete-filename)
-                                                  (set))
+                                      (is (= (into #{}
+                                                   (map test-helpers/filename-as-resource)
+                                                   expected)
                                              (->> input
                                                   sut/analyze
                                                   (filter (rcomp :extension #{extension}))

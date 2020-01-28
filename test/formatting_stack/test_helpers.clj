@@ -4,7 +4,7 @@
   (:import
    (java.io File)))
 
-(speced/defn complete-filename [^string? filename]
+(speced/defn filename-as-resource [^string? filename]
   (str "file:" (-> filename
                    File.
                    .getAbsolutePath)))
