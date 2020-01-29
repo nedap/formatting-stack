@@ -5,9 +5,7 @@
    [clojure.tools.reader.reader-types :refer [push-back-reader]]
    [clojure.walk :as walk]
    [formatting-stack.util :refer [ensure-coll rcomp try-require]]
-   [nedap.speced.def :as speced]
-   [refactor-nrepl.config]
-   [refactor-nrepl.ns.clean-ns :refer [clean-ns]])
+   [nedap.speced.def :as speced])
   (:import
    (java.io File)))
 
@@ -80,10 +78,18 @@
          original-ns-form
          namespaces-that-should-never-cleaned
          libspec-whitelist]}
-  (let [whitelist (into libspec-whitelist (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))]
-    (binding [refactor-nrepl.config/*config* (-> refactor-nrepl-opts
-                                                 (update :libspec-whitelist into whitelist))]
-      (clean-ns {:path filename}))))
+
+  (require ;; lazy-loading in order to support unconfigured consumers
+   '[refactor-nrepl.config]
+   '[refactor-nrepl.ns.clean-ns])
+
+  (let [whitelist (into libspec-whitelist (map str) (used-namespace-names filename namespaces-that-should-never-cleaned))
+        config-var (resolve 'refactor-nrepl.config/*config*)
+        clean-ns (resolve 'refactor-nrepl.ns.clean-ns/clean-ns)]
+    (with-bindings* {config-var (-> refactor-nrepl-opts
+                                    (update :libspec-whitelist into whitelist))}
+      (fn []
+        (clean-ns {:path filename})))))
 
 (defn has-duplicate-requires? [filename]
   (->> filename

@@ -27,20 +27,24 @@
         ;; making usage more awkward.
         ;; the strategies mechanism needs some rework to avoid this limitation.
         cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies default-strategies))]
-    [(formatters.cljfmt/new cljfmt-and-how-to-ns-opts)
-     (formatters.how-to-ns/new cljfmt-and-how-to-ns-opts)
-     (formatters.no-extra-blank-lines/new)
-     (formatters.newlines/new opts)
-     (formatters.trivial-ns-duplicates/new (assoc opts :strategies (conj default-strategies
-                                                                         strategies/files-with-a-namespace
-                                                                         strategies/exclude-edn)))
-     (formatters.clean-ns/new (assoc opts :strategies (conj default-strategies
-                                                            strategies/files-with-a-namespace
-                                                            strategies/exclude-cljc
-                                                            strategies/exclude-cljs
-                                                            strategies/exclude-edn
-                                                            strategies/namespaces-within-refresh-dirs-only
-                                                            strategies/do-not-use-cached-results!)))]))
+    (->> [(formatters.cljfmt/new cljfmt-and-how-to-ns-opts)
+          (formatters.how-to-ns/new cljfmt-and-how-to-ns-opts)
+          (formatters.no-extra-blank-lines/new)
+          (formatters.newlines/new opts)
+          (formatters.trivial-ns-duplicates/new (assoc opts :strategies (conj default-strategies
+                                                                              strategies/files-with-a-namespace
+                                                                              strategies/exclude-edn)))
+          (when (strategies/refactor-nrepl-available?)
+            (formatters.clean-ns/new (assoc opts :strategies (conj default-strategies
+                                                                   strategies/when-refactor-nrepl
+                                                                   strategies/files-with-a-namespace
+                                                                   strategies/exclude-cljc
+                                                                   strategies/exclude-cljs
+                                                                   strategies/exclude-edn
+                                                                   strategies/namespaces-within-refresh-dirs-only
+                                                                   strategies/do-not-use-cached-results!))))]
+
+         (filterv some?))))
 
 (def default-linters [(-> (linters.ns-aliases/new {})
                           (assoc :strategies (conj extended-strategies

@@ -4,6 +4,7 @@
    [formatting-stack.formatters.clean-ns :as sut]
    [formatting-stack.formatters.clean-ns.impl :as impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
+   [formatting-stack.strategies :as strategies]
    [formatting-stack.util.ns :as util.ns]
    [functional.formatting-stack.formatters.clean-ns.should-be-cleaned]
    [functional.formatting-stack.formatters.clean-ns.should-not-be-cleaned]
@@ -45,31 +46,33 @@
 
 (assert should-not-be-cleaned-5)
 
-(deftest used-namespace-names
-  (is (not (seq (impl/used-namespace-names should-be-cleaned-f #{}))))
-  (is (seq (impl/used-namespace-names should-not-be-partially-cleaned-f #{})))
-  (is (seq (impl/used-namespace-names should-not-be-cleaned-f #{})))
-  (is (seq (impl/used-namespace-names should-not-be-cleaned-2-f #{}))))
+(when (strategies/refactor-nrepl-available?)
+  (deftest used-namespace-names
+    (is (not (seq (impl/used-namespace-names should-be-cleaned-f #{}))))
+    (is (seq (impl/used-namespace-names should-not-be-partially-cleaned-f #{})))
+    (is (seq (impl/used-namespace-names should-not-be-cleaned-f #{})))
+    (is (seq (impl/used-namespace-names should-not-be-cleaned-2-f #{})))))
 
-(deftest clean-ns-form
-  (are [op filename ns-form libspec-whitelist namespaces-that-should-never-cleaned]
-       (let [cleaner (sut/make-cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                       sut/default-nrepl-opts
-                                       namespaces-that-should-never-cleaned
-                                       libspec-whitelist
-                                       filename)
-             v (util.ns/replaceable-ns-form filename cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts)]
-         (op v))
-    some? should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{}
-    nil?  should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{'functional.formatting-stack.formatters.clean-ns.should-be-cleaned}
-    some? "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-libspec-whitelist #{}
-    nil?  "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-libspec-whitelist sut/default-namespaces-that-should-never-cleaned
-    nil?  should-not-be-partially-cleaned-f should-not-be-partially-cleaned sut/default-libspec-whitelist #{}
-    nil?  should-not-be-cleaned-f           should-not-be-cleaned           sut/default-libspec-whitelist #{}
-    nil?  should-not-be-cleaned-2-f         should-not-be-cleaned-2         sut/default-libspec-whitelist #{}
-    nil?  should-not-be-cleaned-3-f         should-not-be-cleaned-3         sut/default-libspec-whitelist #{}
-    nil?  should-not-be-cleaned-4-f         should-not-be-cleaned-4         sut/default-libspec-whitelist #{}
-    nil?  should-not-be-cleaned-5-f         should-not-be-cleaned-5         sut/default-libspec-whitelist #{}
-    some? should-not-be-cleaned-3-f         should-not-be-cleaned-3         #{}                           #{}
-    some? should-not-be-cleaned-4-f         should-not-be-cleaned-4         #{}                           #{}
-    some? should-not-be-cleaned-5-f         should-not-be-cleaned-5         #{}                           #{}))
+(when (strategies/refactor-nrepl-available?)
+  (deftest clean-ns-form
+    (are [op filename ns-form libspec-whitelist namespaces-that-should-never-cleaned]
+         (let [cleaner (sut/make-cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
+                                         @sut/default-nrepl-opts
+                                         namespaces-that-should-never-cleaned
+                                         libspec-whitelist
+                                         filename)
+               v (util.ns/replaceable-ns-form filename cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts)]
+           (op v))
+      some? should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{}
+      nil?  should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{'functional.formatting-stack.formatters.clean-ns.should-be-cleaned}
+      some? "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-libspec-whitelist #{}
+      nil?  "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-libspec-whitelist sut/default-namespaces-that-should-never-cleaned
+      nil?  should-not-be-partially-cleaned-f should-not-be-partially-cleaned sut/default-libspec-whitelist #{}
+      nil?  should-not-be-cleaned-f           should-not-be-cleaned           sut/default-libspec-whitelist #{}
+      nil?  should-not-be-cleaned-2-f         should-not-be-cleaned-2         sut/default-libspec-whitelist #{}
+      nil?  should-not-be-cleaned-3-f         should-not-be-cleaned-3         sut/default-libspec-whitelist #{}
+      nil?  should-not-be-cleaned-4-f         should-not-be-cleaned-4         sut/default-libspec-whitelist #{}
+      nil?  should-not-be-cleaned-5-f         should-not-be-cleaned-5         sut/default-libspec-whitelist #{}
+      some? should-not-be-cleaned-3-f         should-not-be-cleaned-3         #{}                           #{}
+      some? should-not-be-cleaned-4-f         should-not-be-cleaned-4         #{}                           #{}
+      some? should-not-be-cleaned-5-f         should-not-be-cleaned-5         #{}                           #{})))

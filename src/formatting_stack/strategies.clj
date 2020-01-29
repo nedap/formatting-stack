@@ -13,16 +13,18 @@
    [clojure.string :as str]
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.formatters.clean-ns.impl]
+   [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
    [formatting-stack.util :refer [try-require]]
+   [formatting-stack.util :refer [require-lock]]
    [nedap.speced.def :as speced]
    [nedap.utils.spec.api :refer [check!]])
   (:import
    (java.io File)))
 
-(defn all-files
+(speced/defn all-files
   "This strategy unconditionally processes all files."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (let [tracked (impl/file-entries "git" "ls-files")
         untracked (impl/file-entries "git" "ls-files" "--others" "--exclude-standard")]
     (->> files
@@ -30,9 +32,9 @@
          (into untracked)
          (impl/extract-clj-files))))
 
-(defn git-completely-staged
+(speced/defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
-  [& {:keys [files impl]
+  [& {:keys [^::protocols.spec/filenames files, impl]
       :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
@@ -43,9 +45,9 @@
        (impl/extract-clj-files)
        (into files)))
 
-(defn git-not-completely-staged
+(speced/defn git-not-completely-staged
   "This strategy processes all files that are not _completely_ staged with git. Untracked files are also included."
-  [& {:keys [files impl]
+  [& {:keys [^::protocols.spec/filenames files, impl]
       :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-not-completely-staged-regex %))
@@ -59,55 +61,55 @@
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
              impl          (impl/file-entries "git" "diff" "--name-only" target-branch)
-             blacklist     (git-not-completely-staged)}}]
+             blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
        (remove (set blacklist))
        impl/extract-clj-files
        (into files)))
 
-(defn exclude-clj
+(speced/defn exclude-clj
   "This strategy excludes .clj files; .cljc files are not excluded in any case."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (remove (partial re-find #"\.clj$"))))
 
-(defn exclude-cljc
+(speced/defn exclude-cljc
   "This strategy excludes .cljc files; .cljs files are not excluded in any case."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (remove (partial re-find #"\.cljc$"))))
 
-(defn exclude-cljs
+(speced/defn exclude-cljs
   "This strategy excludes .cljs files; .cljc files are not excluded in any case."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (remove (partial re-find #"\.cljs$"))))
 
-(defn exclude-edn
+(speced/defn exclude-edn
   "This strategy excludes .edn files."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (remove (partial re-find #"\.edn$"))))
 
-(defn exclusively-cljs
+(speced/defn exclusively-cljs
   "This strategy excludes files not suffixed in .cljs or .cljc"
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (filter (partial re-find #"\.clj[cs]$"))))
 
-(defn files-with-a-namespace
+(speced/defn files-with-a-namespace
   "This strategy excludes files that don't begin with a `(ns ...)` form."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (filter formatting-stack.formatters.clean-ns.impl/ns-form-of)))
 
-(defn jvm-requirable-files
+(speced/defn jvm-requirable-files
   "This strategy excludes files that can't be `require`d under JVM Clojure."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
        (filter try-require)))
 
-(defn do-not-use-cached-results!
+(speced/defn do-not-use-cached-results!
   "Normally, subsequent 'members' (formatters, linters, processors)
   using identical strategies will cache the results of those strategies.
   That is apt for formatters that do safe modifications, but not for more dangerous formatters.
@@ -115,10 +117,10 @@
   By adding this empty strategy, it is signaled that the member using it should not use a cached result.
 
   You can find a detailed explanation/example in https://git.io/fh7E0 ."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   files)
 
-(defn namespaces-within-refresh-dirs-only
+(speced/defn namespaces-within-refresh-dirs-only
   "This strategy excludes the files that are Clojure/Script namespaces
   but are placed outside `#'clojure.tools.namespace.repl/refresh-dirs`.
 
@@ -131,7 +133,7 @@
   and then ensuring that code-evaluating tools such as refactor-nrepl or Eastwood also respect that exclusion.
 
   That can avoid some code-reloading issues related to duplicate `defprotocol` definitions, etc."
-  [& {:keys [files]}]
+  [& {:keys [^::protocols.spec/filenames files]}]
   {:pre [(check! seq                            refresh-dirs
                  (partial every? (speced/fn [^string? refresh-dir]
                                    (let [file (-> refresh-dir File.)]
@@ -148,3 +150,19 @@
                      (->> refresh-dirs
                           (some (fn [dir]
                                   (impl/dir-contains? dir file))))))))))
+
+(defn refactor-nrepl-available? []
+  (locking require-lock
+    (try
+      (require 'refactor-nrepl.ns.clean-ns)
+      true
+      (catch Throwable _
+        false))))
+
+(speced/defn when-refactor-nrepl
+  "This strategy leaves all `files` as-is iff the `refactor-nrepl` library is in the classpath;
+  else all `files` will be filtered out."
+  [& {:keys [^::protocols.spec/filenames files]}]
+  (if (refactor-nrepl-available?)
+    files
+    []))

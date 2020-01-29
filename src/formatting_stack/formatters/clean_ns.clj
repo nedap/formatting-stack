@@ -7,8 +7,7 @@
    [formatting-stack.util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
-   [nedap.utils.modular.api :refer [implement]]
-   [refactor-nrepl.config]))
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn make-cleaner [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
   (speced/fn ^{::speced/spec (complement #{"nil"})} [original-ns-form]
@@ -42,9 +41,18 @@
 (def default-libspec-whitelist
   (make-default-libspec-whitelist))
 
+(def default-nrepl-config-opts
+  (delay
+
+    (require ;; lazy-loading in order to support unconfigured consumers
+     '[refactor-nrepl.config])
+
+    (-> 'refactor-nrepl.config/*config* resolve deref)))
+
 (def default-nrepl-opts
-  (-> refactor-nrepl.config/*config*
-      (assoc :prefix-rewriting false)))
+  (delay
+    (-> @default-nrepl-config-opts
+        (assoc :prefix-rewriting false))))
 
 (def default-namespaces-that-should-never-cleaned
   #{'user 'dev})
@@ -63,11 +71,11 @@
                                          filename))))))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
-            :or {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned
-                 libspec-whitelist                    default-libspec-whitelist
-                 refactor-nrepl-opts                  default-nrepl-opts
-                 how-to-ns-opts                       {}}}]
-  (implement {:refactor-nrepl-opts (deep-merge refactor-nrepl.config/*config* refactor-nrepl-opts)
+            :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned
+                   libspec-whitelist                    default-libspec-whitelist
+                   refactor-nrepl-opts                  @default-nrepl-opts
+                   how-to-ns-opts                       {}}}]
+  (implement {:refactor-nrepl-opts (deep-merge @default-nrepl-config-opts refactor-nrepl-opts)
               :how-to-ns-opts      (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)
               :libspec-whitelist   libspec-whitelist
               :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned}
