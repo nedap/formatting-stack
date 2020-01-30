@@ -1,33 +1,40 @@
 (ns formatting-stack.reporters.pretty-printer
+  "Prints a colorized output of the reports"
   (:require
-   [nedap.utils.modular.api :refer [implement]]
+   [clojure.stacktrace :refer [print-stack-trace]]
+   [formatting-stack.protocols.reporter :as reporter]
+   [formatting-stack.util :refer [colorize]]
    [medley.core :refer [map-vals]]
-   [formatting-stack.protocols.reporter :as reporter]))
+   [nedap.utils.modular.api :refer [implement]]))
 
-;; fixme move to util
-(def ansi-colors
-  {:reset  "[0m"
-   :red    "[031m"
-   :green  "[032m"
-   :yellow "[033m"
-   :cyan   "[036m"
-   :grey   "[037m"})
+(defn print-summary [{:keys [summary?]} reports]
+  (when summary?
+    (->> (group-by :level reports)
+         (map-vals count)
+         (into (sorted-map-by compare)) ;; print summary in order
+         (run! (fn [[type n]]
+                 (-> (str n (case type
+                              :exception " exceptions occurred"
+                              :error " errors found"
+                              :warning " warnings found"))
+                     (colorize (case type
+                                 :exception :red
+                                 :error :red
+                                 :warning :yellow))
+                     (println)))))))
 
-(defn colorize [s color]
-  (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))
-
-;; fixme split into separate parts
-(defn print-report [{:keys [max-msg-length print-stacktraces?]} reports]
+(defn print-exceptions [{:keys [print-stacktraces?]} reports]
   (->> (filter (fn [{:keys [level]}] (#{:exception} level)) reports)
        (group-by :filename)
        (run! (fn [[title reports]]
                (println (colorize title :cyan))
                (doseq [{:keys [^Throwable exception]} reports]
                  (if print-stacktraces?
-                  (clojure.stacktrace/print-stack-trace exception)
-                  (println (ex-message exception)))
-                 (println)))))
+                   (print-stack-trace exception)
+                   (println (ex-message exception)))
+                 (println))))))
 
+(defn print-warnings [{:keys [max-msg-length] } reports]
   (->> (filter (fn [{:keys [level]}] (#{:error :warning} level)) reports)
        (group-by :filename)
        (into (sorted-map-by compare)) ;; sort filenames for consistent output
@@ -40,21 +47,17 @@
                           (colorize (format "%3d:%-3d" line column) :grey)
                           (format (str "%-" max-msg-length "." max-msg-length "s") msg)
                           (colorize (str "  " source) :grey)))
-               (println))))
+               (println)))))
 
-  ;; fixme dedupe
-  (let [summary (->> (group-by :level reports)
-                     (map-vals count))]
-    (when-let [exceptions (:exception summary)]
-      (println (colorize (str exceptions " exceptions occurred") :red)))
-    (when-let [error (:error summary)]
-      (println (colorize (str error " errors found") :red)))
-    (when-let [warning (:warning summary)]
-      (println (colorize (str warning " warnings found") :yellow)))))
+(defn print-report [this reports]
+  (print-exceptions this reports)
+  (print-warnings this reports)
+  (print-summary this reports))
 
-(defn new [{:keys [max-msg-length print-stacktraces?]
+(defn new [{:keys [max-msg-length print-stacktraces? summary?]
             :or {max-msg-length 120
-                 print-stacktraces? true}}]
+                 print-stacktraces? true
+                 summary? true}}]
   (implement {:max-msg-length max-msg-length
               :print-stacktraces? print-stacktraces?}
     reporter/--report print-report))

@@ -65,7 +65,7 @@
                                 strategies/exclude-cljs
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))
-   (-> (linters.kondo/new)
+   (-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn
                                 strategies/exclude-clj
@@ -80,9 +80,10 @@
 (def default-reporter
   (pretty-printer/new {}))
 
-(defn format-and-lint-branch! [& {:keys [target-branch in-background?]
+(defn format-and-lint-branch! [& {:keys [target-branch in-background? reporter]
                                   :or   {target-branch  "master"
-                                         in-background? (not (System/getenv "CI"))}}]
+                                         in-background? (not (System/getenv "CI"))
+                                         reporter default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
                               (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
         formatters (default-formatters default-strategies)
@@ -90,18 +91,20 @@
     (formatting-stack.core/format! :strategies default-strategies
                                    :processors default-processors
                                    :formatters formatters
-                                   :reporter default-reporter
+                                   :reporter reporter
                                    :linters linters
                                    :in-background? in-background?)))
 
-(defn lint-branch! [& {:keys [target-branch in-background?]
-                       :or   {target-branch "master"}}]
+(defn lint-branch! [& {:keys [target-branch in-background? reporter]
+                       :or   {target-branch "master"
+                              in-background? false
+                              reporter default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
                               (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
         linters (default-linters default-strategies)]
     (formatting-stack.core/format! :strategies default-strategies
                                    :formatters []
                                    :processors default-processors
-                                   :reporter default-reporter
+                                   :reporter reporter
                                    :linters linters
                                    :in-background? in-background?)))

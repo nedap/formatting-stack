@@ -17,6 +17,7 @@
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
+   [formatting-stack.reporters.file-writer :as file-writer]
    [formatting-stack.strategies :as strategies]))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
@@ -69,7 +70,7 @@
                                 strategies/exclude-cljs
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))
-   (-> (linters.kondo/new)
+   (-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn
                                 strategies/exclude-clj
@@ -81,20 +82,22 @@
 (def default-processors
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
-(defn format-and-lint-project! [& {:keys [in-background?]
-                                   :or   {in-background? false}}]
+(defn format-and-lint-project! [& {:keys [in-background? reporter]
+                                   :or   {in-background? false
+                                          reporter default-reporter}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
-                                 :reporter default-reporter
+                                 :reporter reporter
                                  :processors default-processors
                                  :in-background? in-background?))
 
-(defn lint-project! [& {:keys [in-background?]
-                        :or   {in-background? false}}]
+(defn lint-project! [& {:keys [in-background? reporter]
+                        :or   {in-background? false
+                               reporter default-reporter}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
                                  :processors default-processors
-                                 :reporter default-reporter
+                                 :reporter reporter
                                  :linters default-linters
                                  :in-background? in-background?))
