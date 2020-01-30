@@ -96,3 +96,14 @@
   (if (sequential? x)
     x
     [x]))
+
+(def ansi-colors
+  {:reset  "[0m"
+   :red    "[031m"
+   :green  "[032m"
+   :yellow "[033m"
+   :cyan   "[036m"
+   :grey   "[037m"})
+
+(defn colorize [s color]
+  (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))

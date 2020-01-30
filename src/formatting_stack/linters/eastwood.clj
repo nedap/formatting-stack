@@ -2,6 +2,7 @@
   (:require
    [clojure.string :as str]
    [eastwood.lint]
+   [eastwood.reporting-callbacks :as reporting-callbacks]
    [eastwood.util]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ns-name-from-filename]]
@@ -19,15 +20,15 @@
 
 (defrecord TrackingReporter [reports])
 
-(defmethod eastwood.reporting-callbacks/lint-warning TrackingReporter [{:keys [reports]} warning]
+(defmethod reporting-callbacks/lint-warning TrackingReporter [{:keys [reports]} warning]
   (swap! reports update :warnings (fnil conj []) warning)
   nil)
 
-(defmethod eastwood.reporting-callbacks/analyzer-exception TrackingReporter [{:keys [reports]} exception]
+(defmethod reporting-callbacks/analyzer-exception TrackingReporter [{:keys [reports]} exception]
   (swap! reports update :errors (fnil conj []) exception)
   nil)
 
-(defmethod eastwood.reporting-callbacks/note TrackingReporter [{:keys [reports]} msg]
+(defmethod reporting-callbacks/note TrackingReporter [{:keys [reports]} msg]
   (swap! reports update :note (fnil conj []) msg)
   nil)
 

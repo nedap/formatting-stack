@@ -65,7 +65,7 @@
                                                    strategies/exclude-cljs
                                                    strategies/jvm-requirable-files
                                                    strategies/namespaces-within-refresh-dirs-only)))
-                      (-> (linters.kondo/new)
+                      (-> (linters.kondo/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/exclude-edn
                                                    strategies/exclude-clj
