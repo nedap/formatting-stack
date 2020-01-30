@@ -20,31 +20,31 @@
 (def extended-strategies [strategies/git-completely-staged
                           strategies/git-not-completely-staged])
 
-;; fixme use assoc because new doesn't allow extra keys
 (defn default-formatters [third-party-indent-specs]
-  (let [opts {:third-party-indent-specs third-party-indent-specs}
-        ;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.
+  (let [;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.
         ;; ideally the how-to-ns formatter would have an extra `files-with-a-namespace` strategy but that would break git caching,
         ;; making usage more awkward.
         ;; the strategies mechanism needs some rework to avoid this limitation.
-        cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies default-strategies))]
-    (->> [(formatters.cljfmt/new cljfmt-and-how-to-ns-opts)
-          (formatters.how-to-ns/new cljfmt-and-how-to-ns-opts)
+        cached-strategies default-strategies]
+    (->> [(-> (formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
+              (assoc :strategies cached-strategies))
+          (-> (formatters.how-to-ns/new {})
+              (assoc :strategies cached-strategies))
           (formatters.no-extra-blank-lines/new)
-          (formatters.newlines/new opts)
-          (formatters.trivial-ns-duplicates/new (assoc opts :strategies (conj default-strategies
-                                                                              strategies/files-with-a-namespace
-                                                                              strategies/exclude-edn)))
+          (formatters.newlines/new {})
+          (-> (formatters.trivial-ns-duplicates/new {})
+              (assoc :strategies (conj default-strategies
+                                       strategies/files-with-a-namespace
+                                       strategies/exclude-edn)))
           (when (strategies/refactor-nrepl-available?)
-            (formatters.clean-ns/new (assoc opts :strategies (conj default-strategies
-                                                                   strategies/when-refactor-nrepl
-                                                                   strategies/files-with-a-namespace
-                                                                   strategies/exclude-cljc
-                                                                   strategies/exclude-cljs
-                                                                   strategies/exclude-edn
-                                                                   strategies/namespaces-within-refresh-dirs-only
-                                                                   strategies/do-not-use-cached-results!))))]
-
+            (-> (formatters.clean-ns/new {})
+                (assoc :strategies (conj default-strategies
+                                         strategies/files-with-a-namespace
+                                         strategies/exclude-cljc
+                                         strategies/exclude-cljs
+                                         strategies/exclude-edn
+                                         strategies/namespaces-within-refresh-dirs-only
+                                         strategies/do-not-use-cached-results!))))]
          (filterv some?))))
 
 (def default-linters [(-> (linters.ns-aliases/new {})
@@ -75,5 +75,5 @@
                                                    strategies/files-with-a-namespace)))])
 
 (defn default-processors [third-party-indent-specs]
-  [(processors.cider/new {:third-party-indent-specs third-party-indent-specs
-                          :strategies               extended-strategies})])
+  [(-> (processors.cider/new {:third-party-indent-specs third-party-indent-specs})
+       (assoc :strategies extended-strategies))])
