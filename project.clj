@@ -20,6 +20,10 @@
                  [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
 
+  ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
+  ;; avoiding having the global version shadow the local onel
+  :exclusions [formatting-stack]
+
   :description "An efficient, smart, graceful composition of formatters, linters and such."
 
   :url "https://github.com/nedap/formatting-stack"
