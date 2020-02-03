@@ -1,13 +1,14 @@
 (ns formatting-stack.component
   (:require
    [com.stuartsierra.component :as component]
+   [formatting-stack.component.impl :refer [parse-options]]
    [formatting-stack.core :refer [format!]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
 
 (speced/defn start [^map? this]
   (->> this
-       (apply seq)
+       parse-options
        (apply format!))
   this)
 

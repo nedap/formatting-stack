@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "2.0.0-alpha1"
+(defproject formatting-stack "2.0.1-alpha2"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2019.05.19-alpha"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
@@ -19,6 +19,10 @@
                  [org.clojure/tools.reader "1.3.2"]
                  [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
+
+  ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
+  ;; avoiding having the global version shadow the local onel
+  :exclusions [formatting-stack]
 
   :description "An efficient, smart, graceful composition of formatters, linters and such."
 
