@@ -2,14 +2,13 @@
   (:require
    [clojure.main]
    [formatting-stack.background]
-   [formatting-stack.defaults :refer [default-processors default-formatters default-linters default-strategies]]
+   [formatting-stack.defaults :refer [default-formatters default-linters default-processors default-strategies]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.protocols.reporter :refer [report]]
-   [formatting-stack.util :refer [with-serialized-output]]
-   [nedap.utils.modular.api :refer [implement]]))
+   [formatting-stack.util :refer [with-serialized-output]]))
 
 (defn files-from-strategies [strategies]
   (->> strategies
@@ -28,22 +27,22 @@
   (let [files (memoize (fn [strategies]
                          (files-from-strategies strategies)))]
     (with-serialized-output
-     (->> members
-         (mapcat (fn [member]
-                  (let [{specific-strategies :strategies} member
-                        strategies (or specific-strategies category-strategies default-strategies)]
-                    (try
-                      (->> strategies files (method member))
-                      (catch Exception e
-                        [{:exception e
-                          :source :formatting-stack/process!
-                          :msg  (str "Exception during " member)
-                          :level :exception}])
-                      (catch AssertionError e
-                        [{:exception e
-                          :source :formatting-stack/process!
-                          :msg  (str "Exception during " member)
-                          :level :exception}])))))))))
+      (->> members
+           (mapcat (fn [member]
+                     (let [{specific-strategies :strategies} member
+                           strategies (or specific-strategies category-strategies default-strategies)]
+                       (try
+                         (->> strategies files (method member))
+                         (catch Exception e
+                           [{:exception e
+                             :source :formatting-stack/process!
+                             :msg  (str "Exception during " member)
+                             :level :exception}])
+                         (catch AssertionError e
+                           [{:exception e
+                             :source :formatting-stack/process!
+                             :msg  (str "Exception during " member)
+                             :level :exception}])))))))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs

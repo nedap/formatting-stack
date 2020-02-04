@@ -5,7 +5,8 @@
    [clojure.string :as str]
    [formatting-stack.protocols.processor :as processor]
    [nedap.utils.modular.api :refer [implement]])
-  (:import (java.io File)))
+  (:import
+   (java.io File)))
 
 (defn process! [_ _]
   (let [files (-> (System/getProperty "java.class.path")

@@ -23,4 +23,3 @@
         :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
         :msg "[clojure.string :as foo] is not a derived alias"
         :filename "test-resources/ns_aliases_warning.clj"}])))
-

@@ -6,7 +6,7 @@
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [process-in-parallel! ensure-coll]]
+   [formatting-stack.util :refer [ensure-coll process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]])
   (:import
    (java.io PushbackReader)))
@@ -54,6 +54,7 @@
   '{d        [datomic.api datomic.client.api]
     impl     [::anything]
     log      [::anything]
+    m        [matcher-combinators.matchers]
     s        [clojure.spec.alpha cljs.spec.alpha]
     spec     [clojure.spec.alpha cljs.spec.alpha]
     speced   [nedap.speced.def]
