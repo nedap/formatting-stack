@@ -46,13 +46,13 @@
          (map :warn-data)
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
-                  :level    :warning
-                  :source   (keyword "eastwood" (name linter))
-                  :filename (if (string? uri-or-file-name)
-                              uri-or-file-name
-                              (str/replace (-> uri-or-file-name .getPath)
-                                           root-dir
-                                           ""))))))))
+                       :level    :warning
+                       :source   (keyword "eastwood" (name linter))
+                       :filename (if (string? uri-or-file-name)
+                                   uri-or-file-name
+                                   (str/replace (-> uri-or-file-name .getPath)
+                                                root-dir
+                                                ""))))))))
 
 (defn new [{:keys [eastwood-options]
             :or {eastwood-options {}}}]

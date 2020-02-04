@@ -1,9 +1,9 @@
 (ns formatting-stack.linters.line-length
- (:require
-  [clojure.string :as string]
-  [formatting-stack.protocols.linter :as linter]
-  [formatting-stack.util :refer [process-in-parallel! ensure-coll]]
-  [nedap.utils.modular.api :refer [implement]]))
+  (:require
+   [clojure.string :as string]
+   [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.util :refer [ensure-coll process-in-parallel!]]
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn exceeding-lines [threshold filename]
   (->> (-> filename slurp (string/split #"\n"))
@@ -25,4 +25,4 @@
 (defn new [{:keys [max-line-length]
             :or {max-line-length 130}}]
   (implement {:max-line-length max-line-length}
-             linter/--lint! lint!))
+    linter/--lint! lint!))

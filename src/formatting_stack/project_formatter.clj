@@ -17,7 +17,6 @@
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
-   [formatting-stack.reporters.file-writer :as file-writer]
    [formatting-stack.strategies :as strategies]))
 
 (def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)

@@ -34,7 +34,7 @@
                    (println (ex-message exception)))
                  (println))))))
 
-(defn print-warnings [{:keys [max-msg-length] } reports]
+(defn print-warnings [{:keys [max-msg-length]} reports]
   (->> (filter (fn [{:keys [level]}] (#{:error :warning} level)) reports)
        (group-by :filename)
        (into (sorted-map-by compare)) ;; sort filenames for consistent output
