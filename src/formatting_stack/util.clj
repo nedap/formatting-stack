@@ -5,7 +5,8 @@
    [medley.core :refer [find-first]]
    [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
-   [nedap.utils.collections.seq :refer [distribute-evenly-by]])
+   [nedap.utils.collections.seq :refer [distribute-evenly-by]]
+   [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
    (java.io File)))
 
@@ -90,7 +91,7 @@
 (def require-lock
   (Object.))
 
-(defn try-require [filename]
+(speced/defn try-require [^present-string? filename]
   (try
     (when-let [namespace (some-> filename file/read-file-ns-decl parse/name-from-ns-decl)]
       (locking require-lock

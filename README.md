@@ -77,9 +77,10 @@ The general intent is to make formatting:
 [formatting-stack "2.0.1-alpha2"]
 ```
 
-**Also** you have to add the latest [cider-nrepl](https://clojars.org/cider/cider-nrepl).
-* It's a transitive, non-automatically-fetched dependency of refactor-nrepl.
-* Sadly we cannot just add it to our project.clj, since it would affect users of lower cider-nrepl versions.
+**Also** you might have to add the [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl) dependency.
+  * If you use tooling like CIDER, typically this dependency will be already injected into your classpath, so no action required in this case.
+  * Else, please add the latest version to your project (or personal [profile](https://github.com/technomancy/leiningen/blob/072dcd62dea0ea46413cf938878e2d31b76357c9/doc/PROFILES.md)).
+  * If this dependency isn't added, formatting-stack will degrade gracefully, using slightly fewer formatters/linters.
 
 ### Component/Integrant integration
 

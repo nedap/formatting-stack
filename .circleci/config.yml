@@ -9,7 +9,7 @@ commands:
             - v1-dependencies-{{ checksum "project.clj" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: lein with-profile -dev,+test,+ci,+cider-nrepl deps
+      - run: lein with-profile -dev,+test,+ci,+refactor-nrepl deps
       - save_cache:
           paths:
             - ~/.m2
@@ -30,8 +30,11 @@ jobs:
     steps:
       - setup-env
       - run:
-          name: 'Run JVM tests'
-          command: lein with-profile -dev,+ci,+cider-nrepl test
+          name: 'Run JVM tests, including refactor-nrepl functionality'
+          command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+      - run:
+          name: 'Run JVM tests, excluding refactor-nrepl functionality'
+          command: lein with-profile -dev,+ci do clean, test
   deploy:
     executor: lein-executor
     steps:

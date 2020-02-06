@@ -17,7 +17,6 @@
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.namespace "0.3.1"]
                  [org.clojure/tools.reader "1.3.2"]
-                 [refactor-nrepl "2.4.0"]
                  [rewrite-clj "0.6.1"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
@@ -64,29 +63,30 @@
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
   ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
-  :profiles {:dev         {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
-                                          [com.stuartsierra/component "0.4.0"]
-                                          [com.taoensso/timbre "4.10.0"]
-                                          [criterium "0.4.5"]
-                                          [lambdaisland/deep-diff "0.0-29"]
-                                          [org.clojure/core.async "0.5.527"]
-                                          [org.clojure/math.combinatorics "0.1.1"]
-                                          [org.clojure/test.check "0.10.0-alpha3"]]
-                           :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
-                           :source-paths ["dev"]
-                           :repl-options {:init-ns dev}}
+  :profiles {:dev            {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
+                                             [com.stuartsierra/component "0.4.0"]
+                                             [com.taoensso/timbre "4.10.0"]
+                                             [criterium "0.4.5"]
+                                             [lambdaisland/deep-diff "0.0-29"]
+                                             [org.clojure/core.async "0.5.527"]
+                                             [org.clojure/math.combinatorics "0.1.1"]
+                                             [org.clojure/test.check "0.10.0-alpha3"]]
+                              :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
+                              :source-paths ["dev"]
+                              :repl-options {:init-ns dev}}
 
              ;; `dev` in :test is important - a test depends on it:
-             :test        {:source-paths   ["dev"]
-                           :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]]
-                           :jvm-opts       ["-Dclojure.core.async.go-checking=true"
-                                            "-Duser.language=en-US"]
-                           :resource-paths ["test-resources-extra"
-                                            "test-resources"]}
+             :test           {:source-paths   ["dev"]
+                              :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]]
+                              :jvm-opts       ["-Dclojure.core.async.go-checking=true"
+                                               "-Duser.language=en-US"]
+                              :resource-paths ["test-resources-extra"
+                                               "test-resources"]}
 
-             :cider-nrepl {:plugins [[cider/cider-nrepl "0.21.1"]]}
+             :refactor-nrepl {:dependencies [[refactor-nrepl "2.4.0"]]
+                              :plugins      [[cider/cider-nrepl "0.21.1"]]}
 
-             :ci          {:pedantic?    :abort
-                           :jvm-opts     ["-Dclojure.main.report=stderr"]
-                           :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                           :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
+             :ci             {:pedantic?    :abort
+                              :jvm-opts     ["-Dclojure.main.report=stderr"]
+                              :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                              :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
