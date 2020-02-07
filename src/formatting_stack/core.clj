@@ -1,6 +1,7 @@
 (ns formatting-stack.core
   (:require
    [clojure.main]
+   [formatting-stack.reporters.printer :as reporters.printer]
    [formatting-stack.background]
    [formatting-stack.defaults :refer [default-formatters default-linters default-processors default-strategies]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
@@ -35,14 +36,14 @@
                          (->> strategies files (method member))
                          (catch Exception e
                            [{:exception e
-                             :source :formatting-stack/process!
-                             :msg  (str "Exception during " member)
-                             :level :exception}])
+                             :source    :formatting-stack/process!
+                             :msg       (str "Exception during " member)
+                             :level     :exception}])
                          (catch AssertionError e
                            [{:exception e
-                             :source :formatting-stack/process!
-                             :msg  (str "Exception during " member)
-                             :level :exception}])))))))))
+                             :source    :formatting-stack/process!
+                             :msg       (str "Exception during " member)
+                             :level     :exception}])))))))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
@@ -57,6 +58,7 @@
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
         processors               (or processors (default-processors third-party-indent-specs))
+        reporter                 (or reporter (reporters.printer/new {}))
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)
