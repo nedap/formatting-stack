@@ -54,7 +54,8 @@
                                             (println "Warning: the namespace"
                                                      (str "`" ns-name "`")
                                                      "is defined over more than one file.\nFound:"
-                                                     (->> filenames (interpose ", ") (apply str))))))))))
+                                                     (->> filenames (interpose ", ") (apply str)))))))))
+  [])
 
 (speced/defn new [^map? opts]
   (implement opts
