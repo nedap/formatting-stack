@@ -1,9 +1,8 @@
-(ns formatting-stack.reporters.pretty-printer
-  "Prints a colorized output of the reports"
+(ns formatting-stack.reporters.printer
+  "Prints a non-colorized output of the reports"
   (:require
    [clojure.stacktrace :refer [print-stack-trace]]
    [formatting-stack.protocols.reporter :as reporter]
-   [formatting-stack.util :refer [colorize]]
    [medley.core :refer [map-vals]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -17,10 +16,6 @@
                               :exception " exceptions occurred"
                               :error     " errors found"
                               :warning   " warnings found"))
-                     (colorize (case type
-                                 :exception :red
-                                 :error     :red
-                                 :warning   :yellow))
                      (println)))))))
 
 (defn print-exceptions [{:keys [print-stacktraces?]} reports]
@@ -29,7 +24,7 @@
                  (#{:exception} level)))
        (group-by :filename)
        (run! (fn [[title reports]]
-               (println (colorize title :cyan))
+               (println title)
                (doseq [{:keys [^Throwable exception]} reports]
                  (if print-stacktraces?
                    (print-stack-trace exception)
@@ -43,14 +38,14 @@
        (group-by :filename)
        (into (sorted-map-by compare)) ;; sort filenames for consistent output
        (run! (fn [[title reports]]
-               (println (colorize title :cyan))
+               (println title)
                (doseq [{:keys [msg column line source level]} (sort-by :line reports)]
                  (println (case level
-                            :error   (colorize "ˣ" :red)
-                            :warning (colorize "⚠" :yellow))
-                          (colorize (format "%3d:%-3d" line column) :grey)
+                            :error   "ˣ"
+                            :warning "⚠")
+                          (format "%3d:%-3d" line column)
                           (format (str "%-" max-msg-length "." max-msg-length "s") msg)
-                          (colorize (str "  " source) :grey)))
+                          (str "  " source)))
                (println)))))
 
 (defn print-report [this reports]
