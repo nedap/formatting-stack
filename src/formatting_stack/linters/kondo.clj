@@ -2,7 +2,7 @@
   (:require
    [clj-kondo.core :as clj-kondo]
    [clojure.set :as set]
-   [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.protocols.linter :as protocols.linter]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -32,26 +32,30 @@
                              "test/unit/formatting_stack/formatters/cljfmt/impl/sample_data.clj"]}})
 
 (def clj-options
-  "CLJ files are also linted by eastwood, disable duplicate linters"
+  ;; .clj files are also linted by Eastwood, so we disable duplicate linters:
   {:linters {:misplaced-docstring off
              :deprecated-var      off
              :inline-def          off
              :redefined-var       off}})
 
 (defn lint! [{:keys [kondo-options]} filenames]
-  (let [{cljs-files true
-         clj-files  false} (group-by (fn [f] (boolean (re-find #"\.cljs$" f))) filenames)]
+  (let [kondo-options (or kondo-options {})
+        {cljs-files true
+         clj-files  false} (->> filenames
+                                (group-by (fn [f]
+                                            (-> (re-find #"\.cljs$" f)
+                                                boolean))))]
     (->> [(clj-kondo/run! {:lint   clj-files
-                           :config (deep-merge default-options clj-options (or kondo-options {}))})
+                           :config (deep-merge default-options clj-options kondo-options)})
           (clj-kondo/run! {:lint   cljs-files
-                           :config (deep-merge default-options (or kondo-options {}))})]
+                           :config (deep-merge default-options kondo-options)})]
          (mapcat :findings)
-         (map (fn [{:keys [type] :as m}]
+         (map (fn [{source-type :type :as m}]
                 (-> (set/rename-keys m {:row     :line
                                         :message :msg
                                         :col     :column})
-                    (assoc :source (keyword "kondo" (name type)))))))))
+                    (assoc :source (keyword "kondo" (name source-type)))))))))
 
 (defn new [{:keys [kondo-options]}]
   (implement {:kondo-options kondo-options}
-    linter/--lint! lint!))
+    protocols.linter/--lint! lint!))
