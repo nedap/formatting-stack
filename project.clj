@@ -72,7 +72,25 @@
                                              [org.clojure/test.check "0.10.0-alpha3"]]
                               :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
                               :source-paths ["dev"]
-                              :repl-options {:init-ns dev}}
+                              :repl-options {:init-ns dev}
+                              :middleware   [~(do ;; the following ensures that :exclusions are honored in all cases
+                                                (create-ns 'user)
+                                                (intern 'user
+                                                        'nedap-ensure-exclusions
+                                                        (fn [project]
+                                                          (let [exclusions (->> project
+                                                                                :exclusions
+                                                                                (map (fn [x]
+                                                                                       (str (if (namespace (symbol x))
+                                                                                              x
+                                                                                              (symbol (str x) (str x))))))
+                                                                                (set))]
+                                                            (update project :dependencies (fn [deps]
+                                                                                            (->> deps
+                                                                                                 (remove (fn [[dep version]]
+                                                                                                           (exclusions (str dep))))
+                                                                                                 vec))))))
+                                                'user/nedap-ensure-exclusions)]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test           {:source-paths   ["dev"]
