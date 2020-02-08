@@ -1,7 +1,6 @@
 (ns formatting-stack.core
   (:require
    [clojure.main]
-   [formatting-stack.reporters.printer :as reporters.printer]
    [formatting-stack.background]
    [formatting-stack.defaults :refer [default-formatters default-linters default-processors default-strategies]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
@@ -9,6 +8,7 @@
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.protocols.reporter :refer [report]]
+   [formatting-stack.reporters.printer :as reporters.printer]
    [formatting-stack.util :refer [with-serialized-output]]))
 
 (defn files-from-strategies [strategies]
@@ -43,7 +43,8 @@
                            [{:exception e
                              :source    :formatting-stack/process!
                              :msg       (str "Exception during " member)
-                             :level     :exception}])))))))))
+                             :level     :exception}])))))
+           (doall)))))
 
 (defn format! [& {:keys [strategies
                          third-party-indent-specs
@@ -69,7 +70,7 @@
                (->> [(process! protocols.formatter/format!  formatters  formatters-strategies strategies)
                      (process! protocols.linter/lint!       linters     linters-strategies    strategies)
                      (process! protocols.processor/process! processors  processors-strategies strategies)]
-                    (mapcat identity)
+                    (apply concat)
                     (report reporter)))]
     (if in-background?
       (do

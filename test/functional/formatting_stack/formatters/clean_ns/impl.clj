@@ -1,7 +1,7 @@
 (ns functional.formatting-stack.formatters.clean-ns.impl
   (:require
    [clojure.java.io :as io]
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest]]
    [formatting-stack.formatters.clean-ns.impl :as sut]))
 
 (deftest has-duplicate-requires?

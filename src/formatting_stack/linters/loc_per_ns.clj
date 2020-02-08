@@ -17,14 +17,14 @@
        (process-in-parallel! (fn [filename]
                                (when (overly-long-ns? filename max-lines-per-ns)
                                  {:filename filename
-                                  :source :formatting-stack/loc-per-ns
-                                  :level :warning
-                                  :msg (str "Longer than " max-lines-per-ns " LOC. consider refactoring")
-                                  :line (+ 1 max-lines-per-ns) ;; first line after limit is the issue
-                                  :column 1})))
+                                  :source   :formatting-stack/loc-per-ns
+                                  :level    :warning
+                                  :msg      (str "Longer than " max-lines-per-ns " LOC. consider refactoring")
+                                  :line     (inc max-lines-per-ns) ;; first line after limit is the issue
+                                  :column   1})))
        (remove nil?)))
 
 (defn new [{:keys [max-lines-per-ns]
-            :or {max-lines-per-ns 350}}]
+            :or   {max-lines-per-ns 350}}]
   (implement {:max-lines-per-ns max-lines-per-ns}
     linter/--lint! lint!))

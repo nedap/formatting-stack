@@ -1,7 +1,7 @@
 (ns unit.formatting-stack.formatters.cljfmt.impl
   (:require
    [clojure.java.io :as io]
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.formatters.cljfmt.impl :as sut]
    [unit.formatting-stack.formatters.cljfmt.impl.sample-data :refer [foo]])
   (:import

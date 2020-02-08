@@ -1,6 +1,6 @@
 (ns unit.formatting-stack.formatters.trivial-ns-duplicates
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.formatters.trivial-ns-duplicates :as sut]
    [formatting-stack.util.ns :as util.ns]))
 

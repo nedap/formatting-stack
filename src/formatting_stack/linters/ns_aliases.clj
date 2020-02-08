@@ -54,7 +54,6 @@
   '{d        [datomic.api datomic.client.api]
     impl     [::anything]
     log      [::anything]
-    m        [matcher-combinators.matchers]
     s        [clojure.spec.alpha cljs.spec.alpha]
     spec     [clojure.spec.alpha cljs.spec.alpha]
     speced   [nedap.speced.def]
@@ -90,16 +89,16 @@
                                     (remove (partial acceptable-require-clause?
                                                      acceptable-aliases-whitelist))
                                     (map (fn [bad-alias]
-                                           {:filename filename
-                                            :line   (:line (meta bad-alias))
-                                            :column (:column (meta bad-alias))
-                                            :level :warning
+                                           {:filename            filename
+                                            :line                (:line (meta bad-alias))
+                                            :column              (:column (meta bad-alias))
+                                            :level               :warning
                                             :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
-                                            :msg (str bad-alias " is not a derived alias")
-                                            :source :formatting-stack/ns-aliases})))))
+                                            :msg                 (str bad-alias " is not a derived alias")
+                                            :source              :formatting-stack/ns-aliases})))))
        (mapcat ensure-coll)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]
-            :or {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
+            :or   {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
   (implement {:acceptable-aliases-whitelist acceptable-aliases-whitelist}
     linter/--lint! lint!))

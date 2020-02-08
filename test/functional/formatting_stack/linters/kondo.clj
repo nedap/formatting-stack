@@ -1,9 +1,9 @@
 (ns functional.formatting-stack.linters.kondo
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest]]
    [formatting-stack.linters.kondo :as sut]
    [formatting-stack.protocols.linter :as linter]
-   [matcher-combinators.matchers :as m]
+   [matcher-combinators.matchers :as matchers]
    [matcher-combinators.test :refer [match?]]))
 
 (deftest lint!
@@ -12,17 +12,17 @@
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
       "test-resources/invalid_syntax.clj"
-      (m/embeds
-       [{:level :error,
+      (matchers/embeds
+       [{:level    :error,
          :filename "test-resources/invalid_syntax.clj",
-         :line 1,
-         :column 2,
-         :source :kondo/syntax}])
+         :line     1,
+         :column   2,
+         :source   :kondo/syntax}])
 
       "test-resources/kondo_warning.clj"
-      (m/embeds
-       [{:source :kondo/unused-binding
-         :level :warning
-         :line 3
-         :column 7
+      (matchers/embeds
+       [{:source   :kondo/unused-binding
+         :level    :warning
+         :line     3
+         :column   7
          :filename "test-resources/kondo_warning.clj"}]))))

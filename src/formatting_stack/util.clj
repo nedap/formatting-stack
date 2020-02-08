@@ -54,11 +54,11 @@
              *flush-on-newline* true]
      ~@forms))
 
-(defn report-processing-error [^Throwable e filename]
-  {:level :exception
-   :source :formatting-stack/report-processing-error
-   :filename filename
-   :msg "Encountered an exception"
+(speced/defn report-processing-error [^Throwable e, filename]
+  {:level     :exception
+   :source    :formatting-stack/report-processing-error
+   :filename  filename
+   :msg       "Encountered an exception"
    :exception e})
 
 (defn process-in-parallel! [f files]
