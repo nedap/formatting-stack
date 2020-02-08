@@ -7,7 +7,7 @@
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
-                 [com.nedap.staffing-solutions/utils.modular "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.modular "2.1.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
@@ -91,6 +91,16 @@
                                                                                                            (exclusions (str dep))))
                                                                                                  vec))))))
                                                 'user/nedap-ensure-exclusions)]}
+
+             :provided       {:dependencies [[org.clojure/clojurescript "1.10.597"
+                                              :exclusions [com.cognitect/transit-clj
+                                                           com.google.code.findbugs/jsr305
+                                                           com.google.errorprone/error_prone_annotations]]
+                                             [com.google.guava/guava "25.1-jre" #_"transitive"]
+                                             [com.google.protobuf/protobuf-java "3.4.0" #_"transitive"]
+                                             [com.cognitect/transit-clj "0.8.313" #_"transitive"]
+                                             [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
+                                             [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test           {:source-paths   ["dev"]
