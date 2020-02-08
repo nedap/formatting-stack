@@ -106,7 +106,7 @@
     (doseq [[sym var-ref] ns-mappings
             :when (var? var-ref)
             :let [fqn (fully-qualified-name-of var-ref)]
-            :when (some (fn [[k _]]
+            :when (some (fn [[k v]]
                           (= k fqn))
                         @result)
             :let [indent (get @result fqn)]]

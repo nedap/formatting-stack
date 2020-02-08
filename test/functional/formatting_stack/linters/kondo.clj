@@ -7,7 +7,8 @@
    [matcher-combinators.test :refer [match?]]))
 
 (deftest lint!
-  (let [linter (sut/new {:kondo-options {:output {:exclude-files []}}})]
+  (let [linter (sut/new {:kondo-options {:output  {:exclude-files []}
+                                         :linters {:unused-binding {:level :warning}}}})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
       "test-resources/invalid_syntax.clj"

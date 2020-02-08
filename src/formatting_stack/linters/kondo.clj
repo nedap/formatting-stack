@@ -11,6 +11,7 @@
 (def default-options
   {:linters {:cond-else            off ;; undesired
              :missing-docstring    off ;; undesired
+             :unused-binding       off ;; undesired
              :unused-symbol        off ;; can give false positives
              :unused-private-var   off ;; can give false positives
              :consistent-alias     off ;; already offered by how-to-ns
