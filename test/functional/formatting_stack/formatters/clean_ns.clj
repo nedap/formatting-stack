@@ -1,6 +1,6 @@
 (ns functional.formatting-stack.formatters.clean-ns
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is]]
    [formatting-stack.formatters.clean-ns :as sut]
    [formatting-stack.formatters.clean-ns.impl :as impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
@@ -56,13 +56,13 @@
 (when (strategies/refactor-nrepl-available?)
   (deftest clean-ns-form
     (are [op filename ns-form libspec-whitelist namespaces-that-should-never-cleaned]
-        (let [cleaner (sut/make-cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
-                                        @sut/default-nrepl-opts
-                                        namespaces-that-should-never-cleaned
-                                        libspec-whitelist
-                                        filename)
-              v (util.ns/replaceable-ns-form filename cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts)]
-          (op v))
+         (let [cleaner (sut/make-cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts
+                                         @sut/default-nrepl-opts
+                                         namespaces-that-should-never-cleaned
+                                         libspec-whitelist
+                                         filename)
+               v (util.ns/replaceable-ns-form filename cleaner formatting-stack.formatters.how-to-ns/default-how-to-ns-opts)]
+           (op v))
       some? should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{}
       nil?  should-be-cleaned-f               should-be-cleaned               sut/default-libspec-whitelist #{'functional.formatting-stack.formatters.clean-ns.should-be-cleaned}
       some? "dev/user.clj"                    (ns-form-of "dev/user.clj")     sut/default-libspec-whitelist #{}

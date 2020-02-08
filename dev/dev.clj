@@ -12,16 +12,21 @@
 ;; the "worker" source-path must be excluded.
 (set-refresh-dirs "src" "test" "dev")
 
+(defn prepare-tests []
+  (clear)
+  (alter-var-root #'clojure.test/*load-tests* (constantly true))
+  (refresh))
+
 (defn suite []
-  (refresh)
+  (prepare-tests)
   (run-all-tests #".*\.formatting-stack.*"))
 
 (defn unit []
-  (refresh)
+  (prepare-tests)
   (run-all-tests #"unit\.formatting-stack.*"))
 
 (defn slow []
-  (refresh)
+  (prepare-tests)
   (run-all-tests #"integration\.formatting-stack.*"))
 
 (defn diff [x y]

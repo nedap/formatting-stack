@@ -1,6 +1,6 @@
 (ns unit.formatting-stack.component.impl
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.component.impl :as sut]))
 
 (deftest parse-options

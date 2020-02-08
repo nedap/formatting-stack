@@ -1,6 +1,6 @@
 (ns integration.formatting-stack.strategies.impl
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest]]
    [formatting-stack.strategies.impl :as sut])
   (:import
    (java.io File)))

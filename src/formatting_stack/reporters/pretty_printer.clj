@@ -9,7 +9,8 @@
 
 (defn print-summary [{:keys [summary?]} reports]
   (when summary?
-    (->> (group-by :level reports)
+    (->> reports
+         (group-by :level)
          (map-vals count)
          (into (sorted-map-by compare)) ;; print summary in order
          (run! (fn [[type n]]

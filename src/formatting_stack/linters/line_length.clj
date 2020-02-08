@@ -12,8 +12,8 @@
                         {:filename filename
                          :source   :formatting-stack/line-length
                          :level    :warning
-                         :column   (+ 1 threshold)
-                         :line     (+ 1 i)
+                         :column   (inc threshold)
+                         :line     (inc i)
                          :msg      (str "Line exceeding " threshold " columns")})))
        (remove nil?)))
 
@@ -23,6 +23,6 @@
        (mapcat ensure-coll)))
 
 (defn new [{:keys [max-line-length]
-            :or {max-line-length 130}}]
+            :or   {max-line-length 130}}]
   (implement {:max-line-length max-line-length}
     linter/--lint! lint!))

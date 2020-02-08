@@ -1,6 +1,6 @@
 (ns unit.formatting-stack.linters.ns-aliases
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest]]
    [formatting-stack.linters.ns-aliases :as sut]))
 
 (deftest name-and-alias
