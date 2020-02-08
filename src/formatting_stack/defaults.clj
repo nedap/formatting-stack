@@ -67,9 +67,7 @@
                                                    strategies/namespaces-within-refresh-dirs-only)))
                       (-> (linters.kondo/new {})
                           (assoc :strategies (conj extended-strategies
-                                                   strategies/exclude-edn
-                                                   strategies/exclude-clj
-                                                   strategies/exclude-cljc)))
+                                                   strategies/exclude-edn)))
                       (-> (linters.one-resource-per-ns/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/files-with-a-namespace)))])

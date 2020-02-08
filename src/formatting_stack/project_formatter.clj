@@ -71,9 +71,7 @@
                                 strategies/namespaces-within-refresh-dirs-only)))
    (-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
-                                strategies/exclude-edn
-                                strategies/exclude-clj
-                                strategies/exclude-cljc)))
+                                strategies/exclude-edn)))
    (-> (linters.one-resource-per-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace)))])
@@ -83,7 +81,7 @@
 
 (defn format-and-lint-project! [& {:keys [in-background? reporter]
                                    :or   {in-background? false
-                                          reporter default-reporter}}]
+                                          reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters default-formatters
                                  :linters default-linters
@@ -93,7 +91,7 @@
 
 (defn lint-project! [& {:keys [in-background? reporter]
                         :or   {in-background? false
-                               reporter default-reporter}}]
+                               reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies default-strategies
                                  :formatters []
                                  :processors default-processors
