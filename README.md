@@ -73,7 +73,7 @@ The general intent is to make formatting:
 #### Coordinates
 
 ```clojure
-[formatting-stack "3.0.0-alpha1"]
+[formatting-stack "3.0.0-alpha2"]
 ```
 
 **Also** you might have to add the [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl) dependency.
