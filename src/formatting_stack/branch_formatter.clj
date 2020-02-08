@@ -67,9 +67,7 @@
                                 strategies/namespaces-within-refresh-dirs-only)))
    (-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
-                                strategies/exclude-edn
-                                strategies/exclude-clj
-                                strategies/exclude-cljc)))
+                                strategies/exclude-edn)))
    (-> (linters.one-resource-per-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace)))])
@@ -83,7 +81,7 @@
 (defn format-and-lint-branch! [& {:keys [target-branch in-background? reporter]
                                   :or   {target-branch  "master"
                                          in-background? (not (System/getenv "CI"))
-                                         reporter default-reporter}}]
+                                         reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
                               (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
         formatters (default-formatters default-strategies)
@@ -96,9 +94,9 @@
                                    :in-background? in-background?)))
 
 (defn lint-branch! [& {:keys [target-branch in-background? reporter]
-                       :or   {target-branch "master"
+                       :or   {target-branch  "master"
                               in-background? false
-                              reporter default-reporter}}]
+                              reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
                               (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
         linters (default-linters default-strategies)]
