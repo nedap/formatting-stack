@@ -36,6 +36,7 @@
 (def clj-options
   ;; .clj files are also linted by Eastwood, so we disable duplicate linters:
   {:linters {:misplaced-docstring off
+             :invalid-arity       off
              :deprecated-var      off
              :inline-def          off
              :redefined-var       off}})
