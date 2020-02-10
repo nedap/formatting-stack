@@ -11,7 +11,7 @@
 (def cache-dir ".clj-kondo")
 
 (def classpath-cache
-  (delay
+  (future
     (let [files (-> (System/getProperty "java.class.path")
                     (string/split #"\:"))]
       (-> ".clj-kondo" File. .mkdirs)
