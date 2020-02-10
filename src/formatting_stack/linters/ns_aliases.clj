@@ -76,8 +76,8 @@
 (defn read-ns-decl
   "Reads file with line/column metadata"
   [filename]
-  (with-open [rdr (-> (io/reader filename) PushbackReader. indexing-push-back-reader)]
-    (parse/read-ns-decl rdr)))
+  (with-open [reader (-> (io/reader filename) PushbackReader. indexing-push-back-reader)]
+    (parse/read-ns-decl reader)))
 
 (defn lint! [{:keys [acceptable-aliases-whitelist]} filenames]
   (->> filenames
@@ -90,11 +90,11 @@
                                                      acceptable-aliases-whitelist))
                                     (map (fn [bad-alias]
                                            {:filename            filename
-                                            :line                (:line (meta bad-alias))
-                                            :column              (:column (meta bad-alias))
+                                            :line                (-> bad-alias meta :line)
+                                            :column              (-> bad-alias meta :column)
                                             :level               :warning
                                             :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
-                                            :msg                 (str bad-alias " is not a derived alias")
+                                            :msg                 (str bad-alias " is not a derived alias.")
                                             :source              :formatting-stack/ns-aliases})))))
        (mapcat ensure-coll)))
 

@@ -4,23 +4,24 @@
    [nedap.utils.spec.predicates :refer [present-string?]]))
 
 (spec/def ::filename present-string?)
+
 (spec/def ::filenames (spec/coll-of ::filename))
 
 (spec/def ::msg present-string?)
+
 (spec/def ::source
   (fn [x]
     (and (keyword? x)
          (namespace x))))
 
-(spec/def ::column
-  (fn [x]
-    (or (zero? x)
-        (pos-int? x))))
+(spec/def ::column nat-int?)
 
 (spec/def ::line ::column)
+
 (spec/def ::level #{:warning :error :exception})
 
 (defmulti reportmm :level)
+
 (defmethod reportmm :exception [_]
   (spec/keys :req-un [::msg
                       ::exception
