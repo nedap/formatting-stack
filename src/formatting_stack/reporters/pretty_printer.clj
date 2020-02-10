@@ -72,9 +72,15 @@
                        :let [_ (println " " (cond-> source-group
                                               colorize? (colorize (case (-> group-entries first :level)
                                                                     :error   :red
-                                                                    :warning :yellow))))]
-                       {:keys [msg column line source level msg-extra-data]} (->> group-entries
-                                                                                  (sort-by :line))]
+                                                                    :warning :yellow))))
+                             _ (when-let [url (->> group-entries
+                                                   (keep :warning-details-url)
+                                                   first)]
+                                 (cond-> (str "    See: " url)
+                                   colorize? (colorize :grey)
+                                   true      println))]
+                       {:keys [msg column line source level msg-extra-data warning-details-url]} (->> group-entries
+                                                                                                      (sort-by :line))]
 
                  (println (cond-> (str "    " line ":" column)
                             colorize? (colorize :grey))
