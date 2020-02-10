@@ -43,4 +43,9 @@
     [{:filename "filename", :msg "message", :source ::source-A, :level :warning, :line 0 :column 0}
      {:filename "filename", :msg "message", :source ::source-B, :level :warning, :line 2 :column 2}
      {:filename "filename", :msg "message", :source ::source-A, :level :warning, :line 1 :column 1}]
-    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source-A\n    0:0 message\n    1:1 message\n  :unit.formatting-stack.reporters.pretty-printer/source-B\n    2:2 message\n\n"))
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source-A\n    0:0 message\n    1:1 message\n  :unit.formatting-stack.reporters.pretty-printer/source-B\n    2:2 message\n\n"
+
+    "Can print `:msg-extra-data` (at the correct indentation level)"
+    [{:filename       "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0,
+      :msg-extra-data ["Foo" "Bar"]}]
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"))

@@ -73,12 +73,15 @@
                                               colorize? (colorize (case (-> group-entries first :level)
                                                                     :error   :red
                                                                     :warning :yellow))))]
-                       {:keys [msg column line source level]} (->> group-entries
-                                                                   (sort-by :line))]
+                       {:keys [msg column line source level msg-extra-data]} (->> group-entries
+                                                                                  (sort-by :line))]
 
                  (println (cond-> (str "    " line ":" column)
                             colorize? (colorize :grey))
-                          (truncate-line-wise msg max-msg-length)))
+                          (truncate-line-wise msg max-msg-length))
+                 (doseq [entry msg-extra-data]
+                   (println "       "
+                            (truncate-line-wise entry max-msg-length))))
                (println)))))
 
 (defn print-report [this reports]
