@@ -9,10 +9,9 @@
 
 (spec/def ::msg present-string?)
 
-(spec/def ::source
-  (fn [x]
-    (and (keyword? x)
-         (namespace x))))
+(spec/def ::msg-extra-data (spec/coll-of present-string?))
+
+(spec/def ::source qualified-keyword?)
 
 (spec/def ::column nat-int?)
 
@@ -35,7 +34,8 @@
                       ::msg
                       ::level
                       ::column
-                      ::line]))
+                      ::line]
+             :opt-un [::msg-extra-data]))
 
 (spec/def ::report
   (spec/multi-spec reportmm :level))
