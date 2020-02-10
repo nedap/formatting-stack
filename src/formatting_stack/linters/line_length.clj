@@ -16,7 +16,8 @@
                            :column   column-count
                            :line     (inc i)
                            :msg      (str "Line exceeding " threshold " columns")}))))
-       (remove nil?)))
+       (remove nil?)
+       (vec)))
 
 (defn lint! [{:keys [max-line-length]} filenames]
   (->> filenames

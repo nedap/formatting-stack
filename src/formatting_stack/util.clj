@@ -1,5 +1,6 @@
 (ns formatting-stack.util
   (:require
+   [clojure.spec.alpha :as spec]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [medley.core :refer [find-first]]
@@ -8,6 +9,7 @@
    [nedap.utils.collections.seq :refer [distribute-evenly-by]]
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
+   (clojure.lang IBlockingDeref IPending)
    (java.io File)))
 
 (defmacro rcomp
@@ -61,13 +63,25 @@
    :msg       "Encountered an exception"
    :exception e})
 
+(spec/def ::non-lazy-result
+  (fn [x]
+    (cond
+      (sequential? x)              (vector? x)
+      (instance? IBlockingDeref x) false
+      (instance? IPending x)       false
+      true                         true)))
+
 (defn process-in-parallel! [f files]
   (->> files
        (distribute-evenly-by {:f (fn [^String filename]
                                    (-> (File. filename) .length))})
        (partitioning-pmap (bound-fn [filename]
                             (try
-                              (f filename)
+                              (let [v (f filename)]
+                                (assert (spec/valid? ::non-lazy-result v)
+                                        (pr-str "Parallel processing shouldn't return lazy computations"
+                                                f))
+                                v)
                               (catch Exception e
                                 (report-processing-error e filename))
                               (catch AssertionError e

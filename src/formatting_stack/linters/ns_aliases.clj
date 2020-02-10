@@ -88,14 +88,15 @@
                                     (rest)
                                     (remove (partial acceptable-require-clause?
                                                      acceptable-aliases-whitelist))
-                                    (map (fn [bad-alias]
-                                           {:filename            filename
-                                            :line                (-> bad-alias meta :line)
-                                            :column              (-> bad-alias meta :column)
-                                            :level               :warning
-                                            :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
-                                            :msg                 (str bad-alias " is not a derived alias.")
-                                            :source              :formatting-stack/ns-aliases})))))
+                                    (filter some?)
+                                    (mapv (fn [bad-alias]
+                                            {:filename            filename
+                                             :line                (-> bad-alias meta :line)
+                                             :column              (-> bad-alias meta :column)
+                                             :level               :warning
+                                             :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
+                                             :msg                 (str bad-alias " is not a derived alias.")
+                                             :source              :formatting-stack/ns-aliases})))))
        (mapcat ensure-coll)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]
