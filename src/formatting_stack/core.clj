@@ -8,7 +8,7 @@
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.protocols.reporter :refer [report]]
-   [formatting-stack.reporters.printer :as reporters.printer]
+   [formatting-stack.reporters.pretty-printer :as reporters.pretty-printer]
    [formatting-stack.util :refer [with-serialized-output]]))
 
 (defn files-from-strategies [strategies]
@@ -59,7 +59,7 @@
         formatters               (or formatters (default-formatters third-party-indent-specs))
         linters                  (or linters default-linters)
         processors               (or processors (default-processors third-party-indent-specs))
-        reporter                 (or reporter (reporters.printer/new {}))
+        reporter                 (or reporter (reporters.pretty-printer/new {}))
         in-background?           (if (some? in-background?)
                                    in-background?
                                    true)
