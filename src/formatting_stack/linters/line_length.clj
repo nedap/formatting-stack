@@ -8,13 +8,14 @@
 (defn exceeding-lines [threshold filename]
   (->> (-> filename slurp (string/split #"\n"))
        (map-indexed (fn [i row]
-                      (when (< threshold (count row))
-                        {:filename filename
-                         :source   :formatting-stack/line-length
-                         :level    :warning
-                         :column   (inc threshold)
-                         :line     (inc i)
-                         :msg      (str "Line exceeding " threshold " columns")})))
+                      (let [column-count (count row)]
+                        (when (< threshold column-count)
+                          {:filename filename
+                           :source   :formatting-stack/line-length
+                           :level    :warning
+                           :column   column-count
+                           :line     (inc i)
+                           :msg      (str "Line exceeding " threshold " columns")}))))
        (remove nil?)))
 
 (defn lint! [{:keys [max-line-length]} filenames]
