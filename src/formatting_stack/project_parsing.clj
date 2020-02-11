@@ -2,10 +2,9 @@
   (:require
    [clojure.java.classpath :as classpath]
    [clojure.java.io :as io]
-   [clojure.stacktrace]
-   [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
+   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of]]
    [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]])
   (:import
@@ -29,11 +28,12 @@
   Includes third-party dependencies."
   []
   (->> (find-files (classpath/classpath-directories) find/clj)
-       (partitioning-pmap (fn [file]
-                            (let [decl (-> file file/read-file-ns-decl)
-                                  n (-> decl parse/name-from-ns-decl)
-                                  deps (-> decl parse/deps-from-ns-decl)]
-                              (conj deps n))))
+
+       (partitioning-pmap (speced/fn [^File file]
+                            (let [decl (-> file str ns-form-of)
+                                  n (some-> decl parse/name-from-ns-decl)
+                                  deps (some-> decl parse/deps-from-ns-decl)]
+                              (some-> deps (conj n)))))
        (apply concat)
        (distinct)
        (filter identity)
