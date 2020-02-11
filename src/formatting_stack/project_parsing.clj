@@ -2,6 +2,7 @@
   (:require
    [clojure.java.classpath :as classpath]
    [clojure.java.io :as io]
+   [clojure.stacktrace]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]

@@ -51,30 +51,30 @@
        (filterv some?)))
 
 (def default-linters
-  [(-> (linters.ns-aliases/new {})
+  [(-> (linters.kondo/new {})
+       (assoc :strategies (conj default-strategies
+                                strategies/exclude-edn)))
+   (-> (linters.one-resource-per-ns/new {})
+       (assoc :strategies (conj default-strategies
+                                strategies/files-with-a-namespace)))
+   (-> (linters.ns-aliases/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace
                                 ;; reader conditionals may confuse `linters.ns-aliases`
                                 strategies/exclude-cljc
                                 ;; string requires may confuse clojure.tools.*
                                 strategies/exclude-cljs)))
-   (-> (linters.loc-per-ns/new {})
+   (-> (linters.line-length/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
-   (-> (linters.line-length/new {})
+   (-> (linters.loc-per-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
    (-> (linters.eastwood/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-cljs
                                 strategies/jvm-requirable-files
-                                strategies/namespaces-within-refresh-dirs-only)))
-   (-> (linters.kondo/new {})
-       (assoc :strategies (conj default-strategies
-                                strategies/exclude-edn)))
-   (-> (linters.one-resource-per-ns/new {})
-       (assoc :strategies (conj default-strategies
-                                strategies/files-with-a-namespace)))])
+                                strategies/namespaces-within-refresh-dirs-only)))])
 
 (def default-processors
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
