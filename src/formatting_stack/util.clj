@@ -107,6 +107,12 @@
       false)))
 
 (speced/defn ensure-coll [^some? x]
+  (if (coll? x)
+    x
+    [x]))
+
+;; Rationale: https://github.com/nedap/formatting-stack/pull/109/files#r376891779
+(speced/defn ensure-sequential [^some? x]
   (if (sequential? x)
     x
     [x]))

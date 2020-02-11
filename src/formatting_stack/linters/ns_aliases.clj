@@ -6,7 +6,7 @@
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll process-in-parallel!]]
+   [formatting-stack.util :refer [ensure-sequential ensure-coll process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]])
   (:import
    (java.io PushbackReader)))
@@ -97,7 +97,7 @@
                                              :warning-details-url "https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
                                              :msg                 (str bad-alias " is not a derived alias.")
                                              :source              :formatting-stack/ns-aliases})))))
-       (mapcat ensure-coll)))
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [acceptable-aliases-whitelist]
             :or   {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
