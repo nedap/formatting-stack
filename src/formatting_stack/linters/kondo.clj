@@ -42,20 +42,22 @@
              :inline-def          off
              :redefined-var       off}})
 
-(defn lint! [{:keys [kondo-options]} filenames]
+(defn lint! [{:keys [kondo-clj-options kondo-cljs-options]}
+             filenames]
 
   @formatting-stack.kondo-classpath-cache/classpath-cache
 
-  (let [kondo-options (or kondo-options {})
+  (let [kondo-clj-options (or kondo-clj-options {})
+        kondo-cljs-options (or kondo-cljs-options {})
         {cljs-files true
          clj-files  false} (->> filenames
                                 (group-by (fn [f]
                                             (-> (re-find #"\.cljs$" f)
                                                 boolean))))]
     (->> [(kondo/run! {:lint   clj-files
-                       :config (deep-merge default-options clj-options kondo-options)})
+                       :config (deep-merge default-options clj-options kondo-clj-options)})
           (kondo/run! {:lint   cljs-files
-                       :config (deep-merge default-options kondo-options)})]
+                       :config (deep-merge default-options kondo-cljs-options)})]
          (mapcat :findings)
          (map (fn [{source-type :type :as m}]
                 (-> (set/rename-keys m {:row     :line
@@ -63,6 +65,8 @@
                                         :col     :column})
                     (assoc :source (keyword "kondo" (name source-type)))))))))
 
-(defn new [{:keys [kondo-options]}]
-  (implement {:kondo-options kondo-options}
+(defn new [{:keys [kondo-clj-options
+                   kondo-cljs-options]}]
+  (implement {:kondo-clj-options  kondo-clj-options
+              :kondo-cljs-options kondo-cljs-options}
     protocols.linter/--lint! lint!))
