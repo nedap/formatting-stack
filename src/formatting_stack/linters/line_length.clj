@@ -15,7 +15,7 @@
                            :level    :warning
                            :column   column-count
                            :line     (inc i)
-                           :msg      (str "Line exceeding " threshold " columns")}))))
+                           :msg      (str "Line exceeding " threshold " columns.")}))))
        (remove nil?)
        (vec)))
 

@@ -16,5 +16,5 @@
       [{:source   :formatting-stack/loc-per-ns
         :line     5
         :column   0
-        :msg      "Longer than 4 LOC. Consider refactoring."
+        :msg      "Longer than 4 LOC."
         :filename "test-resources/sample_clj_ns.clj"}])))

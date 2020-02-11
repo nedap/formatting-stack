@@ -19,7 +19,7 @@
                                    {:filename filename
                                     :source   :formatting-stack/loc-per-ns
                                     :level    :warning
-                                    :msg      (str "Longer than " max-lines-per-ns " LOC. Consider refactoring.")
+                                    :msg      (str "Longer than " max-lines-per-ns " LOC.")
                                     :line     lines
                                     :column   0}))))
        (remove nil?)))
