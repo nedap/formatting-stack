@@ -44,6 +44,8 @@
                               (->TrackingReporter reports)))
     (->> (:warnings @reports)
          (map :warn-data)
+         (remove (fn [{{{[[_fn* [_arglist [_assert v]]]] :form} :ast} :wrong-pre-post}]
+                   (= "*" (-> v str first) (-> v str last)))) ;; False positives for dynamic vars https://git.io/fhQTx
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
                        :level    :warning
