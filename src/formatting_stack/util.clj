@@ -1,8 +1,10 @@
 (ns formatting-stack.util
   (:require
+   [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
+   [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
    [medley.core :refer [find-first]]
    [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
@@ -22,6 +24,18 @@
   (->> m
        (filter (rcomp first f))
        (into {})))
+
+(speced/defn read-ns-decl
+  "Reads ns declaration in file with line/column metadata"
+  [^string? filename]
+  (when-not (-> filename File. .isDirectory)
+    (try
+      (with-open [reader (-> filename io/reader push-back-reader indexing-push-back-reader)]
+        (parse/read-ns-decl reader))
+      (catch Exception e
+        (if (-> e ex-data :type #{:reader-exception})
+          nil
+          (throw e))))))
 
 (def ns-name-from-filename (rcomp file/read-file-ns-decl parse/name-from-ns-decl))
 

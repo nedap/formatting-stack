@@ -4,7 +4,7 @@
    [clojure.java.io :as io]
    [clojure.tools.namespace.find :as find]
    [clojure.tools.namespace.parse :as parse]
-   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of]]
+   [formatting-stack.util :refer [read-ns-decl]]
    [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]])
   (:import
@@ -30,7 +30,7 @@
   (->> (find-files (classpath/classpath-directories) find/clj)
 
        (partitioning-pmap (speced/fn [^File file]
-                            (let [decl (-> file str ns-form-of)
+                            (let [decl (-> file str read-ns-decl)
                                   n (some-> decl parse/name-from-ns-decl)
                                   deps (some-> decl parse/deps-from-ns-decl)]
                               (some-> deps (conj n)))))

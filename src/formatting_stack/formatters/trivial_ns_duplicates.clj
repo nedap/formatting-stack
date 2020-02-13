@@ -6,10 +6,9 @@
    [clojure.set :as set]
    [clojure.spec.alpha :as spec]
    [clojure.walk :as walk]
-   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of]]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
-   [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp]]
+   [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp read-ns-decl]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -137,7 +136,7 @@
 (defn format! [{:keys [how-to-ns-opts]} files]
   (->> files
        (process-in-parallel! (fn [filename]
-                               (when (ns-form-of filename)
+                               (when (read-ns-decl filename)
                                  (replace-ns-form! filename
                                                    (speced/fn ^{::speced/spec (complement #{"nil"})} [ns-form]
                                                      (some-> ns-form remove-exact-duplicates pr-str))

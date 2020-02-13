@@ -6,7 +6,7 @@
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-sequential ensure-coll process-in-parallel!]]
+   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]])
   (:import
    (java.io PushbackReader)))
@@ -73,17 +73,11 @@
                 (derived? alias :from ns-name))
             (boolean))))))
 
-(defn read-ns-decl
-  "Reads file with line/column metadata"
-  [filename]
-  (with-open [reader (-> (io/reader filename) PushbackReader. indexing-push-back-reader)]
-    (parse/read-ns-decl reader)))
-
 (defn lint! [{:keys [acceptable-aliases-whitelist]} filenames]
   (->> filenames
        (process-in-parallel! (fn [filename]
                                (->> filename
-                                    read-ns-decl
+                                    formatting-stack.util/read-ns-decl
                                     formatting-stack.util/require-from-ns-decl
                                     (rest)
                                     (remove (partial acceptable-require-clause?

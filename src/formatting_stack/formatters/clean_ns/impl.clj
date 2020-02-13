@@ -2,22 +2,12 @@
   (:require
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader :as tools.reader]
-   [clojure.tools.reader.reader-types :refer [push-back-reader]]
+   [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
    [clojure.walk :as walk]
    [formatting-stack.util :refer [ensure-coll rcomp]]
    [nedap.speced.def :as speced])
   (:import
-   (clojure.lang Namespace)
-   (java.io File)))
-
-(speced/defn ns-form-of [^string? filename]
-  (when-not (-> filename File. .isDirectory)
-    (try
-      (-> filename slurp push-back-reader parse/read-ns-decl)
-      (catch Exception e
-        (if (-> e ex-data :type #{:reader-exception})
-          nil
-          (throw e))))))
+   (clojure.lang Namespace)))
 
 (speced/defn safely-read-ns-contents [^string? buffer, ^Namespace ns-obj]
   (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
@@ -38,7 +28,7 @@
   {:pre [(string? filename)
          (set? namespaces-that-should-never-cleaned)]}
   (let [buffer (slurp filename)
-        ns-obj (-> filename ns-form-of parse/name-from-ns-decl the-ns)
+        ns-obj (-> filename formatting-stack.util/read-ns-decl parse/name-from-ns-decl the-ns)
         _ (assert ns-obj)
         [ns-form & contents] (safely-read-ns-contents buffer ns-obj)
         _ (assert (and (list? ns-form)
@@ -94,7 +84,7 @@
 
 (defn has-duplicate-requires? [filename]
   (->> filename
-       ns-form-of
+       formatting-stack.util/read-ns-decl
        formatting-stack.util/require-from-ns-decl
        rest
        (map ensure-coll)

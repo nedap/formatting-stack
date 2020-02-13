@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as string]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]))
 
 (defn exceeding-lines [threshold filename]

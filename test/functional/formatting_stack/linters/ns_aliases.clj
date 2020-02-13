@@ -10,11 +10,7 @@
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
       "test-resources/invalid_syntax.clj"
-      [{:source    :formatting-stack/report-processing-error
-        :filename  "test-resources/invalid_syntax.clj"
-        :msg       "Encountered an exception"
-        :level     :exception
-        :exception #(instance? Throwable %)}]
+      [] ;; reader exceptions are ignored
 
       "test-resources/ns_aliases_warning.clj"
       [{:source              :formatting-stack/ns-aliases
