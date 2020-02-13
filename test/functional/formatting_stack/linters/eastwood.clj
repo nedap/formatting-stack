@@ -10,6 +10,9 @@
   (let [linter (sut/new {})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
+      "test-resources/invalid-syntax.clj"
+      []
+
       "test-resources/eastwood_warning.clj"
       (matchers/embeds
        [{:source   :eastwood/def-in-def
