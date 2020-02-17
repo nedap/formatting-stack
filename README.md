@@ -1,17 +1,19 @@
 # formatting-stack [![CircleCI](https://circleci.com/gh/nedap/formatting-stack.svg?style=svg&circle-token=581a4a0fa4b19f0ac5c7d90d494c9df0c34cee68)](https://circleci.com/gh/nedap/formatting-stack)
 
-**formatting-stack** is a formatting/linting solution that is typically integrated with:
+**formatting-stack** is a formatting/linting solution that can be integrated with:
 
 * your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [clojure.tools.namespace.repl](https://github.com/clojure/tools.namespace)) system
   * for instantaneous performance
     * no cold-starts!
   * and precise understanding of your codebase
-    * no AST heuristics, no `eval` either
+    * powered by Clojure's introspection capabilities (reified vars, namespaces), and occasionally `eval`
   * and a reasonable triggering frequency
     * so you don't format too frequently (format-on-save), or not frequently enough (git pre-commit hook)
 * Git status/branch information
   * for some performance gains (typically only added/changed files will be processed)
   * and also for gradual formatting
+* Anything you want
+  * A vanilla repl, Lein task, CI workflow...
 
 As of today, it is integrated with:
 
@@ -19,7 +21,7 @@ As of today, it is integrated with:
   * [how-to-ns](https://github.com/gfredericks/how-to-ns)
   * [eastwood](https://github.com/jonase/eastwood)
   * [clj-kondo](https://github.com/borkdude/clj-kondo)
-    * Defaults to processing .cljs files only, given the overlap with Eastwood.
+    * By default, both Eastwood and Kondo are enabled, each having some linters disabled, filling each other's gaps.
   * [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl)
     * Used for "clean unused imports" functionality
   * [all-my-files-should-end-with-exactly-one-newline-character](https://github.com/gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character)
@@ -35,6 +37,8 @@ And it also bundles a few tiny linters of its own:
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
 Each formatter makes full use of your CPU's cores.
+
+Linters' reports are presented under a unified format. 
 
 ## Smart code analysis
 
@@ -86,8 +90,6 @@ The general intent is to make formatting:
 **formatting-stack** provides components that you can integrate into your system.
 
 The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`.
-
-(Fear not about reading code. Any namespace here not ending in `impl.clj` is optimized for readability.)
 
 ### Reloaded Workflow integration
 
