@@ -10,7 +10,8 @@
 (def off {:level :off})
 
 (def default-options
-  {:cache-dir formatting-stack.kondo-classpath-cache/cache-dir
+  {:cache     true
+   :cache-dir formatting-stack.kondo-classpath-cache/cache-dir
    :linters   {:cond-else            off ;; undesired
                :missing-docstring    off ;; undesired
                :unused-binding       off ;; undesired
@@ -58,9 +59,12 @@
                                             (-> (re-find #"\.cljs$" f)
                                                 boolean))))]
     (->> [(kondo/run! {:lint   clj-files
-                       :config (deep-merge default-options clj-options kondo-clj-options)})
+                       :config (deep-merge default-options clj-options kondo-clj-options)
+                       ;; :lang is unset here, so as not to particularly prefer .clj over .cljc
+                       })
           (kondo/run! {:lint   cljs-files
-                       :config (deep-merge default-options kondo-cljs-options)})]
+                       :config (deep-merge default-options kondo-cljs-options)
+                       :lang   :cljs})]
          (mapcat :findings)
          (map (fn [{source-type :type :as m}]
                 (-> (set/rename-keys m {:row     :line
