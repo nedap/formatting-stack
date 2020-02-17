@@ -12,24 +12,26 @@
    (java.io File)))
 
 (def default-eastwood-options
-  ;; Avoid false positives or more-annoying-than-useful checks:
+  ;; Avoid false positives or undesired checks:
   (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
                         eastwood.lint/default-linters)]
     (-> eastwood.lint/default-opts
         (assoc :linters linters))))
 
+(def vconj (fnil conj []))
+
 (defrecord TrackingReporter [reports])
 
 (defmethod reporting-callbacks/lint-warning TrackingReporter [{:keys [reports]} warning]
-  (swap! reports update :warnings (fnil conj []) warning)
+  (swap! reports update :warnings vconj warning)
   nil)
 
 (defmethod reporting-callbacks/analyzer-exception TrackingReporter [{:keys [reports]} exception]
-  (swap! reports update :errors (fnil conj []) exception)
+  (swap! reports update :errors vconj exception)
   nil)
 
 (defmethod reporting-callbacks/note TrackingReporter [{:keys [reports]} msg]
-  (swap! reports update :note (fnil conj []) msg)
+  (swap! reports update :note vconj msg)
   nil)
 
 (defn lint! [{:keys [options]} filenames]
@@ -42,21 +44,24 @@
     (with-out-str
       (eastwood.lint/eastwood (assoc options :namespaces namespaces)
                               (->TrackingReporter reports)))
-    (->> (:warnings @reports)
+    (->> @reports
+         :warnings
          (map :warn-data)
          (remove (fn [{{{[[_fn* [_arglist [_assert v]]]] :form} :ast} :wrong-pre-post}]
-                   (= "*" (-> v str first) (-> v str last)))) ;; False positives for dynamic vars https://git.io/fhQTx
+                   (= "*" ;; False positives for dynamic vars https://git.io/fhQTx
+                      (-> v str first)
+                      (-> v str last))))
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
                        :level    :warning
                        :source   (keyword "eastwood" (name linter))
                        :filename (if (string? uri-or-file-name)
                                    uri-or-file-name
-                                   (str/replace (-> uri-or-file-name .getPath)
+                                   (str/replace (-> ^File uri-or-file-name .getPath)
                                                 root-dir
                                                 ""))))))))
 
 (defn new [{:keys [eastwood-options]
-            :or {eastwood-options {}}}]
+            :or   {eastwood-options {}}}]
   (implement {:options (deep-merge default-eastwood-options eastwood-options)}
     linter/--lint! lint!))
