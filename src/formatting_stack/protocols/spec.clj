@@ -38,6 +38,8 @@ so that final users can locate them and configure them."
 
 (spec/def ::warning-details-url present-string?)
 
+(spec/def ::diff string?)
+
 (spec/def ::level #{:warning :error :exception})
 
 (defmulti reportmm :level)
@@ -57,7 +59,8 @@ so that final users can locate them and configure them."
                       ::column
                       ::line]
              :opt-un [::msg-extra-data
-                      ::warning-details-url]))
+                      ::warning-details-url
+                      ::diff]))
 
 (spec/def ::report
   (spec/multi-spec reportmm :level))
