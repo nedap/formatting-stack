@@ -70,11 +70,11 @@
              *flush-on-newline* true]
      ~@forms))
 
-(speced/defn report-processing-error [^Throwable e, filename]
+(speced/defn report-processing-error [^Throwable e, filename, ^ifn? f]
   {:level     :exception
    :source    :formatting-stack/report-processing-error
    :filename  filename
-   :msg       "Encountered an exception"
+   :msg       (str "Encountered an exception while running " (pr-str f))
    :exception e})
 
 (spec/def ::non-lazy-result
@@ -97,9 +97,9 @@
                                                 f))
                                 v)
                               (catch Exception e
-                                (report-processing-error e filename))
+                                (report-processing-error e filename f))
                               (catch AssertionError e
-                                (report-processing-error e filename)))))))
+                                (report-processing-error e filename f)))))))
 
 (defn require-from-ns-decl [ns-decl]
   (->> ns-decl
