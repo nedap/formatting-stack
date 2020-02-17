@@ -30,7 +30,10 @@
                 nedap.speced.def/doc          clojure.repl/doc
                 nedap.speced.def/fn           clojure.core/fn
                 nedap.speced.def/let          clojure.core/let
-                nedap.speced.def/letfn        clojure.core/letfn}
+                nedap.speced.def/letfn        clojure.core/letfn
+                nedap.utils.reverse/r->       clojure.core/->
+                nedap.utils.reverse/rcomp     clojure.core/comp
+                nedap.utils.reverse/rcond->   clojure.core/cond->}
    :output    {:exclude-files ["test-resources/*"
                                "test/unit/formatting_stack/formatters/cljfmt/impl/sample_data.clj"]}})
 
