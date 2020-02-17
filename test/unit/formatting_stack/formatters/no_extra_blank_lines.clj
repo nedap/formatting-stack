@@ -1,6 +1,6 @@
 (ns unit.formatting-stack.formatters.no-extra-blank-lines
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest]]
    [formatting-stack.formatters.no-extra-blank-lines :as sut]))
 
 (deftest without-extra-newlines

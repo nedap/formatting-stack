@@ -15,28 +15,43 @@ commands:
             - ~/.m2
           key: v1-dependencies-{{ checksum "project.clj" }}
 
+executor_defaults: &executor_defaults
+  working_directory: ~/repo
+
 executors:
-  lein-executor:
+  openjdk8:
     docker:
       - image: circleci/clojure:openjdk-8-lein-2.9.1
-    working_directory: ~/repo
     environment:
       LEIN_ROOT: "true"
       JVM_OPTS: -Xmx3200m
+    <<: *executor_defaults
+  openjdk11:
+    docker:
+      - image: circleci/clojure:openjdk-11-lein-2.9.1
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xmx3200m --illegal-access=deny
+    <<: *executor_defaults
 
 jobs:
-  build:
-    executor: lein-executor
+  test_code:
+    description: |
+      Runs tests against given version of the JDK
+    parameters:
+      jdk_version:
+        description: Version of the JDK to test against
+        type: string
+      lein_test_command:
+        description: A Leiningen command that will run a test suite
+        type: string
+    executor: << parameters.jdk_version >>
     steps:
       - setup-env
       - run:
-          name: 'Run JVM tests, including refactor-nrepl functionality'
-          command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
-      - run:
-          name: 'Run JVM tests, excluding refactor-nrepl functionality'
-          command: lein with-profile -dev,+ci do clean, test
+          command: << parameters.lein_test_command >>
   deploy:
-    executor: lein-executor
+    executor: openjdk8
     steps:
       - setup-env
       - run:
@@ -52,21 +67,44 @@ jobs:
           name: release to Clojars
           command: lein deploy clojars
 
+test_code_filters: &test_code_filters
+  filters:
+    branches:
+      only: /.*/
+    tags:
+      only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
+
 workflows:
-  version: 2
-  CircleCI:
+  version: 2.1
+  ci-test-matrix:
     jobs:
-      - build:
-          context: JFrog
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
+      - test_code:
+          name: "JDK 8 including refactor-nrepl"
+          jdk_version: openjdk8
+          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+          <<: *test_code_filters
+      - test_code:
+          name: "JDK 8 excluding refactor-nrepl"
+          jdk_version: openjdk8
+          lein_test_command: lein with-profile -dev,+ci do clean, test
+          <<: *test_code_filters
+      - test_code:
+          name: "JDK 11 including refactor-nrepl"
+          jdk_version: openjdk11
+          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+          <<: *test_code_filters
+      - test_code:
+          name: "JDK 11 excluding refactor-nrepl"
+          jdk_version: openjdk11
+          lein_test_command: lein with-profile -dev,+ci do clean, test
+          <<: *test_code_filters
       - deploy:
           context: JFrog
           requires:
-            - build
+            - "JDK 8 including refactor-nrepl"
+            - "JDK 8 excluding refactor-nrepl"
+            - "JDK 11 including refactor-nrepl"
+            - "JDK 11 excluding refactor-nrepl"
           filters:
             branches:
               ignore: /.*/

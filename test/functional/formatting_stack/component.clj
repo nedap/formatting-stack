@@ -1,8 +1,9 @@
 (ns functional.formatting-stack.component
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is testing]]
    [com.stuartsierra.component :as component]
-   [formatting-stack.component :as sut]))
+   [formatting-stack.component :as sut]
+   [formatting-stack.reporters.passthrough :as reporters.passthrough]))
 
 (deftest works
   (testing "It can be started/stopped without errors"
@@ -13,7 +14,7 @@
                 :linters                  []
                 :processors               []
                 :in-background?           false
-                :intersperse-newlines?    false}
+                :reporter                 (reporters.passthrough/new)}
           instance (sut/new opts)]
       (is (= instance
              (component/start instance)))

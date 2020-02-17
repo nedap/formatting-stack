@@ -1,7 +1,7 @@
 (ns unit.formatting-stack.formatters.cljfmt.impl.magic-symbols
   (:require
    [clojure.java.io :as io]
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is]]
    [formatting-stack.formatters.cljfmt.impl :as sut]))
 
 (deftest works

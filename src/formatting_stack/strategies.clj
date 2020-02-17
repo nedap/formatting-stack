@@ -12,11 +12,9 @@
   (:require
    [clojure.string :as str]
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
-   [formatting-stack.formatters.clean-ns.impl]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
-   [formatting-stack.util :refer [try-require]]
-   [formatting-stack.util :refer [require-lock]]
+   [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
    [nedap.utils.spec.api :refer [check!]])
   (:import
@@ -101,7 +99,7 @@
   "This strategy excludes files that don't begin with a `(ns ...)` form."
   [& {:keys [^::protocols.spec/filenames files]}]
   (->> files
-       (filter formatting-stack.formatters.clean-ns.impl/ns-form-of)))
+       (filter read-ns-decl)))
 
 (speced/defn jvm-requirable-files
   "This strategy excludes files that can't be `require`d under JVM Clojure."
@@ -144,7 +142,7 @@
                                        true)))) refresh-dirs)]}
   (->> files
        (filter (speced/fn [^string? filename]
-                 (if-not (formatting-stack.formatters.clean-ns.impl/ns-form-of filename)
+                 (if-not (read-ns-decl filename)
                    true
                    (let [file (-> filename File.)]
                      (->> refresh-dirs

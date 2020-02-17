@@ -18,9 +18,10 @@
 (defn format! [{:keys [how-to-ns-options]} files]
   (->> (remove #(str/ends-with? % ".edn") files)
        (process-in-parallel! (fn [filename]
-                               (how-to-ns.main/fix [filename] how-to-ns-options)))))
+                               (how-to-ns.main/fix [filename] how-to-ns-options))))
+  nil)
 
 (defn new [{:keys [how-to-ns-options]
             :or {how-to-ns-options {}}}]
-  (implement {:how-to-ns-options (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-options)}
+  (implement {:how-to-ns-options (deep-merge default-how-to-ns-opts how-to-ns-options)}
     formatter/--format! format!))

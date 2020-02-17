@@ -1,6 +1,6 @@
 (ns unit.formatting-stack.indent-specs
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is testing]]
    [formatting-stack.formatters.cljfmt.impl :as cljfmt.impl]
    [formatting-stack.indent-specs :as sut]
    [formatting-stack.processors.cider :as processors.cider]

@@ -1,7 +1,7 @@
 (ns unit.formatting-stack.strategies
   (:require
    [clojure.string :as str]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is use-fixtures]]
    [formatting-stack.strategies :as sut]
    [formatting-stack.strategies.impl :as sut.impl]))
 

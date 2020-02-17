@@ -36,7 +36,9 @@
        (mapv str)))
 
 (speced/defn analyze [^present-string? filename]
-  (for [extension [".clj" ".cljs" ".cljc"]
+  (for [extension (->> [".clj" ".cljs" ".cljc"]
+                       (filter (fn [x]
+                                 (string/ends-with? filename x))))
         :let [decl (-> filename file/read-file-ns-decl)
               resource-path (ns-decl->resource-path decl extension)
               filenames (resource-path->filenames resource-path)]
@@ -50,11 +52,19 @@
        (process-in-parallel! (fn [filename]
                                (->> filename
                                     analyze
-                                    (run! (speced/fn [{:keys [^symbol? ns-name, ^coll? filenames]}]
-                                            (println "Warning: the namespace"
-                                                     (str "`" ns-name "`")
-                                                     "is defined over more than one file.\nFound:"
-                                                     (->> filenames (interpose ", ") (apply str))))))))))
+                                    (mapv (speced/fn [{:keys [^symbol? ns-name, ^coll? filenames]}]
+                                            {:filename       filename
+                                             :level          :warning
+                                             :line           0
+                                             :column         0
+                                             :msg            (str "The namespace "
+                                                                  "`" ns-name "`"
+                                                                  " is defined over more than one file. Found:")
+                                             :msg-extra-data (->> filenames
+                                                                  (mapv (fn [s]
+                                                                          (string/replace s #"^file:" ""))))
+                                             :source         :formatting-stack/one-resource-per-ns})))))
+       (apply concat)))
 
 (speced/defn new [^map? opts]
   (implement opts

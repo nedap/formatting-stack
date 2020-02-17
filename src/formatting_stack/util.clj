@@ -1,13 +1,17 @@
 (ns formatting-stack.util
   (:require
+   [clojure.java.io :as io]
+   [clojure.spec.alpha :as spec]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
+   [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
    [medley.core :refer [find-first]]
    [nedap.speced.def :as speced]
    [nedap.utils.collections.eager :refer [partitioning-pmap]]
    [nedap.utils.collections.seq :refer [distribute-evenly-by]]
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
+   (clojure.lang IBlockingDeref IPending)
    (java.io File)))
 
 (defmacro rcomp
@@ -20,6 +24,18 @@
   (->> m
        (filter (rcomp first f))
        (into {})))
+
+(speced/defn read-ns-decl
+  "Reads ns declaration in file with line/column metadata"
+  [^string? filename]
+  (when-not (-> filename File. .isDirectory)
+    (try
+      (with-open [reader (-> filename io/reader push-back-reader indexing-push-back-reader)]
+        (parse/read-ns-decl reader))
+      (catch Exception e
+        (if (-> e ex-data :type #{:reader-exception})
+          nil
+          (throw e))))))
 
 (def ns-name-from-filename (rcomp file/read-file-ns-decl parse/name-from-ns-decl))
 
@@ -54,20 +70,20 @@
              *flush-on-newline* true]
      ~@forms))
 
-(defn report-processing-error [^Throwable e filename]
-  (let [s (->> e
-               .getStackTrace
-               (map (fn [x]
-                      (str "    " x)))
-               (interpose "\n"))]
-    (println (apply str
-                    "Encountered an exception, processing file: "
-                    filename
-                    ". The exception will be printed in the next line. "
-                    "formatting-stack execution has *not* been aborted.\n"
-                    (-> e .getMessage)
-                    "\n"
-                    s))))
+(speced/defn report-processing-error [^Throwable e, filename, ^ifn? f]
+  {:level     :exception
+   :source    :formatting-stack/report-processing-error
+   :filename  filename
+   :msg       (str "Encountered an exception while running " (pr-str f))
+   :exception e})
+
+(spec/def ::non-lazy-result
+  (fn [x]
+    (cond
+      (sequential? x)              (vector? x)
+      (instance? IBlockingDeref x) false
+      (instance? IPending x)       false
+      true                         true)))
 
 (defn process-in-parallel! [f files]
   (->> files
@@ -75,11 +91,15 @@
                                    (-> (File. filename) .length))})
        (partitioning-pmap (bound-fn [filename]
                             (try
-                              (f filename)
+                              (let [v (f filename)]
+                                (assert (spec/valid? ::non-lazy-result v)
+                                        (pr-str "Parallel processing shouldn't return lazy computations"
+                                                f))
+                                v)
                               (catch Exception e
-                                (report-processing-error e filename))
+                                (report-processing-error e filename f))
                               (catch AssertionError e
-                                (report-processing-error e filename)))))))
+                                (report-processing-error e filename f)))))))
 
 (defn require-from-ns-decl [ns-decl]
   (->> ns-decl
@@ -104,3 +124,20 @@
   (if (coll? x)
     x
     [x]))
+
+;; Rationale: https://github.com/nedap/formatting-stack/pull/109/files#r376891779
+(speced/defn ensure-sequential [^some? x]
+  (if (sequential? x)
+    x
+    [x]))
+
+(def ansi-colors
+  {:reset  "[0m"
+   :red    "[031m"
+   :green  "[032m"
+   :yellow "[033m"
+   :cyan   "[036m"
+   :grey   "[037m"})
+
+(defn colorize [s color]
+  (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))

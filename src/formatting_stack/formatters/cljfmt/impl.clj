@@ -23,7 +23,7 @@
     (locking require-lock
       (require namespace))
     (ns-map namespace)
-    (catch Exception e
+    (catch Exception _
       {})))
 
 (spec/def ::indent-key #{:style/indent :style.cljfmt/indent :style.cljfmt/type})

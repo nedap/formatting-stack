@@ -1,7 +1,7 @@
 (ns unit.formatting-stack.processors.test-runner.impl
   (:require
    [clojure.string :as string]
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.processors.test-runner.impl :as sut]
    [formatting-stack.project-parsing :refer [project-namespaces]]
    [nedap.speced.def :as speced]))

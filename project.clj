@@ -1,18 +1,17 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "2.0.1-alpha2"
+(defproject formatting-stack "3.0.0-alpha6"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2019.05.19-alpha"]
+  :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
-                 [com.nedap.staffing-solutions/utils.modular "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.modular "2.1.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [com.stuartsierra/component "0.4.0"]
                  [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
-                 [lein-bikeshed "0.5.1"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.namespace "0.3.1"]
@@ -73,11 +72,41 @@
                                              [org.clojure/test.check "0.10.0-alpha3"]]
                               :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
                               :source-paths ["dev"]
-                              :repl-options {:init-ns dev}}
+                              :repl-options {:init-ns dev}
+                              :middleware   [~(do ;; the following ensures that :exclusions are honored in all cases
+                                                (create-ns 'user)
+                                                (intern 'user
+                                                        'nedap-ensure-exclusions
+                                                        (fn [project]
+                                                          (let [exclusions (->> project
+                                                                                :exclusions
+                                                                                (map (fn [x]
+                                                                                       (str (if (namespace (symbol x))
+                                                                                              x
+                                                                                              (symbol (str x) (str x))))))
+                                                                                (set))]
+                                                            (update project :dependencies (fn [deps]
+                                                                                            (->> deps
+                                                                                                 (remove (fn [[dep version]]
+                                                                                                           (exclusions (str dep))))
+                                                                                                 vec))))))
+                                                'user/nedap-ensure-exclusions)]}
+
+             :provided       {:dependencies [[org.clojure/clojurescript "1.10.597"
+                                              :exclusions [com.cognitect/transit-clj
+                                                           com.google.code.findbugs/jsr305
+                                                           com.google.errorprone/error_prone_annotations]]
+                                             [com.google.guava/guava "25.1-jre" #_"transitive"]
+                                             [com.google.protobuf/protobuf-java "3.4.0" #_"transitive"]
+                                             [com.cognitect/transit-clj "0.8.313" #_"transitive"]
+                                             [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
+                                             [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test           {:source-paths   ["dev"]
-                              :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]]
+                              :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]
+                                               [nubank/matcher-combinators "1.0.1"
+                                                :exclusions [commons-codec]]]
                               :jvm-opts       ["-Dclojure.core.async.go-checking=true"
                                                "-Duser.language=en-US"]
                               :resource-paths ["test-resources-extra"

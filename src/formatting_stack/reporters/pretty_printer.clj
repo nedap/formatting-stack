@@ -1,0 +1,106 @@
+(ns formatting-stack.reporters.pretty-printer
+  "Prints an optionally colorized, indented, possibly truncated output of the reports."
+  (:require
+   [clojure.stacktrace :refer [print-stack-trace]]
+   [clojure.string :as string]
+   [formatting-stack.protocols.reporter :as reporter]
+   [formatting-stack.protocols.spec :as protocols.spec]
+   [formatting-stack.util :refer [colorize]]
+   [medley.core :refer [map-vals]]
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
+
+(speced/defn truncate-line-wise [^string? s, length]
+  (if (= s "\n")
+    s
+    (->> (string/split s #"\n")
+         (map (fn [s]
+                (let [suffix "…"
+                      string-length (count s)
+                      suffix-length (count suffix)]
+                  (if (<= string-length length)
+                    s
+                    (str (subs s
+                               0
+                               (- length suffix-length))
+                         suffix)))))
+         (string/join "\n"))))
+
+(defn print-summary [{:keys [summary?]} reports]
+  (when summary?
+    (->> reports
+         (group-by :level)
+         (map-vals count)
+         (into (sorted-map-by compare)) ;; print summary in order
+         (run! (fn [[report-type n]]
+                 (-> (str n (case report-type
+                              :exception " exceptions occurred"
+                              :error     " errors found"
+                              :warning   " warnings found"))
+                     (colorize (case type
+                                 :exception :red
+                                 :error     :red
+                                 :warning   :yellow))
+                     (println)))))))
+
+(defn print-exceptions [{:keys [print-stacktraces?]} reports]
+  (->> reports
+       (filter (speced/fn [{:keys [^::protocols.spec/level level]}]
+                 (#{:exception} level)))
+       (group-by :filename)
+       (run! (fn [[title reports]]
+               (println (colorize title :cyan))
+               (doseq [{:keys [^Throwable exception]} reports]
+                 (if print-stacktraces?
+                   (print-stack-trace exception)
+                   (println (ex-message exception)))
+                 (println))))))
+
+(speced/defn print-warnings [{:keys [max-msg-length
+                                     ^boolean? colorize?]}
+                             ^::protocols.spec/reports reports]
+  (->> reports
+       (filter (speced/fn [{:keys [^::protocols.spec/level level]}]
+                 (#{:error :warning} level)))
+       (group-by :filename)
+       (into (sorted-map-by compare)) ;; sort filenames for consistent output
+       (run! (fn [[title reports]]
+               (println (cond-> title
+                          colorize? (colorize :cyan)))
+               (doseq [[source-group group-entries] (->> reports
+                                                         (group-by :source))
+                       :let [_ (println " " (cond-> source-group
+                                              colorize? (colorize (case (-> group-entries first :level)
+                                                                    :error   :red
+                                                                    :warning :yellow))))
+                             _ (when-let [url (->> group-entries
+                                                   (keep :warning-details-url)
+                                                   first)]
+                                 (cond-> (str "    See: " url)
+                                   colorize? (colorize :grey)
+                                   true      println))]
+                       {:keys [msg column line source level msg-extra-data warning-details-url]} (->> group-entries
+                                                                                                      (sort-by :line))]
+
+                 (println (cond-> (str "    " line ":" column)
+                            colorize? (colorize :grey))
+                          (truncate-line-wise msg max-msg-length))
+                 (doseq [entry msg-extra-data]
+                   (println "       "
+                            (truncate-line-wise entry max-msg-length))))
+               (println)))))
+
+(defn print-report [this reports]
+  (print-exceptions this reports)
+  (print-warnings this reports)
+  (print-summary this reports))
+
+(defn new [{:keys [max-msg-length print-stacktraces? summary? colorize?]
+            :or   {max-msg-length     200
+                   print-stacktraces? true
+                   summary?           true
+                   colorize?          true}}]
+  (implement {:max-msg-length max-msg-length
+              :print-stacktraces? print-stacktraces?
+              :colorize? colorize?}
+    reporter/--report print-report))

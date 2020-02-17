@@ -1,6 +1,6 @@
 (ns integration.formatting-stack.linters.one-resource-per-ns
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.linters.one-resource-per-ns :as sut]
    [formatting-stack.test-helpers :as test-helpers]
    [formatting-stack.util :refer [rcomp]]))

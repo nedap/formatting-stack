@@ -18,7 +18,8 @@
                                      formatted (without-extra-newlines contents)]
                                  (when-not (= contents formatted)
                                    (println "Removing extra blank lines:" filename)
-                                   (spit filename formatted)))))))
+                                   (spit filename formatted))))))
+  nil)
 
 (defn new []
   (implement {}

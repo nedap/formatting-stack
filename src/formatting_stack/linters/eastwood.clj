@@ -3,51 +3,51 @@
    [clojure.string :as str]
    [eastwood.lint]
    [eastwood.util]
+   [formatting-stack.linters.eastwood.impl :as impl]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [deep-merge]]
-   [nedap.utils.modular.api :refer [implement]]))
+   [nedap.utils.modular.api :refer [implement]])
+  (:import
+   (java.io File)))
 
 (def default-eastwood-options
-  ;; Avoid false positives or more-annoying-than-useful checks:
+  ;; Avoid false positives or undesired checks:
   (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
                         eastwood.lint/default-linters)]
     (-> eastwood.lint/default-opts
         (assoc :linters linters))))
 
-(def default-warnings-to-silence
-  [#"== Eastwood"
-   #"^dbg "
-   #"Warning: protocol .* is overwriting function" ;; False positive with nedap.speced.def
-   #"Directories scanned"
-   #"Entering directory"
-   #".*wrong-pre-post.*\*.*\*" ;; False positives for dynamic vars https://git.io/fhQTx
-   #"== Warnings"
-   #"== Linting done"])
-
-(defn lint! [{:keys [options warnings-to-silence]} filenames]
+(defn lint! [{:keys [options]} filenames]
   (reset! eastwood.util/warning-enable-config-atom []) ;; https://github.com/jonase/eastwood/issues/317
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
-        result (->> (with-out-str
-                      (binding [*warn-on-reflection* true]
-                        (eastwood.lint/eastwood (-> options
-                                                    (assoc :namespaces namespaces)))))
-                    (str/split-lines)
-                    (remove (fn [line]
-                              (or (str/blank? line)
-                                  (some (fn [re]
-                                          (re-find re line))
-                                        warnings-to-silence)))))]
-    (when-not (every? (fn [line]
-                        (str/starts-with? line "== Linting"))
-                      result)
-      (->> result (str/join "\n") println))))
+        root-dir   (-> (File. "") .getAbsolutePath)
+        reports    (atom nil)
+        output     (with-out-str
+                     (binding [*warn-on-reflection* true]
+                       (eastwood.lint/eastwood (assoc options :namespaces namespaces)
+                                               (impl/->TrackingReporter reports))))]
+    (->> @reports
+         :warnings
+         (map :warn-data)
+         (remove (fn [{{{[[_fn* [_arglist [_assert v]]]] :form} :ast} :wrong-pre-post}]
+                   (= "*" ;; False positives for dynamic vars https://git.io/fhQTx
+                      (-> v str first)
+                      (-> v str last))))
+         (map (fn [{:keys [uri-or-file-name linter] :as m}]
+                (assoc m
+                       :level    :warning
+                       :source   (keyword "eastwood" (name linter))
+                       :filename (if (string? uri-or-file-name)
+                                   uri-or-file-name
+                                   (str/replace (-> ^File uri-or-file-name .getPath)
+                                                root-dir
+                                                "")))))
+         (concat (impl/warnings->reports output)))))
 
-(defn new [{:keys [eastwood-options warnings-to-silence]
-            :or {warnings-to-silence default-warnings-to-silence
-                 eastwood-options {}}}]
-  (implement {:options (deep-merge default-eastwood-options eastwood-options)
-              :warnings-to-silence warnings-to-silence}
+(defn new [{:keys [eastwood-options]
+            :or   {eastwood-options {}}}]
+  (implement {:options (deep-merge default-eastwood-options eastwood-options)}
     linter/--lint! lint!))

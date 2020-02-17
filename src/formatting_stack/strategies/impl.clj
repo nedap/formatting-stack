@@ -4,7 +4,8 @@
    [clojure.string :as str]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
-   [formatting-stack.formatters.clean-ns.impl :refer [ns-form-of safely-read-ns-contents]]
+   [formatting-stack.formatters.clean-ns.impl :refer [safely-read-ns-contents]]
+   [formatting-stack.util :refer [read-ns-decl]]
    [nedap.speced.def :as speced])
   (:import
    (clojure.lang Namespace)
@@ -27,7 +28,7 @@
     (catch Exception _)))
 
 (speced/defn ^::speced/nilable ^Namespace filename->ns [^string? filename]
-  (some-> filename ns-form-of parse/name-from-ns-decl safe-the-ns))
+  (some-> filename read-ns-decl parse/name-from-ns-decl safe-the-ns))
 
 (defn readable?
   "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
@@ -46,9 +47,9 @@
                  (-> decl parse/deps-from-ns-decl) ;; no exceptions thrown
                  true)
                true)))
-      (catch Exception e
+      (catch Exception _
         false)
-      (catch AssertionError e
+      (catch AssertionError _
         false))))
 
 (defn extract-clj-files [files]

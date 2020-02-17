@@ -68,7 +68,8 @@
                                          refactor-nrepl-opts
                                          namespaces-that-should-never-cleaned
                                          libspec-whitelist
-                                         filename))))))
+                                         filename)))))
+  nil)
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
             :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned

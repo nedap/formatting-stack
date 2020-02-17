@@ -6,9 +6,9 @@
    [formatting-stack.formatters.newlines :as formatters.newlines]
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
-   [formatting-stack.linters.bikeshed :as linters.bikeshed]
    [formatting-stack.linters.eastwood :as linters.eastwood]
    [formatting-stack.linters.kondo :as linters.kondo]
+   [formatting-stack.linters.line-length :as linters.line-length]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
@@ -21,58 +21,57 @@
                           strategies/git-not-completely-staged])
 
 (defn default-formatters [third-party-indent-specs]
-  (let [opts {:third-party-indent-specs third-party-indent-specs}
-        ;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.
+  (let [;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.
         ;; ideally the how-to-ns formatter would have an extra `files-with-a-namespace` strategy but that would break git caching,
         ;; making usage more awkward.
         ;; the strategies mechanism needs some rework to avoid this limitation.
-        cljfmt-and-how-to-ns-opts (-> opts (assoc :strategies default-strategies))]
-    (->> [(formatters.cljfmt/new cljfmt-and-how-to-ns-opts)
-          (formatters.how-to-ns/new cljfmt-and-how-to-ns-opts)
+        cached-strategies default-strategies]
+    (->> [(-> (formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
+              (assoc :strategies cached-strategies))
+          (-> (formatters.how-to-ns/new {})
+              (assoc :strategies cached-strategies))
           (formatters.no-extra-blank-lines/new)
-          (formatters.newlines/new opts)
-          (formatters.trivial-ns-duplicates/new (assoc opts :strategies (conj default-strategies
-                                                                              strategies/files-with-a-namespace
-                                                                              strategies/exclude-edn)))
+          (formatters.newlines/new {})
+          (-> (formatters.trivial-ns-duplicates/new {})
+              (assoc :strategies (conj default-strategies
+                                       strategies/files-with-a-namespace
+                                       strategies/exclude-edn)))
           (when (strategies/refactor-nrepl-available?)
-            (formatters.clean-ns/new (assoc opts :strategies (conj default-strategies
-                                                                   strategies/when-refactor-nrepl
-                                                                   strategies/files-with-a-namespace
-                                                                   strategies/exclude-cljc
-                                                                   strategies/exclude-cljs
-                                                                   strategies/exclude-edn
-                                                                   strategies/namespaces-within-refresh-dirs-only
-                                                                   strategies/do-not-use-cached-results!))))]
-
+            (-> (formatters.clean-ns/new {})
+                (assoc :strategies (conj default-strategies
+                                         strategies/files-with-a-namespace
+                                         strategies/exclude-cljc
+                                         strategies/exclude-cljs
+                                         strategies/exclude-edn
+                                         strategies/namespaces-within-refresh-dirs-only
+                                         strategies/do-not-use-cached-results!))))]
          (filterv some?))))
 
-(def default-linters [(-> (linters.ns-aliases/new {})
+(def default-linters [(-> (linters.kondo/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-edn)))
+                      (-> (linters.one-resource-per-ns/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/files-with-a-namespace)))
+                      (-> (linters.ns-aliases/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/files-with-a-namespace
                                                    ;; reader conditionals may confuse `linters.ns-aliases`
                                                    strategies/exclude-cljc
                                                    ;; string requires may confuse clojure.tools.*
                                                    strategies/exclude-cljs)))
-                      (-> (linters.loc-per-ns/new {})
+                      (-> (linters.line-length/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/exclude-edn)))
-                      (-> (linters.bikeshed/new {})
+                      (-> (linters.loc-per-ns/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/exclude-edn)))
                       (-> (linters.eastwood/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/exclude-cljs
                                                    strategies/jvm-requirable-files
-                                                   strategies/namespaces-within-refresh-dirs-only)))
-                      (-> (linters.kondo/new)
-                          (assoc :strategies (conj extended-strategies
-                                                   strategies/exclude-edn
-                                                   strategies/exclude-clj
-                                                   strategies/exclude-cljc)))
-                      (-> (linters.one-resource-per-ns/new {})
-                          (assoc :strategies (conj extended-strategies
-                                                   strategies/files-with-a-namespace)))])
+                                                   strategies/namespaces-within-refresh-dirs-only)))])
 
 (defn default-processors [third-party-indent-specs]
-  [(processors.cider/new {:third-party-indent-specs third-party-indent-specs
-                          :strategies               extended-strategies})])
+  [(-> (processors.cider/new {:third-party-indent-specs third-party-indent-specs})
+       (assoc :strategies extended-strategies))])
