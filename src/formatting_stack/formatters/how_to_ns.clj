@@ -5,7 +5,7 @@
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [process-in-parallel!]]
+   [formatting-stack.util :refer [process-in-parallel! ensure-sequential]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -26,23 +26,19 @@
 (defn lint! [{:keys [how-to-ns-options]} files]
   (->> (remove #(str/ends-with? % ".edn") files)
        (process-in-parallel! (fn [filename]
-                               (try
-                                 (let [contents  (slurp filename)
-                                       formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
-                                   (when-not (= contents formatted)
-                                     {:filename filename
-                                      :diff (#'how-to-ns.main/unified-diff
-                                             (str filename)
-                                             contents
-                                             formatted)
-                                      :msg "Badly formatted namespace"
-                                      :source :how-to-ns/ns}))
-                                 (catch Exception e
+                               (let [contents  (slurp filename)
+                                     formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
+                                 (when-not (= contents formatted)
                                    {:filename filename
-                                    :msg (str "Failed to parse " filename)
-                                    :exception e
-                                    :source :how-to-ns/ns
-                                    :level :exception}))))
+                                    :diff (#'how-to-ns.main/unified-diff
+                                           (str filename)
+                                           contents
+                                           formatted)
+                                    :line 0 ;; todo extract from diff
+                                    :column 0
+                                    :level :warning
+                                    :msg "Badly formatted namespace"
+                                    :source :how-to-ns/ns}))))
        (remove nil?)))
 
 (defn new [{:keys [how-to-ns-options]

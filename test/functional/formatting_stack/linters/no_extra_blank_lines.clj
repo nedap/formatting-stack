@@ -18,4 +18,3 @@
         :line 4
         :column 1
         :filename "test-resources/extra_newlines_warning.clj"}])))
-
