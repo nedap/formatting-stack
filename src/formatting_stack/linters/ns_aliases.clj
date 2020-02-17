@@ -1,15 +1,10 @@
 (ns formatting-stack.linters.ns-aliases
   "Observes these guidelines: https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
   (:require
-   [clojure.java.io :as io]
    [clojure.string :as string]
-   [clojure.tools.namespace.parse :as parse]
-   [clojure.tools.reader.reader-types :refer [indexing-push-back-reader]]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel!]]
-   [nedap.utils.modular.api :refer [implement]])
-  (:import
-   (java.io PushbackReader)))
+   [nedap.utils.modular.api :refer [implement]]))
 
 (defn clause= [a b]
   (->> [a b]

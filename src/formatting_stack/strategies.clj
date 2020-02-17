@@ -12,7 +12,6 @@
   (:require
    [clojure.string :as str]
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
-   [formatting-stack.formatters.clean-ns.impl]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]

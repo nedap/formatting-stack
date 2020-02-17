@@ -10,12 +10,17 @@
   (let [linter (sut/new {})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
-      "test-resources/invalid-syntax.clj"
+      "test-resources/invalid_syntax.clj"
       []
 
       "test-resources/eastwood_warning.clj"
-      (matchers/embeds
-       [{:source   :eastwood/def-in-def
+      (matchers/in-any-order
+       [{:source :eastwood/warn-on-reflection
+         :msg "reference to field getPath can't be resolved"
+         :line 6
+         :column 25
+         :filename "test-resources/eastwood_warning.clj"}
+        {:source   :eastwood/def-in-def
          :line     3
          :column   13
          :filename "test-resources/eastwood_warning.clj"}]))))

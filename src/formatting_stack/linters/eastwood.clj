@@ -2,8 +2,8 @@
   (:require
    [clojure.string :as str]
    [eastwood.lint]
-   [eastwood.reporting-callbacks :as reporting-callbacks]
    [eastwood.util]
+   [formatting-stack.linters.eastwood.impl :as impl]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [deep-merge]]
@@ -18,32 +18,17 @@
     (-> eastwood.lint/default-opts
         (assoc :linters linters))))
 
-(def vconj (fnil conj []))
-
-(defrecord TrackingReporter [reports])
-
-(defmethod reporting-callbacks/lint-warning TrackingReporter [{:keys [reports]} warning]
-  (swap! reports update :warnings vconj warning)
-  nil)
-
-(defmethod reporting-callbacks/analyzer-exception TrackingReporter [{:keys [reports]} exception]
-  (swap! reports update :errors vconj exception)
-  nil)
-
-(defmethod reporting-callbacks/note TrackingReporter [{:keys [reports]} msg]
-  (swap! reports update :note vconj msg)
-  nil)
-
 (defn lint! [{:keys [options]} filenames]
   (reset! eastwood.util/warning-enable-config-atom []) ;; https://github.com/jonase/eastwood/issues/317
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
         root-dir   (-> (File. "") .getAbsolutePath)
-        reports    (atom nil)]
-    (with-out-str
-      (eastwood.lint/eastwood (assoc options :namespaces namespaces)
-                              (->TrackingReporter reports)))
+        reports    (atom nil)
+        output     (with-out-str
+                     (binding [*warn-on-reflection* true]
+                       (eastwood.lint/eastwood (assoc options :namespaces namespaces)
+                                               (impl/->TrackingReporter reports))))]
     (->> @reports
          :warnings
          (map :warn-data)
@@ -59,7 +44,8 @@
                                    uri-or-file-name
                                    (str/replace (-> ^File uri-or-file-name .getPath)
                                                 root-dir
-                                                ""))))))))
+                                                "")))))
+         (concat (impl/warnings->reports output)))))
 
 (defn new [{:keys [eastwood-options]
             :or   {eastwood-options {}}}]
