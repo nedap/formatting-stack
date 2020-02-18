@@ -9,8 +9,6 @@
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.1.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
-                 [com.stuartsierra/component "0.4.0"]
-                 [integrant "0.7.0"]
                  [jonase/eastwood "0.3.5"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
@@ -66,6 +64,7 @@
                                              [com.stuartsierra/component "0.4.0"]
                                              [com.taoensso/timbre "4.10.0"]
                                              [criterium "0.4.5"]
+                                             [integrant/repl "0.3.1"]
                                              [lambdaisland/deep-diff "0.0-29"]
                                              [org.clojure/core.async "0.5.527"]
                                              [org.clojure/math.combinatorics "0.1.1"]
@@ -100,7 +99,9 @@
                                              [com.google.protobuf/protobuf-java "3.4.0" #_"transitive"]
                                              [com.cognitect/transit-clj "0.8.313" #_"transitive"]
                                              [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
-                                             [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
+                                             [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]
+                                             [com.stuartsierra/component "0.4.0"]
+                                             [integrant "0.8.0"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test           {:source-paths   ["dev"]
