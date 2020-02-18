@@ -1,5 +1,7 @@
 (ns formatting-stack.project-formatter
-  "A set of defaults apt for formatting a whole project."
+  "A set of defaults apt for formatting/linting a whole project.
+
+  See also: `formatting-stack.branch-formatter`, `formatting-stack.defaults`"
   (:require
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]

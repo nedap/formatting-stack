@@ -32,11 +32,11 @@ And it also bundles a few tiny linters of its own:
   * [loc-per-ns](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/loc_per_ns.clj) warns if a given NS surpasses a targeted LOC count.
   * [ns-aliases](https://github.com/nedap/formatting-stack/blob/debdab8129dae7779d390216490625a3264c9d2c/src/formatting_stack/linters/ns_aliases.clj) warns if [Sierra's](https://stuartsierra.com/2015/05/10/clojure-namespace-aliases) aliasing guide is disregarded.
   * [one-resource-per-ns](https://github.com/nedap/formatting-stack/blob/master/src/formatting_stack/linters/one_resource_per_ns.clj) warns if a Clojure namespace is defined in more than one file.
-  * [line-length](https://github.com/nedap/formatting-stack/blob/f1cf4206399a77a83fde4140095d4c59c10b1605/src/formatting_stack/linters/line_length.clj) warns if max line length is reached.
+  * [line-length](https://github.com/nedap/formatting-stack/blob/f1cf4206399a77a83fde4140095d4c59c10b1605/src/formatting_stack/linters/line_length.clj) warns when a given max line length is surpassed.
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
-Each formatter makes full use of your CPU's cores.
+Whenever it's safe, each formatter/linter will mae full use of your CPU's cores. 
 
 Linters' reports are presented under a unified format. 
 
@@ -49,7 +49,7 @@ It also associates `:style` metadata to your project's vars, in a clean manner, 
 
 Armed with those powers, we can do two nifty things:
 
-* Inform cljfmt of indentation through metadata + config, using the [CIDER indent spec format](https://cider.readthedocs.io/en/latest/indent_spec/)
+* Inform cljfmt of indentation through metadata + config, using the [CIDER indent spec format](https://docs.cider.mx/cider/indent_spec.html)
 (by default, using an heuristic for cider->cljfmt format translation) or the cljfmt format (as a fallback).
   * Recommendation: use metadata **for your own code**, use config for **third-party code** (that may be awaiting for a pull request)
 * Inform CIDER of indentation rules through config
@@ -70,7 +70,17 @@ The general intent is to make formatting:
   * favor reviewable diffs - nobody can review (or learn from) whole-project diffs
 * Safe
   * only format code that is completely staged by git
-  * else any bug in formatting code could destroy your unsaved changes
+    * else any bug in formatting code could destroy your unsaved changes
+
+...that's the default Git `strategy` anyway, apt for repl-driven development. You are free to supply an alternative strategy.
+
+Commonly needed alternative strategies are offered/documented in [branch-formatter](https://github.com/nedap/formatting-stack/blob/0d78f726555db175aa446f4a0a9d2e289cfdd540/src/formatting_stack/branch_formatter.clj) and [project-formatter](https://github.com/nedap/formatting-stack/blob/0d78f726555db175aa446f4a0a9d2e289cfdd540/src/formatting_stack/project_formatter.clj).
+
+## Consolidated reporting
+
+As you can see in the screenshot, **formatting-stack** presents linters' outputs under a hierarchical, file-grouped format.
+
+<img width="710" alt="Screenshot 2020-02-19 at 07 04 38" src="https://user-images.githubusercontent.com/1162994/74806403-2aaa9700-52e6-11ea-8088-b073d82e2879.png">
 
 ## Installation
 
@@ -94,8 +104,9 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
 ### Reloaded Workflow integration
 
 * If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters.
+  * You can find a working sample setup in [component_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/component_repl.clj).
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack, applying all its formatters/linters.
-  * You can find a working example setup in [integrant_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/integrant_repl.clj).
+  * You can find a working sample setup in [integrant_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/integrant_repl.clj).
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
 and you may find yourself using `clojure.tools.namespace.repl/refresh` instead.
@@ -106,27 +117,29 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 (clojure.tools.namespace.repl/refresh :after 'formatting-stack.core/format!)
 ```
 
+### Vanilla integration
+
+[`formatting-stack.core/format!`](https://github.com/nedap/formatting-stack/blob/0d78f726555db175aa446f4a0a9d2e289cfdd540/src/formatting_stack/core.clj#L49) is a plain function, considered a public API, that is safe to invoke over REPL, a script, or anything you please.
+
 ## Advanced configuration
 
-If you want to add custom members to the component's `:formatters` (or `:strategies`, etc), a typical pattern would be:
+If you want to add custom members to the `format!` options (namely: `:formatters`, or `:strategies`, etc), a typical pattern would be:
 
 ```clojure
-(formatting-stack.component/map->Formatter {:formatters (conj formatting-stack.defaults/default-formatters
-                                                              my-custom-formatter)})
+(formatting-stack.core/format! :formatters (conj formatting-stack.defaults/default-formatters my-custom-formatter))
 ```
 
 You can also pass `[]` for disabling a particular aspect:
 
 ```clojure
-;; The default :formatters will be used, the default :linters will be omitted:
-(formatting-stack.component/map->Formatter {:linters []})
+;; The default :formatters will be used, no :linters will be run:
+(formatting-stack.core/format! :linters [])
 ```
 
-There's no facility for finer-grained manipulations, e.g. removing only certain formatters, or adding a formatter at a certain position rather than at the end.
-
-That's by design, to avoid intrincate DSLs or data structures.
-If you need something finer-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
+If you need something more fine-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
 That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.
+
+> We might implement an easier way to configure the stack: [#38](https://github.com/nedap/formatting-stack/issues/38)
 
 ## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 

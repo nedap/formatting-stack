@@ -1,5 +1,8 @@
 (ns formatting-stack.branch-formatter
-  "A set of defaults apt for formatting a git branch (namely, the files that a branch has modified, respective to another)."
+  "A set of defaults apt for formatting/linting a git branch
+  (namely, the files that a branch has modified, respective to another).
+
+  See also: `formatting-stack.defaults`, `formatting-stack.project-formatter`"
   (:require
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
