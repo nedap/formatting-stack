@@ -95,6 +95,7 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
 
 * If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters.
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack, applying all its formatters/linters.
+  * You can find a working example setup in [integrant_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/integrant_repl.clj).
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
 and you may find yourself using `clojure.tools.namespace.repl/refresh` instead.
