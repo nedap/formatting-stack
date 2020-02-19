@@ -20,6 +20,6 @@
   (future
     (let [files (-> (System/getProperty "java.class.path")
                     (string/split #"\:"))]
-      (-> (File. cache-parent-dir cache-subdir) .mkdirs)
+      (-> (clojure.java.io/file cache-parent-dir cache-subdir) .mkdirs)
       (kondo/run! {:lint      files
                    :cache-dir cache-dir}))))

@@ -33,7 +33,7 @@
 (defn readable?
   "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
   [^String filename]
-  (if-not (-> filename File. .exists)
+  (if-not (-> filename clojure.java.io/file .exists)
     true ;; undecidable
     (try
       (let [ns-obj (filename->ns filename)]
@@ -56,13 +56,13 @@
   (cond->> files
     true                     (filter #(re-find #"\.(clj|cljc|cljs|edn)$" %))
     *filter-existing-files?* (filter (fn [^String f]
-                                       (-> f File. .exists)))
+                                       (-> f clojure.java.io/file .exists)))
     true                     (remove #(str/ends-with? % "project.clj"))
     true                     (filter readable?)))
 
 (speced/defn ^boolean? dir-contains?
   [^string? dirname, ^File file]
-  (->> (file-seq (File. dirname))
+  (->> (file-seq (clojure.java.io/file dirname))
        (map (speced/fn [^File f]
               (-> f .getCanonicalPath)))
        (some #{(-> file .getCanonicalPath)})

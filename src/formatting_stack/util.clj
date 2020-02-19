@@ -12,7 +12,7 @@
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
    (clojure.lang IBlockingDeref IPending)
-   (java.io File)))
+   (java.io Writer)))
 
 (defmacro rcomp
   "Like `comp`, but in reverse order.
@@ -28,7 +28,7 @@
 (speced/defn read-ns-decl
   "Reads ns declaration in file with line/column metadata"
   [^string? filename]
-  (when-not (-> filename File. .isDirectory)
+  (when-not (-> filename clojure.java.io/file .isDirectory)
     (try
       (with-open [reader (-> filename io/reader push-back-reader indexing-push-back-reader)]
         (parse/read-ns-decl reader))
@@ -45,7 +45,7 @@
                  (swap! state update (Thread/currentThread) vec)
                  (swap! state update (Thread/currentThread) conj input)
                  nil)]
-    (proxy [java.io.Writer] []
+    (proxy [Writer] []
       (append [& input]
         (write! input))
       (close [])
@@ -88,7 +88,7 @@
 (defn process-in-parallel! [f files]
   (->> files
        (distribute-evenly-by {:f (fn [^String filename]
-                                   (-> (File. filename) .length))})
+                                   (-> (clojure.java.io/file filename) .length))})
        (partitioning-pmap (bound-fn [filename]
                             (try
                               (let [v (f filename)]

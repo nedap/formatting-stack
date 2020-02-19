@@ -23,7 +23,7 @@
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
-        root-dir   (-> (File. "") .getAbsolutePath)
+        root-dir   (-> (clojure.java.io/file "") .getAbsolutePath)
         reports    (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]

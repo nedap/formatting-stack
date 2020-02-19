@@ -16,9 +16,7 @@
    [formatting-stack.strategies.impl :as impl]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
-   [nedap.utils.spec.api :refer [check!]])
-  (:import
-   (java.io File)))
+   [nedap.utils.spec.api :refer [check!]]))
 
 (speced/defn all-files
   "This strategy unconditionally processes all files."
@@ -134,7 +132,7 @@
   [& {:keys [^::protocols.spec/filenames files]}]
   {:pre [(check! seq                            refresh-dirs
                  (partial every? (speced/fn [^string? refresh-dir]
-                                   (let [file (-> refresh-dir File.)]
+                                   (let [file (-> refresh-dir clojure.java.io/file)]
                                      (if (-> file .exists)
                                        (-> file .isDirectory)
                                        ;; allow non-existing directories.
@@ -144,7 +142,7 @@
        (filter (speced/fn [^string? filename]
                  (if-not (read-ns-decl filename)
                    true
-                   (let [file (-> filename File.)]
+                   (let [file (-> filename clojure.java.io/file)]
                      (->> refresh-dirs
                           (some (fn [dir]
                                   (impl/dir-contains? dir file))))))))))

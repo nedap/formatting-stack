@@ -6,5 +6,5 @@
 
 (speced/defn filename-as-resource [^string? filename]
   (str "file:" (-> filename
-                   File.
+                   clojure.java.io/file
                    .getAbsolutePath)))
