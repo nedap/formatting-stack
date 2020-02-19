@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "3.1.0"
+(defproject formatting-stack "3.1.1-alpha1"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
