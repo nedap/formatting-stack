@@ -1,9 +1,9 @@
-(ns functional.formatting-stack.component
+(ns functional.formatting-stack.integrant
   (:require
    [clojure.test :refer [deftest is testing]]
-   [com.stuartsierra.component :as component]
-   [formatting-stack.component :as sut]
+   [formatting-stack.integrant :as sut]
    [formatting-stack.reporters.passthrough :as reporters.passthrough]
+   [integrant.core :as integrant]
    [nedap.utils.spec.api :refer [check!]]))
 
 (def sample-report
@@ -31,13 +31,11 @@
                 :processors               []
                 :in-background?           false
                 :reporter                 (reporters.passthrough/new)}
-          instance (sut/new opts)]
-      (is (= instance
-             (component/start instance)))
+          system {:formatting-stack.integrant/component opts}
+          started-system (integrant/init system)]
 
       (testing "It actually runs its members, such as linters"
         (is (= [sample-report]
                @p)))
 
-      (is (= instance
-             (component/stop instance))))))
+      (integrant/halt! started-system))))

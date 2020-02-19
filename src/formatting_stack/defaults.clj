@@ -1,4 +1,7 @@
 (ns formatting-stack.defaults
+  "A set of defaults apt for frequent usage.
+
+  See also: `formatting-stack.branch-formatter`, `formatting-stack.project-formatter`"
   (:require
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
    [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
