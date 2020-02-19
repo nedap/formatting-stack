@@ -2,7 +2,7 @@
 
 **formatting-stack** is a formatting/linting solution that can be integrated with:
 
-* your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [clojure.tools.namespace.repl](https://github.com/clojure/tools.namespace)) system
+* your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [tools.namespace](https://github.com/clojure/tools.namespace)) system
   * for instantaneous performance
     * no cold-starts!
   * and precise understanding of your codebase
@@ -36,7 +36,7 @@ And it also bundles a few tiny linters of its own:
 
 It is fully extensible: you can configure the bundled formatters, remove them, and/or add your own.
 
-Whenever it's safe, each formatter/linter will mae full use of your CPU's cores. 
+Whenever it's safe, each formatter/linter will make full use of your CPU's cores. 
 
 Linters' reports are presented under a unified format. 
 
