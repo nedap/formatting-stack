@@ -32,7 +32,7 @@
     (->> @reports
          :warnings
          (map :warn-data)
-         (remove impl/wrong-pre-post-false-positives)
+         (remove impl/contains-dynamic-assertions?)
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
                        :level    :warning

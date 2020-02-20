@@ -5,13 +5,18 @@
    [formatting-stack.protocols.spec :as protocols.spec]
    [nedap.speced.def :as speced]))
 
-(speced/defn ^boolean? wrong-pre-post-false-positives
-  "Removes false positives for dynamic vars https://git.io/fhQTx"
-  [{{{[_fn* [_arglist [_assert v]]] :form} :ast} :wrong-pre-post}]
-  (let [varname (-> v str (string/split #"\/") last)]
-    (= \*
-       (first varname)
-       (last varname))))
+(speced/defn ^boolean? contains-dynamic-assertions?
+  "Does this linting result refer to a :pre/:post containing dynamic assetions?
+
+See https://git.io/fhQTx"
+  [{{{[_fn* [_arglist [_assert & vs]]] :form} :ast} :wrong-pre-post}]
+  (->> vs
+       (some (fn [v]
+               (let [varname (-> v str (string/split #"\/") last)]
+                 (= \*
+                    (first varname)
+                    (last varname)))))
+       (boolean)))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
   [^string? warnings]
