@@ -1,9 +1,41 @@
 (ns unit.formatting-stack.linters.eastwood.impl
   (:require
    [clojure.string :as str]
-   [clojure.test :refer [are deftest]]
+   [clojure.test :refer [are deftest testing]]
    [formatting-stack.linters.eastwood.impl :as sut]
    [matcher-combinators.test :refer [match?]]))
+
+(deftest wrong-pre-post-false-positives
+  (testing "matches on false-positive wrong-pre-post reports"
+    (are [form expected] (= expected
+                            (sut/wrong-pre-post-false-positives
+                             {:wrong-pre-post {:ast {:form (list 'fn* (list [] (list 'clojure.core/assert form)))}}}))
+      '*test*           true
+      'namespace/*test* true
+
+      'test             false
+      '*namespace*/test false
+      '*namespace/test* false
+
+      1                 false
+      []                false
+      {}                false
+      "test"            false))
+
+  (testing "can handle variable input"
+    (are [input expected] (= expected
+                            (sut/wrong-pre-post-false-positives input))
+      {:test 1}
+      false
+
+      {:wrong-pre-post {:ast nil}}
+      false
+
+      {:wrong-pre-post {:ast {:form []}}}
+      false
+
+      {:wrong-pre-post {:ast {:form '(fn* ([] (clojure.core/assert (true? true))))}}}
+      false)))
 
 (deftest warnings->report
   (are [input expected] (match? expected

@@ -32,11 +32,7 @@
     (->> @reports
          :warnings
          (map :warn-data)
-         (remove (fn [{{{[_fn* [_arglist [_assert v]]] :form} :ast} :wrong-pre-post}]
-                   (let [varname (-> v str (str/split #"\/") last)]
-                     (= \* ;; False positives for dynamic vars https://git.io/fhQTx
-                        (first varname)
-                        (last varname)))))
+         (remove impl/wrong-pre-post-false-positives)
          (map (fn [{:keys [uri-or-file-name linter] :as m}]
                 (assoc m
                        :level    :warning

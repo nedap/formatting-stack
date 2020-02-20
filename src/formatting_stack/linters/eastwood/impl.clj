@@ -1,8 +1,20 @@
 (ns formatting-stack.linters.eastwood.impl
   (:require
+   [clojure.string :as string]
    [eastwood.reporting-callbacks :as reporting-callbacks]
    [formatting-stack.protocols.spec :as protocols.spec]
    [nedap.speced.def :as speced]))
+
+(speced/defn ^boolean? wrong-pre-post-false-positives
+  "Removes false positives for dynamic vars https://git.io/fhQTx"
+  [{{{[_fn* [_arglist [_assert v]]] :form} :ast} :wrong-pre-post}]
+  (println ::fn _fn*)
+  (println ::a _assert)
+  (println ::v v)
+  (let [varname (-> v str (string/split #"\/") last)]
+    (= \*
+       (first varname)
+       (last varname))))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
   [^string? warnings]
