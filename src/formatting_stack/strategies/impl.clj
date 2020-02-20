@@ -49,7 +49,9 @@
          (map (fn [filename]
                 (->> (string/split filename separator-pattern)
                      (concat toplevel-fragments)
-                     (string/join File/separator)))))))
+                     (string/join File/separator)
+                     File.
+                     .getCanonicalPath))))))
 
 (def ^:dynamic *filter-existing-files?* true)
 

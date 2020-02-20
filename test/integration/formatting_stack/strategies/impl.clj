@@ -1,6 +1,6 @@
 (ns integration.formatting-stack.strategies.impl
   (:require
-   [clojure.test :refer [are deftest is]]
+   [clojure.test :refer [are deftest is testing]]
    [formatting-stack.strategies.impl :as sut])
   (:import
    (java.io File)))
@@ -25,8 +25,11 @@
     "dev"                           (File. "user.clj")                                    false))
 
 (deftest absolutize
-  (let [target "src/formatting_stack/strategies/impl.clj"]
-    (is (= (sut/absolutize "git" [target])
-           [(-> target File. .getCanonicalPath)]))
+  (are [target] (testing target
+                  (is (= [(-> target File. .getCanonicalPath)]
+                         (sut/absolutize "git" [target])))
+                  true)
+    "src/formatting_stack/strategies/impl.clj"
+    "src/../src/formatting_stack/strategies/impl.clj")
 
-    (is (spec-assertion-thrown? ::sut/existing-files (sut/absolutize "git" ["I_dont_exist"])))))
+  (is (spec-assertion-thrown? ::sut/existing-files (sut/absolutize "git" ["I_dont_exist"]))))
