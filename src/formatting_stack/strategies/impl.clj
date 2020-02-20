@@ -1,7 +1,7 @@
 (ns formatting-stack.strategies.impl
   (:require
    [clojure.java.shell :refer [sh]]
-   [clojure.string :as str]
+   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.formatters.clean-ns.impl :refer [safely-read-ns-contents]]
@@ -17,8 +17,27 @@
 ;; modified, added
 (def git-not-completely-staged-regex #"^( M|AM|MM|AD| D|\?\?|) ")
 
-(defn file-entries [& args]
-  (->> args (apply sh) :out str/split-lines (filter seq)))
+(defn file-entries
+  "Note that the result may not necessarily constitute a filename,
+  e.g. the string \"M  src/formatting_stack/strategies/impl.clj\" is a valid output"
+  [& args]
+  (->> args (apply sh) :out string/split-lines (filter seq)))
+
+(def separator-pattern (re-pattern File/separator))
+
+(defn absolutize [command output]
+  (let [toplevel-fragments (case command
+                             "git" (-> (sh "git" "rev-parse" "--show-toplevel")
+                                       (:out)
+                                       (string/split #"\n")
+                                       (first)
+                                       (string/split separator-pattern))
+                             [])]
+    (->> output
+         (map (fn [filename]
+                (->> (string/split filename separator-pattern)
+                     (concat toplevel-fragments)
+                     (string/join File/separator)))))))
 
 (def ^:dynamic *filter-existing-files?* true)
 
@@ -57,7 +76,7 @@
     true                     (filter #(re-find #"\.(clj|cljc|cljs|edn)$" %))
     *filter-existing-files?* (filter (fn [^String f]
                                        (-> f File. .exists)))
-    true                     (remove #(str/ends-with? % "project.clj"))
+    true                     (remove #(string/ends-with? % "project.clj"))
     true                     (filter readable?)))
 
 (speced/defn ^boolean? dir-contains?

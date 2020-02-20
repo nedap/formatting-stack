@@ -23,8 +23,10 @@
 (speced/defn all-files
   "This strategy unconditionally processes all files."
   [& {:keys [^::protocols.spec/filenames files]}]
-  (let [tracked (impl/file-entries "git" "ls-files")
-        untracked (impl/file-entries "git" "ls-files" "--others" "--exclude-standard")]
+  (let [tracked (->> (impl/file-entries "git" "ls-files")
+                     (impl/absolutize "git"))
+        untracked (->> (impl/file-entries "git" "ls-files" "--others" "--exclude-standard")
+                       (impl/absolutize "git"))]
     (->> files
          (into tracked)
          (into untracked)
@@ -40,6 +42,7 @@
        (map (fn [s]
               ;; for renames:
               (-> s (str/split #" -> ") last)))
+       (impl/absolutize "git")
        (impl/extract-clj-files)
        (into files)))
 
@@ -50,6 +53,7 @@
   (->> impl
        (filter #(re-find impl/git-not-completely-staged-regex %))
        (map #(str/replace-first % impl/git-not-completely-staged-regex ""))
+       (impl/absolutize "git")
        (impl/extract-clj-files)
        (into files)))
 
@@ -61,8 +65,9 @@
              impl          (impl/file-entries "git" "diff" "--name-only" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
+       (impl/absolutize "git")
        (remove (set blacklist))
-       impl/extract-clj-files
+       (impl/extract-clj-files)
        (into files)))
 
 (speced/defn exclude-clj
