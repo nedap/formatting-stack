@@ -1,7 +1,8 @@
 (ns formatting-stack.strategies.impl
   (:require
    [clojure.java.shell :refer [sh]]
-   [clojure.string :as str]
+   [clojure.spec.alpha :as spec]
+   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.formatters.clean-ns.impl :refer [safely-read-ns-contents]]
@@ -17,8 +18,38 @@
 ;; modified, added
 (def git-not-completely-staged-regex #"^( M|AM|MM|AD| D|\?\?|) ")
 
-(defn file-entries [& args]
-  (->> args (apply sh) :out str/split-lines (filter seq)))
+(speced/def-with-doc ::file-entry
+  "Not necessarily a filename,
+  e.g. the string \"M  src/formatting_stack/strategies/impl.clj\" is a valid output."
+  string?)
+
+(spec/def ::file-entries (spec/coll-of ::file-entry))
+
+(speced/defn ^::file-entries file-entries
+  [& args]
+  (->> args (apply sh) :out string/split-lines (filter seq)))
+
+(def separator-pattern (re-pattern File/separator))
+
+(def ^:dynamic *skip-existing-files-check?* false)
+
+(spec/def ::existing-files (spec/coll-of (speced/fn [^string? s]
+                                           (if *skip-existing-files-check?*
+                                             true
+                                             (-> s File. .exists)))))
+
+(speced/defn ^::existing-files absolutize [command, ^::file-entries file-entries]
+  (let [toplevel-fragments (case command
+                             "git" (-> (sh "git" "rev-parse" "--show-toplevel")
+                                       (:out)
+                                       (string/split #"\n")
+                                       (first)
+                                       (string/split separator-pattern)))]
+    (->> file-entries
+         (map (fn [filename]
+                (->> (string/split filename separator-pattern)
+                     (concat toplevel-fragments)
+                     (string/join File/separator)))))))
 
 (def ^:dynamic *filter-existing-files?* true)
 
@@ -57,7 +88,7 @@
     true                     (filter #(re-find #"\.(clj|cljc|cljs|edn)$" %))
     *filter-existing-files?* (filter (fn [^String f]
                                        (-> f File. .exists)))
-    true                     (remove #(str/ends-with? % "project.clj"))
+    true                     (remove #(string/ends-with? % "project.clj"))
     true                     (filter readable?)))
 
 (speced/defn ^boolean? dir-contains?
