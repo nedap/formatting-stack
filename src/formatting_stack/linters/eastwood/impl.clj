@@ -8,9 +8,6 @@
 (speced/defn ^boolean? wrong-pre-post-false-positives
   "Removes false positives for dynamic vars https://git.io/fhQTx"
   [{{{[_fn* [_arglist [_assert v]]] :form} :ast} :wrong-pre-post}]
-  (println ::fn _fn*)
-  (println ::a _assert)
-  (println ::v v)
   (let [varname (-> v str (string/split #"\/") last)]
     (= \*
        (first varname)
