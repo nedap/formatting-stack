@@ -58,7 +58,7 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries "bash" "-c" (str "git diff --name-only " target-branch " | xargs -I '{}' realpath --relative-to=. $(git rev-parse --show-toplevel)/'{}'"))
+             impl          (impl/file-entries "git" "diff" "--name-only" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
        (remove (set blacklist))
