@@ -102,5 +102,6 @@
                    colorize?          true}}]
   (implement {:max-msg-length max-msg-length
               :print-stacktraces? print-stacktraces?
+              :summary? summary?
               :colorize? colorize?}
     reporter/--report print-report))
