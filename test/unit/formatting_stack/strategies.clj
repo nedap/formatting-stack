@@ -6,7 +6,8 @@
    [formatting-stack.strategies.impl :as sut.impl]))
 
 (use-fixtures :once (fn [tests]
-                      (binding [sut.impl/*filter-existing-files?* false]
+                      (binding [sut.impl/*filter-existing-files?* false
+                                sut.impl/*skip-existing-files-check?* true]
                         (tests))))
 
 (def not-completely-staged-files
@@ -29,7 +30,9 @@
             (-> s
                 (str/replace #".* " "")
                 (str/replace "test/unit/formatting_stack/g.clj -> " "")))]
-    (map strip files)))
+    (->> files
+         (map strip)
+         (sut.impl/absolutize "git"))))
 
 (deftest git-completely-staged
   (is (= (strip-git completely-staged-files)
@@ -40,7 +43,7 @@
          (sut/git-not-completely-staged :files [] :impl all-files))))
 
 (deftest git-diff-against-default-branch
-  (is (= ["a.clj"]
+  (is (= (sut.impl/absolutize "git" ["a.clj"])
          (sut/git-diff-against-default-branch :files []
                                               :impl ["a.clj" "b.clj"]
-                                              :blacklist ["b.clj"]))))
+                                              :blacklist (sut.impl/absolutize "git" ["b.clj"])))))
