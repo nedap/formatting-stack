@@ -26,3 +26,9 @@
   "This function should not return a prepost warning (because there's no precondition at all: the {:pre} is the return value)"
   [x]
   {:pre [x *dynamic*]})
+
+(defn no-pre-post-warning--4
+  "This function should return no prepost warnings."
+  [x]
+  {:pre [x *dynamic*]} ;; variation: *dynamic* is not the first member
+  logical-false)

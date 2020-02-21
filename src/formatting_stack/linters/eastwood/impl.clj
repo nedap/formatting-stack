@@ -6,22 +6,24 @@
    [nedap.speced.def :as speced]))
 
 (speced/defn ^boolean? contains-dynamic-assertions?
-  "Does this linting result refer to a :pre/:post containing dynamic assetions?
+  "Does this linting result refer to a :pre/:post containing dynamic assertions?
 
 See https://git.io/fhQTx"
   [{{{[_fn* [_arglist & fn-tails]] :form} :ast} :wrong-pre-post
-    msg :msg :as x}]
+    msg                                         :msg
+    :as                                         x}]
   (->> fn-tails
        (some (fn [tail]
                (when (and (coll? tail)
                           (= 'clojure.core/assert
                              (first tail)))
-                 (let [v (second tail)]
+                 (let [v (second tail)
+                       v-name (name v)]
                    (and (symbol? v)
-                        (string/includes? msg (name v)) ;; make sure it's the same symbol as in msg
+                        (string/includes? msg v-name) ;; make sure it's the same symbol as in msg
                         (= \*
-                           (first (name v))
-                           (last (name v))))))))
+                           (first v-name)
+                           (last v-name)))))))
        (boolean)))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
