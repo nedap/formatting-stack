@@ -19,14 +19,14 @@
       (list 'fn* (list [] (list 'clojure.core/assert 'namespace/*test*))) true
 
       (list 'fn*
-        (list []
-          (list 'clojure.core/assert '(foo 42))
-          (list 'clojure.core/assert '*test*)))                           true
+            (list []
+                  (list 'clojure.core/assert '(foo 42))
+                  (list 'clojure.core/assert '*test*)))                   true
 
       (list 'fn*
-        (list []
-          (list 'clojure.core/assert '(foo 42))
-          (list 'clojure.core/assert 'namespace/*test*)))                 true
+            (list []
+                  (list 'clojure.core/assert '(foo 42))
+                  (list 'clojure.core/assert 'namespace/*test*)))         true
 
       (list 'fn* (list [] (list 'clojure.core/assert 'test)))             false
 

@@ -18,10 +18,10 @@ See https://git.io/fhQTx"
                              (first tail)))
                  (let [v (second tail)]
                    (and (symbol? v)
-                     (string/includes? msg (name v)) ;; make sure it's the same symbol as in msg
-                     (= \*
-                        (first (name v))
-                        (last (name v))))))))
+                        (string/includes? msg (name v)) ;; make sure it's the same symbol as in msg
+                        (= \*
+                           (first (name v))
+                           (last (name v))))))))
        (boolean)))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
