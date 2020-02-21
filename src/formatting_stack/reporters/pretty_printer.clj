@@ -26,7 +26,8 @@
                          suffix)))))
          (string/join "\n"))))
 
-(defn print-summary [{:keys [summary? colorize?]} reports]
+(defn print-summary [{:keys [^boolean? summary?
+                             ^boolean? colorize?]} reports]
   (when summary?
     (->> reports
          (group-by :level)
@@ -44,7 +45,7 @@
                                    :warning   :yellow)))
                      (println)))))))
 
-(defn print-exceptions [{:keys [print-stacktraces?]} reports]
+(defn print-exceptions [{:keys [^boolean? print-stacktraces?]} reports]
   (->> reports
        (filter (speced/fn [{:keys [^::protocols.spec/level level]}]
                  (#{:exception} level)))
