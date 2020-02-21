@@ -26,7 +26,7 @@
                          suffix)))))
          (string/join "\n"))))
 
-(defn print-summary [{:keys [summary?]} reports]
+(defn print-summary [{:keys [summary? colorize?]} reports]
   (when summary?
     (->> reports
          (group-by :level)
@@ -37,10 +37,11 @@
                               :exception " exceptions occurred"
                               :error     " errors found"
                               :warning   " warnings found"))
-                     (colorize (case type
-                                 :exception :red
-                                 :error     :red
-                                 :warning   :yellow))
+                     (cond-> colorize?
+                       (colorize (case report-type
+                                   :exception :red
+                                   :error     :red
+                                   :warning   :yellow)))
                      (println)))))))
 
 (defn print-exceptions [{:keys [print-stacktraces?]} reports]
