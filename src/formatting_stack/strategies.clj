@@ -20,11 +20,15 @@
   (:import
    (java.io File)))
 
+(def git-command "git")
+
 (speced/defn all-files
   "This strategy unconditionally processes all files."
   [& {:keys [^::protocols.spec/filenames files]}]
-  (let [tracked (impl/file-entries "git" "ls-files")
-        untracked (impl/file-entries "git" "ls-files" "--others" "--exclude-standard")]
+  (let [tracked (->> (impl/file-entries git-command "ls-files")
+                     (impl/absolutize git-command))
+        untracked (->> (impl/file-entries git-command "ls-files" "--others" "--exclude-standard")
+                       (impl/absolutize git-command))]
     (->> files
          (into tracked)
          (into untracked)
@@ -33,23 +37,25 @@
 (speced/defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
   [& {:keys [^::protocols.spec/filenames files, impl]
-      :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
+      :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
        (map #(str/replace-first % impl/git-completely-staged-regex ""))
        (map (fn [s]
               ;; for renames:
               (-> s (str/split #" -> ") last)))
+       (impl/absolutize git-command)
        (impl/extract-clj-files)
        (into files)))
 
 (speced/defn git-not-completely-staged
   "This strategy processes all files that are not _completely_ staged with git. Untracked files are also included."
   [& {:keys [^::protocols.spec/filenames files, impl]
-      :or   {impl (impl/file-entries "git" "status" "--porcelain")}}]
+      :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-not-completely-staged-regex %))
        (map #(str/replace-first % impl/git-not-completely-staged-regex ""))
+       (impl/absolutize git-command)
        (impl/extract-clj-files)
        (into files)))
 
@@ -58,11 +64,12 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries "git" "diff" "--name-only" target-branch)
+             impl          (impl/file-entries git-command "diff" "--name-only" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
+       (impl/absolutize git-command)
        (remove (set blacklist))
-       impl/extract-clj-files
+       (impl/extract-clj-files)
        (into files)))
 
 (speced/defn exclude-clj
