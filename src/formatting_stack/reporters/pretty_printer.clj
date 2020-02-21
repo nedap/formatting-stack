@@ -34,16 +34,16 @@
          (map-vals count)
          (into (sorted-map-by compare)) ;; print summary in order
          (run! (fn [[report-type n]]
-                 (-> (str n (case report-type
-                              :exception " exceptions occurred"
-                              :error     " errors found"
-                              :warning   " warnings found"))
-                     (cond-> colorize?
-                       (colorize (case report-type
-                                   :exception :red
-                                   :error     :red
-                                   :warning   :yellow)))
-                     (println)))))))
+                 (cond-> n
+                   true      (str (case report-type
+                                    :exception " exceptions occurred"
+                                    :error     " errors found"
+                                    :warning   " warnings found"))
+                   colorize? (colorize (case report-type
+                                         :exception :red
+                                         :error     :red
+                                         :warning   :yellow))
+                   true      println))))))
 
 (speced/defn print-exceptions [{:keys [^boolean? print-stacktraces?]} reports]
   (->> reports
