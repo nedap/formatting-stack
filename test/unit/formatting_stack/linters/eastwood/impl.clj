@@ -38,7 +38,7 @@
       (list 'fn* (list [] (list 'clojure.core/assert [])))                false
       (list 'fn* (list [] (list 'clojure.core/assert {})))                false
       (list 'fn* (list [] (list 'clojure.core/assert "test")))            false
-      (list 'fn* (list [] (list 'clojure.core/assert "foo/test")))        false)))
+      (list 'fn* (list [] (list 'clojure.core/assert "foo/test")))        false))
 
   (testing "can handle variable input"
     (are [input] (= false
@@ -48,9 +48,7 @@
       {:test 1}
       {:wrong-pre-post {:ast nil}}
       {:wrong-pre-post {:ast {:form []}}}
-      {:wrong-pre-post {:ast {:form '(fn* ([] (clojure.core/assert (true? true))))}}}))
-
-#_ (clojure.test/run-tests)
+      {:wrong-pre-post {:ast {:form '(fn* ([] (clojure.core/assert (true? true))))}}})))
 
 (deftest warnings->report
   (are [input expected] (match? expected
