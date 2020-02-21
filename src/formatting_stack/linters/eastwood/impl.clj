@@ -18,8 +18,9 @@ See https://git.io/fhQTx"
                           (= 'clojure.core/assert
                              (first tail)))
                  (let [v (second tail)
-                       v-name (name v)]
-                   (and (symbol? v)
+                       v-name (when (symbol? v)
+                                (name v))]
+                   (and v-name
                         (string/includes? msg v-name) ;; make sure it's the same symbol as in msg
                         (= \*
                            (first v-name)
