@@ -36,15 +36,16 @@
                    (= "*" ;; False positives for dynamic vars https://git.io/fhQTx
                       (-> v str first)
                       (-> v str last))))
-         (map (fn [{:keys [uri-or-file-name linter] :as m}]
+         (map (fn [{:keys [uri-or-file-name linter] :strs [warning-details-url] :as m}]
                 (assoc m
-                       :level    :warning
-                       :source   (keyword "eastwood" (name linter))
-                       :filename (if (string? uri-or-file-name)
-                                   uri-or-file-name
-                                   (str/replace (-> ^File uri-or-file-name .getPath)
-                                                root-dir
-                                                "")))))
+                       :level               :warning
+                       :source              (keyword "eastwood" (name linter))
+                       :warning-details-url warning-details-url
+                       :filename            (if (string? uri-or-file-name)
+                                              uri-or-file-name
+                                              (str/replace (-> ^File uri-or-file-name .getPath)
+                                                           root-dir
+                                                           "")))))
          (concat (impl/warnings->reports output)))))
 
 (defn new [{:keys [eastwood-options]

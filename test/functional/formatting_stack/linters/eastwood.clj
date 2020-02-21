@@ -23,4 +23,5 @@
         {:source   :eastwood/def-in-def
          :line     3
          :column   13
+         :warning-details-url "https://github.com/jonase/eastwood#def-in-def"
          :filename "test-resources/eastwood_warning.clj"}]))))
