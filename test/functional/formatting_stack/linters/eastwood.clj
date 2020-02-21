@@ -28,4 +28,8 @@
         {:source   :eastwood/def-in-def
          :line     3
          :column   13
+         :filename "test-resources/eastwood_warning.clj"}
+        {:source   :eastwood/wrong-pre-post
+         :line     22
+         :column   9
          :filename "test-resources/eastwood_warning.clj"}]))))

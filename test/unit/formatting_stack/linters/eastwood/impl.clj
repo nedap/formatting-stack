@@ -10,23 +10,35 @@
     (are [form expected] (testing (pr-str form)
                            (is (= expected
                                   (sut/contains-dynamic-assertions?
-                                   {:wrong-pre-post {:ast {:form (list 'fn* (list [] form))}}})))
+                                   {:wrong-pre-post {:ast {:form form}}
+                                    :msg (str "Precondition found that is probably always logical true or always logical false."
+                                              "Should be changed to function call?  *test*")})))
                            true)
-      (list 'clojure.core/assert '*test*)                     true
-      (list 'clojure.core/assert 'namespace/*test*)           true
+      (list 'fn* (list [] (list 'clojure.core/assert '*test*)))           true
 
-      (list 'clojure.core/assert '(foo 42) '*test*)           true
-      (list 'clojure.core/assert '(foo 42) 'namespace/*test*) true
+      (list 'fn* (list [] (list 'clojure.core/assert 'namespace/*test*))) true
 
-      (list 'clojure.core/assert 'test)                       false
-      (list 'clojure.core/assert '*namespace*/test)           false
-      (list 'clojure.core/assert '*namespace/test*)           false
+      (list 'fn*
+        (list []
+          (list 'clojure.core/assert '(foo 42))
+          (list 'clojure.core/assert '*test*)))                           true
 
-      (list 'clojure.core/assert 1)                           false
-      (list 'clojure.core/assert [])                          false
-      (list 'clojure.core/assert {})                          false
-      (list 'clojure.core/assert "test")                      false
-      (list 'clojure.core/assert "foo/test")                  false))
+      (list 'fn*
+        (list []
+          (list 'clojure.core/assert '(foo 42))
+          (list 'clojure.core/assert 'namespace/*test*)))                 true
+
+      (list 'fn* (list [] (list 'clojure.core/assert 'test)))             false
+
+      (list 'fn* (list [] (list 'clojure.core/assert '*namespace*/test))) false
+
+      (list 'fn* (list [] (list 'clojure.core/assert '*namespace/test*))) false
+
+      (list 'fn* (list [] (list 'clojure.core/assert 1)))                 false
+      (list 'fn* (list [] (list 'clojure.core/assert [])))                false
+      (list 'fn* (list [] (list 'clojure.core/assert {})))                false
+      (list 'fn* (list [] (list 'clojure.core/assert "test")))            false
+      (list 'fn* (list [] (list 'clojure.core/assert "foo/test")))        false)))
 
   (testing "can handle variable input"
     (are [input] (= false
@@ -36,7 +48,9 @@
       {:test 1}
       {:wrong-pre-post {:ast nil}}
       {:wrong-pre-post {:ast {:form []}}}
-      {:wrong-pre-post {:ast {:form '(fn* ([] (clojure.core/assert (true? true))))}}})))
+      {:wrong-pre-post {:ast {:form '(fn* ([] (clojure.core/assert (true? true))))}}}))
+
+#_ (clojure.test/run-tests)
 
 (deftest warnings->report
   (are [input expected] (match? expected
