@@ -35,7 +35,7 @@
                 :processors               []
                 :in-background?           false
                 :reporter                 (reporters.passthrough/new)}]
-      (sut/configure opts)
+      (sut/configure! opts)
       (mount/start)
       (testing "It actually runs its members, such as linters"
         (is (= [sample-report]
