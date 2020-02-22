@@ -53,3 +53,23 @@
     "Can print `:msg-extra-data` (at the correct indentation level)"
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0, :msg-extra-data ["Foo" "Bar"]}]
     "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"))
+
+(deftest print-summary
+  (are [input expected] (= expected
+                           (with-out-str
+                             (sut/print-summary {:colorize? false
+                                                 :summary? true}
+                                                input)))
+    (repeat 5 {:level :warning})
+    "5 warnings found\n"
+
+    (repeat 4 {:level :error})
+    "4 errors found\n"
+
+    (repeat 3 {:level :exception})
+    "3 exceptions occurred\n"
+
+    (concat (repeat 5 {:level :warning})
+            (repeat 4 {:level :error})
+            (repeat 3 {:level :exception}))
+    "4 errors found\n3 exceptions occurred\n5 warnings found\n"))
