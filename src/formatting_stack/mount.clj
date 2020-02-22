@@ -2,8 +2,8 @@
   (:require
    [formatting-stack.component.impl :refer [parse-options]]
    [formatting-stack.core :refer [format!]]
-   [mount.core :as mount]
    [mount-up.core :as mount-up]
+   [mount.core :as mount]
    [nedap.speced.def :as speced]))
 
 (speced/defn start [^map? this]
@@ -19,7 +19,7 @@
                     (start config)))
                 :before)
 
-(defn configure [config]
+(defn configure! [config]
   (mount-up/on-up :formatting-with-provided-config
                   (fn [_]
                     (start config))
