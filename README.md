@@ -136,10 +136,7 @@ You can also pass `[]` for disabling a particular aspect:
 (formatting-stack.core/format! :linters [])
 ```
 
-If you need something more fine-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
-That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.
-
-> We might implement an easier way to configure the stack: [#38](https://github.com/nedap/formatting-stack/issues/38)
+...And you can also override specific parameters (like max line length from 130 to 80) in a fine-grained manner, as documented in [customization_example.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/customization_example.clj).
 
 ## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 

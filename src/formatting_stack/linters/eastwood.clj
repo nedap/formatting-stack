@@ -47,5 +47,6 @@
 
 (defn new [{:keys [eastwood-options]
             :or   {eastwood-options {}}}]
-  (implement {:options (deep-merge default-eastwood-options eastwood-options)}
+  (implement {:id ::id
+              :options (deep-merge default-eastwood-options eastwood-options)}
     linter/--lint! lint!))

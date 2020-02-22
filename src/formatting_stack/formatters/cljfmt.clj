@@ -15,5 +15,5 @@
   nil)
 
 (speced/defn new [{:keys [third-party-indent-specs] :as options}]
-  (implement options
+  (implement (assoc options :id ::id)
     formatter/--format! format!))

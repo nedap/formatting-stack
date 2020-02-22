@@ -90,5 +90,6 @@
 
 (defn new [{:keys [acceptable-aliases-whitelist]
             :or   {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
-  (implement {:acceptable-aliases-whitelist acceptable-aliases-whitelist}
+  (implement {:id ::id
+              :acceptable-aliases-whitelist acceptable-aliases-whitelist}
     linter/--lint! lint!))
