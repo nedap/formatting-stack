@@ -66,9 +66,11 @@
                                              [criterium "0.4.5"]
                                              [integrant/repl "0.3.1"]
                                              [lambdaisland/deep-diff "0.0-29"]
+                                             [mount "0.1.16"]
                                              [org.clojure/core.async "0.5.527"]
                                              [org.clojure/math.combinatorics "0.1.1"]
-                                             [org.clojure/test.check "0.10.0-alpha3"]]
+                                             [org.clojure/test.check "0.10.0-alpha3"]
+                                             [tolitius/mount-up "0.1.2"]]
                               :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
                               :source-paths ["dev"]
                               :repl-options {:init-ns dev}
@@ -101,7 +103,9 @@
                                              [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
                                              [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]
                                              [com.stuartsierra/component "0.4.0"]
-                                             [integrant "0.8.0"]]}
+                                             [integrant "0.8.0"]
+                                             [mount "0.1.16"]
+                                             [tolitius/mount-up "0.1.2"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test           {:source-paths   ["dev"]

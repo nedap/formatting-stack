@@ -2,7 +2,7 @@
 
 **formatting-stack** is a formatting/linting solution that can be integrated with:
 
-* your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or bare [tools.namespace](https://github.com/clojure/tools.namespace)) system
+* your [Component](https://github.com/stuartsierra/component) (or [Integrant](https://github.com/weavejester/integrant), or [mount](https://github.com/tolitius/mount), or bare [tools.namespace](https://github.com/clojure/tools.namespace)) system
   * for instantaneous performance
     * no cold-starts!
   * and precise understanding of your codebase
@@ -95,11 +95,11 @@ As you can see in the screenshot, **formatting-stack** presents linters' outputs
   * Else, please add the latest version to your project (or personal [profile](https://github.com/technomancy/leiningen/blob/072dcd62dea0ea46413cf938878e2d31b76357c9/doc/PROFILES.md)).
   * If this dependency isn't added, formatting-stack will degrade gracefully, using slightly fewer formatters/linters.
 
-### Component/Integrant integration
+### Component/Integrant/mount integration
 
 **formatting-stack** provides components that you can integrate into your system.
 
-The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`.
+The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`, `formatting-stack.mount`.
 
 ### Reloaded Workflow integration
 
@@ -107,6 +107,8 @@ The provided components are fully configurable. See `formatting-stack.core`, `fo
   * You can find a working sample setup in [component_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/component_repl.clj).
 * If you use the Integrant component, then `integrant.repl/reset` will use formatting-stack, applying all its formatters/linters.
   * You can find a working sample setup in [integrant_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/integrant_repl.clj).
+* If you use the mount component, then `mount.core/start` will use formatting-stack, applying all its formatters/linters.
+  * You can find a working sample setup in [mount_repl.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/mount_repl.clj).
 
 The above can be good enough. However `reset`ting your system can be somewhat expensive,
 and you may find yourself using `clojure.tools.namespace.repl/refresh` instead.
