@@ -17,6 +17,8 @@
 
 (spec/def ::line ::column)
 
+(spec/def ::warning-details-url present-string?)
+
 (spec/def ::level #{:warning :error :exception})
 
 (defmulti reportmm :level)
@@ -35,7 +37,8 @@
                       ::level
                       ::column
                       ::line]
-             :opt-un [::msg-extra-data]))
+             :opt-un [::msg-extra-data
+                      ::warning-details-url]))
 
 (spec/def ::report
   (spec/multi-spec reportmm :level))
