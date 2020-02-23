@@ -95,12 +95,6 @@ As you can see in the screenshot, **formatting-stack** presents linters' outputs
   * Else, please add the latest version to your project (or personal [profile](https://github.com/technomancy/leiningen/blob/072dcd62dea0ea46413cf938878e2d31b76357c9/doc/PROFILES.md)).
   * If this dependency isn't added, formatting-stack will degrade gracefully, using slightly fewer formatters/linters.
 
-### Component/Integrant integration
-
-**formatting-stack** provides components that you can integrate into your system.
-
-The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`.
-
 ### Reloaded Workflow integration
 
 * If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters.
