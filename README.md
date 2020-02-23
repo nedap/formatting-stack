@@ -121,6 +121,8 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 
 [`formatting-stack.core/format!`](https://github.com/nedap/formatting-stack/blob/0d78f726555db175aa446f4a0a9d2e289cfdd540/src/formatting_stack/core.clj#L49) is a plain function, considered a public API, that is safe to invoke over REPL, a script, or anything you please.
 
+> See also: [`format-and-lint-branch!`](https://github.com/nedap/formatting-stack/blob/5d66e2adffd1696af8b020c56d33d443b299aabd/src/formatting_stack/branch_formatter.clj#L84), [`format-and-lint-project!`](https://github.com/nedap/formatting-stack/blob/5d66e2adffd1696af8b020c56d33d443b299aabd/src/formatting_stack/project_formatter.clj#L84).
+
 ## Advanced configuration
 
 If you want to add custom members to the `format!` options (namely: `:formatters`, or `:strategies`, etc), a typical pattern would be:
