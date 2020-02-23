@@ -17,7 +17,7 @@ so that final users can locate them and configure them."
   (fn [x]
     (if-not (map? x)
       ;; we are facing a `reify`, which means that formatting-stack is being customized
-      ;; In thsoe cases, an :id is practically useless (since the point of :id is overriding f-s), so no validation needed:
+      ;; In those cases, an :id is practically useless (since the point of :id is overriding f-s), so no validation needed:
       true
       (check! (spec/keys :req-un [:formatting-stack.protocols.spec.member/id])
               x))))

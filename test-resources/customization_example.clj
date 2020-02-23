@@ -29,7 +29,7 @@
                  ;; remove an undesired linter:
                  ::ns-aliases/id  nil
 
-                 ;; overrride some kondo defaults. They will be deep-merged against formatting-stack's kondo config:
+                 ;; override some kondo defaults. They will be deep-merged against formatting-stack's kondo config:
                  ::kondo/id       (assoc linter
                                          :kondo-clj-options  {:linters {:cond-else {:level :warning}}}
                                          ;; remember there are different options, for clj and cljs.
@@ -40,6 +40,7 @@
 (def all-linters
   (into custom-linters tweaked-linters))
 
-(formatting-stack.core/format! :linters all-linters
-                               :formatters [] ;; disable all formatters
-                               :in-background? false)
+(comment
+  (formatting-stack.core/format! :linters all-linters
+                                 :formatters [] ;; disable all formatters
+                                 :in-background? false))
