@@ -1,4 +1,12 @@
 (ns customization-example
+  "Documents how users can customize formatting-stack, as a runnable example.
+
+  Not a part of the test suite.
+
+  See also:
+
+    * https://github.com/nedap/formatting-stack/blob/master/README.md
+    * https://github.com/nedap/formatting-stack/wiki/FAQ"
   (:require
    [formatting-stack.core]
    [formatting-stack.defaults]
@@ -42,5 +50,5 @@
 
 (comment
   (formatting-stack.core/format! :linters all-linters
-                                 :formatters [] ;; disable all formatters
+                                 :formatters [] ;; disable all formatters (as an example of how to do that)
                                  :in-background? false))
