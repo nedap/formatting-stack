@@ -9,21 +9,20 @@
   "Does this linting result refer to a :pre/:post containing dynamic assertions?
 
 See https://git.io/fhQTx"
-  [{{{xxx :form} :ast} :wrong-pre-post
-    msg                :msg
-    :as                x}]
-  (let [[_fn* yyy] (if (coll? xxx)
-                     xxx
-                     [])
-        [_arglist & fn-tails] (if (coll? yyy)
-                                yyy
-                                [])]
-    (->> fn-tails
-         (some (fn [tail]
-                 (when (and (coll? tail)
+  [{{{ast-form :form} :ast} :wrong-pre-post
+    msg                     :msg}]
+  (let [[_fn* fn-tails] (if (coll? ast-form)
+                          ast-form
+                          [])
+        [_arglist & body] (if (coll? fn-tails)
+                            fn-tails
+                            [])]
+    (->> body
+         (some (fn [form]
+                 (when (and (coll? form)
                             (= 'clojure.core/assert
-                               (first tail)))
-                   (let [v (second tail)
+                               (first form)))
+                   (let [v      (second form)
                          v-name (when (symbol? v)
                                   (name v))]
                      (and v-name
