@@ -22,5 +22,5 @@
   nil)
 
 (defn new []
-  (implement {}
+  (implement {:id ::id}
     formatter/--format! format!))

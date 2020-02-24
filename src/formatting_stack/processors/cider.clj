@@ -15,5 +15,5 @@
   "This processor alters var metadata from third-party libs,
   so that runtime-based tooling such as CIDER can work more accurately."
   [{:keys [third-party-indent-specs] :as options}]
-  (implement options
+  (implement (assoc options :id ::id)
     processor/--process! process!))

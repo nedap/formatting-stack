@@ -145,6 +145,7 @@
   nil)
 
 (defn new [{:keys [how-to-ns-opts]
-            :or {how-to-ns-opts {}}}]
-  (implement {:how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)}
+            :or   {how-to-ns-opts {}}}]
+  (implement {:id ::id
+              :how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)}
     formatter/--format! format!))

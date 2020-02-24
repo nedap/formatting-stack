@@ -95,12 +95,6 @@ As you can see in the screenshot, **formatting-stack** presents linters' outputs
   * Else, please add the latest version to your project (or personal [profile](https://github.com/technomancy/leiningen/blob/072dcd62dea0ea46413cf938878e2d31b76357c9/doc/PROFILES.md)).
   * If this dependency isn't added, formatting-stack will degrade gracefully, using slightly fewer formatters/linters.
 
-### Component/Integrant integration
-
-**formatting-stack** provides components that you can integrate into your system.
-
-The provided components are fully configurable. See `formatting-stack.core`, `formatting-stack.component`, `formatting-stack.integrant`.
-
 ### Reloaded Workflow integration
 
 * If you use the Component component, then `com.stuartsierra.component.repl/reset` will use formatting-stack, applying all its formatters/linters.
@@ -121,6 +115,8 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 
 [`formatting-stack.core/format!`](https://github.com/nedap/formatting-stack/blob/0d78f726555db175aa446f4a0a9d2e289cfdd540/src/formatting_stack/core.clj#L49) is a plain function, considered a public API, that is safe to invoke over REPL, a script, or anything you please.
 
+> See also: [`format-and-lint-branch!`](https://github.com/nedap/formatting-stack/blob/5d66e2adffd1696af8b020c56d33d443b299aabd/src/formatting_stack/branch_formatter.clj#L84), [`format-and-lint-project!`](https://github.com/nedap/formatting-stack/blob/5d66e2adffd1696af8b020c56d33d443b299aabd/src/formatting_stack/project_formatter.clj#L84).
+
 ## Advanced configuration
 
 If you want to add custom members to the `format!` options (namely: `:formatters`, or `:strategies`, etc), a typical pattern would be:
@@ -136,10 +132,7 @@ You can also pass `[]` for disabling a particular aspect:
 (formatting-stack.core/format! :linters [])
 ```
 
-If you need something more fine-grained, you are encouraged to copy the contents of the `formatting-stack.defaults` ns to your project, adapting things as needed.
-That ns is a deliberately thin and data-only one, with the precise purpose of being forked at no cost.
-
-> We might implement an easier way to configure the stack: [#38](https://github.com/nedap/formatting-stack/issues/38)
+...And you can also override specific parameters (like max line length from 130 to 80) in a fine-grained manner, as documented in [customization_example.clj](https://github.com/nedap/formatting-stack/blob/master/test-resources/customization_example.clj).
 
 ## [FAQ](https://github.com/nedap/formatting-stack/wiki/FAQ)
 
