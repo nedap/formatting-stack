@@ -74,6 +74,7 @@
 
 (defn new [{:keys [kondo-clj-options
                    kondo-cljs-options]}]
-  (implement {:kondo-clj-options  kondo-clj-options
+  (implement {:id ::id
+              :kondo-clj-options  kondo-clj-options
               :kondo-cljs-options kondo-cljs-options}
     protocols.linter/--lint! lint!))

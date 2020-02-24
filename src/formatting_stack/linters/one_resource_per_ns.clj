@@ -67,5 +67,5 @@
        (apply concat)))
 
 (speced/defn new [^map? opts]
-  (implement opts
+  (implement (assoc opts :id ::id)
     linter/--lint! lint!))

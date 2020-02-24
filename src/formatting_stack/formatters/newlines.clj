@@ -14,6 +14,7 @@
   nil)
 
 (speced/defn new [{:keys [^pos-int? expected-newline-count]
-                   :or {expected-newline-count 1}}]
-  (implement {:expected-newline-count expected-newline-count}
+                   :or   {expected-newline-count 1}}]
+  (implement {:id ::id
+              :expected-newline-count expected-newline-count}
     formatter/--format! format!))

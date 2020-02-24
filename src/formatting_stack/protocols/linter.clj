@@ -8,5 +8,6 @@
 
 Normally it's a wrapper around a linting library, with extra configuration, performance improvements, etc."
 
-  (^::protocols.spec/reports lint! [this, ^::protocols.spec/filenames filenames]
+  (^::protocols.spec/reports lint! [^::protocols.spec/member this
+                                    ^::protocols.spec/filenames filenames]
     "Lints `filenames` according to a linter of your choice: e.g. Eastwood, or Kibit, lein-dependency-check, etc."))

@@ -76,7 +76,8 @@
                    libspec-whitelist                    default-libspec-whitelist
                    refactor-nrepl-opts                  @default-nrepl-opts
                    how-to-ns-opts                       {}}}]
-  (implement {:refactor-nrepl-opts (deep-merge @default-nrepl-config-opts refactor-nrepl-opts)
+  (implement {:id ::id
+              :refactor-nrepl-opts (deep-merge @default-nrepl-config-opts refactor-nrepl-opts)
               :how-to-ns-opts      (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)
               :libspec-whitelist   libspec-whitelist
               :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned}
