@@ -9,23 +9,28 @@
   "Does this linting result refer to a :pre/:post containing dynamic assertions?
 
 See https://git.io/fhQTx"
-  [{{{[_fn* [_arglist & fn-tails]] :form} :ast} :wrong-pre-post
-    msg                                         :msg
-    :as                                         x}]
-  (->> fn-tails
-       (some (fn [tail]
-               (when (and (coll? tail)
-                          (= 'clojure.core/assert
-                             (first tail)))
-                 (let [v (second tail)
-                       v-name (when (symbol? v)
-                                (name v))]
-                   (and v-name
-                        (string/includes? msg v-name) ;; make sure it's the same symbol as in msg
-                        (= \*
-                           (first v-name)
-                           (last v-name)))))))
-       (boolean)))
+  [{{{ast-form :form} :ast} :wrong-pre-post
+    msg                     :msg}]
+  (let [[_fn* fn-tails] (if (coll? ast-form)
+                          ast-form
+                          [])
+        [_arglist & body] (if (coll? fn-tails)
+                            fn-tails
+                            [])]
+    (->> body
+         (some (fn [form]
+                 (when (and (coll? form)
+                            (= 'clojure.core/assert
+                               (first form)))
+                   (let [v      (second form)
+                         v-name (when (symbol? v)
+                                  (name v))]
+                     (and v-name
+                          (string/includes? msg v-name) ;; make sure it's the same symbol as in msg
+                          (= \*
+                             (first v-name)
+                             (last v-name)))))))
+         (boolean))))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
   [^string? warnings]

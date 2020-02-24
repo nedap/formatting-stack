@@ -28,6 +28,16 @@
                   (list 'clojure.core/assert '(foo 42))
                   (list 'clojure.core/assert 'namespace/*test*)))         true
 
+      nil                                                                 false
+      []                                                                  false
+      42                                                                  false
+      [42]                                                                false
+      [[42]]                                                              false
+      [[[42]]]                                                            false
+      [:_ [:_]]                                                           false
+      [:_ [:_ []]]                                                        false
+      [:_ [:_ 'aaaaaaaaa]]                                                false
+
       (list 'fn* (list [] (list 'clojure.core/assert 'test)))             false
 
       (list 'fn* (list [] (list 'clojure.core/assert '*namespace*/test))) false
