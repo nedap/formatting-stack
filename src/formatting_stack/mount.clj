@@ -12,15 +12,5 @@
        (apply format!))
   this)
 
-;; Allow parameterless configuring using `mount/start-with-args`.
-(mount-up/on-up :formatting-with-mount-args
-                (fn [_]
-                  (when-let [config (::config (mount/args))]
-                    (start config)))
-                :before)
-
-(defn configure [config]
-  (mount-up/on-up :formatting-with-provided-config
-                  (fn [_]
-                    (start config))
-                  :before))
+(defn configure! [config]
+  (mount-up/on-up :formatting (fn [_] (start config)) :before))
