@@ -2,8 +2,8 @@
   (:require
    [formatting-stack.component.impl :refer [parse-options]]
    [formatting-stack.core :refer [format!]]
-   [mount.core :as mount]
    [mount-up.core :as mount-up]
+   [mount.core :as mount]
    [nedap.speced.def :as speced]))
 
 (speced/defn start [^map? this]

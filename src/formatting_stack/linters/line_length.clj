@@ -26,5 +26,6 @@
 
 (defn new [{:keys [max-line-length]
             :or   {max-line-length 130}}]
-  (implement {:max-line-length max-line-length}
+  (implement {:id ::id
+              :max-line-length max-line-length}
     linter/--lint! lint!))

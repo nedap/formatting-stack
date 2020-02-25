@@ -26,24 +26,25 @@
                          suffix)))))
          (string/join "\n"))))
 
-(defn print-summary [{:keys [summary?]} reports]
+(speced/defn print-summary [{:keys [^boolean? summary?
+                                    ^boolean? colorize?]} reports]
   (when summary?
     (->> reports
          (group-by :level)
          (map-vals count)
          (into (sorted-map-by compare)) ;; print summary in order
          (run! (fn [[report-type n]]
-                 (-> (str n (case report-type
-                              :exception " exceptions occurred"
-                              :error     " errors found"
-                              :warning   " warnings found"))
-                     (colorize (case type
-                                 :exception :red
-                                 :error     :red
-                                 :warning   :yellow))
-                     (println)))))))
+                 (cond-> (str n (case report-type
+                                  :exception " exceptions occurred"
+                                  :error     " errors found"
+                                  :warning   " warnings found"))
+                   colorize? (colorize (case report-type
+                                         :exception :red
+                                         :error     :red
+                                         :warning   :yellow))
+                   true      println))))))
 
-(defn print-exceptions [{:keys [print-stacktraces?]} reports]
+(speced/defn print-exceptions [{:keys [^boolean? print-stacktraces?]} reports]
   (->> reports
        (filter (speced/fn [{:keys [^::protocols.spec/level level]}]
                  (#{:exception} level)))
@@ -102,5 +103,6 @@
                    colorize?          true}}]
   (implement {:max-msg-length max-msg-length
               :print-stacktraces? print-stacktraces?
+              :summary? summary?
               :colorize? colorize?}
     reporter/--report print-report))

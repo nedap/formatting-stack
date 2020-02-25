@@ -1,8 +1,36 @@
 (ns formatting-stack.linters.eastwood.impl
   (:require
+   [clojure.string :as string]
    [eastwood.reporting-callbacks :as reporting-callbacks]
    [formatting-stack.protocols.spec :as protocols.spec]
    [nedap.speced.def :as speced]))
+
+(speced/defn ^boolean? contains-dynamic-assertions?
+  "Does this linting result refer to a :pre/:post containing dynamic assertions?
+
+See https://git.io/fhQTx"
+  [{{{ast-form :form} :ast} :wrong-pre-post
+    msg                     :msg}]
+  (let [[_fn* fn-tails] (if (coll? ast-form)
+                          ast-form
+                          [])
+        [_arglist & body] (if (coll? fn-tails)
+                            fn-tails
+                            [])]
+    (->> body
+         (some (fn [form]
+                 (when (and (coll? form)
+                            (= 'clojure.core/assert
+                               (first form)))
+                   (let [v      (second form)
+                         v-name (when (symbol? v)
+                                  (name v))]
+                     (and v-name
+                          (string/includes? msg v-name) ;; make sure it's the same symbol as in msg
+                          (= \*
+                             (first v-name)
+                             (last v-name)))))))
+         (boolean))))
 
 (speced/defn ^::protocols.spec/reports warnings->reports
   [^string? warnings]

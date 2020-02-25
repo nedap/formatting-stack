@@ -40,5 +40,5 @@
     (process! {} filenames)))
 
 (defn new []
-  (implement {}
+  (implement {:id ::id}
     processor/--process! process!))

@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "3.1.0"
+(defproject formatting-stack "4.0.0"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
@@ -66,11 +66,9 @@
                                              [criterium "0.4.5"]
                                              [integrant/repl "0.3.1"]
                                              [lambdaisland/deep-diff "0.0-29"]
-                                             [mount "0.1.16"]
                                              [org.clojure/core.async "0.5.527"]
                                              [org.clojure/math.combinatorics "0.1.1"]
-                                             [org.clojure/test.check "0.10.0-alpha3"]
-                                             [tolitius/mount-up "0.1.2"]]
+                                             [org.clojure/test.check "0.10.0-alpha3"]]
                               :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
                               :source-paths ["dev"]
                               :repl-options {:init-ns dev}
