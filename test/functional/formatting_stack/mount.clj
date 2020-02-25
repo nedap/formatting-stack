@@ -41,20 +41,3 @@
         (is (= [sample-report]
                @p)))
       (mount/stop))))
-
-(deftest works-with-mount-args
-  (testing "It can be started/stopped without errors"
-    (let [p (atom nil)
-          ;; pass an empty stack (except for the `proof`), so that no side-effects will be triggered (would muddy the test suite):
-          opts {:strategies               []
-                :third-party-indent-specs {}
-                :formatters               []
-                :linters                  [(proof p)]
-                :processors               []
-                :in-background?           false
-                :reporter                 (reporters.passthrough/new)}]
-      (mount/start-with-args {:formatting-stack.mount/config opts})
-      (testing "It actually runs its members, such as linters"
-        (is (= [sample-report]
-               @p)))
-      (mount/stop))))
