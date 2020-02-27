@@ -22,9 +22,10 @@
 
 (deftest sut-consumers
   (let [corpus (project-namespaces)]
-    (are [input expected] (= expected
-                             (sut/sut-consumers corpus input))
-      (the-ns 'formatting-stack.strategies) [(the-ns 'unit.formatting-stack.strategies)])))
+    (are [input expected] (=  expected
+                              (sut/sut-consumers corpus input))
+      (the-ns 'formatting-stack.strategies) [(the-ns 'integration.formatting-stack.strategies)
+                                             (the-ns 'unit.formatting-stack.strategies)])))
 
 (deftest permutations
   (testing "Multi-segment ns"
@@ -66,4 +67,5 @@
 
     ;; `sut` alias detection
     ["src/formatting_stack/strategies.clj"]
-    [(the-ns 'unit.formatting-stack.strategies)]))
+    [(the-ns 'integration.formatting-stack.strategies)
+     (the-ns 'unit.formatting-stack.strategies)]))
