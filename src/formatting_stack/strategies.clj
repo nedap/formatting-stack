@@ -1,6 +1,8 @@
 (ns formatting-stack.strategies
   "Strategies are concerned with generating a seq of filenames to process (format, lint, or compile).
 
+  Said filenames must follow `::protocols.spec/filenames`, and represent an existing file.
+
   They are configured to run in a determinate order.
 
   In practice, a strategy is function that receives a seq of filenames, and returns another:
@@ -25,22 +27,25 @@
 (speced/defn all-files
   "This strategy unconditionally processes all files."
   [& {:keys [^::protocols.spec/filenames files]}]
-  (let [tracked (->> (impl/file-entries git-command "ls-files")
-                     (impl/absolutize git-command))
-        untracked (->> (impl/file-entries git-command "ls-files" "--others" "--exclude-standard")
-                       (impl/absolutize git-command))
-
-        deleted (binding [impl/*skip-existing-files-check?* true]
-                  (->> (impl/file-entries git-command "status" "--porcelain")
+  ;; This first `binding` is necessary for obtaining an absolutized list of deletions
+  (binding [impl/*skip-existing-files-check?* true]
+    (let [deleted (->> (impl/file-entries git-command "status" "--porcelain")
                        (filter impl/deleted-file?)
                        (map impl/remove-deletion-markers)
-                       (impl/absolutize git-command)))]
-    (->> files
-         (into tracked)
-         (into untracked)
-         (remove (set deleted))
-         (impl/absolutize git-command)
-         (impl/extract-clj-files))))
+                       (impl/absolutize git-command)
+                       (set))
+          tracked (->> (impl/file-entries git-command "ls-files")
+                       (impl/absolutize git-command)
+                       (remove deleted))
+          untracked (->> (impl/file-entries git-command "ls-files" "--others" "--exclude-standard")
+                         (impl/absolutize git-command)
+                         (remove deleted))]
+      ;; Second `binding`, to ensure correct results
+      (binding [impl/*skip-existing-files-check?* false]
+        (speced/let [^::impl/existing-files corpus (into tracked untracked)]
+          (->> files
+               (into corpus)
+               (impl/extract-clj-files)))))))
 
 (speced/defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
@@ -77,7 +82,9 @@
              impl          (impl/file-entries git-command "diff" "--name-status" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
-       (remove impl/deleted-file?)
+       (remove (fn [s]
+                 (-> s (string/starts-with? "D\t"))))
+       (map #(string/replace-first % #"(A|C|D|M|R|T|U|X|B)\t" "")) ;; See: `git diff --help`, `diff-filter` section
        (impl/absolutize git-command)
        (remove (set blacklist))
        (impl/extract-clj-files)
