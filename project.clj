@@ -7,7 +7,7 @@
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
-                 [com.nedap.staffing-solutions/utils.modular "2.1.0"]
+                 [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [jonase/eastwood "0.3.5"]
                  [medley "1.2.0"]
@@ -90,6 +90,13 @@
                                                                                                            (exclusions (str dep))))
                                                                                                  vec))))))
                                                 'user/nedap-ensure-exclusions)]}
+
+             :cljs-old       {:dependencies [[com.stuartsierra/component "0.4.0"]
+                                             [integrant "0.8.0"]
+                                             [org.clojure/clojurescript "1.7.228"
+                                              :exclusions [com.cognitect/transit-clj
+                                                           com.google.code.findbugs/jsr305
+                                                           com.google.errorprone/error_prone_annotations]]]}
 
              :provided       {:dependencies [[org.clojure/clojurescript "1.10.597"
                                               :exclusions [com.cognitect/transit-clj
