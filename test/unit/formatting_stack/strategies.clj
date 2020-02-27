@@ -39,8 +39,12 @@
          (sut/git-completely-staged :files [] :impl all-files))))
 
 (deftest git-not-completely-staged
-  (is (= (strip-git not-completely-staged-files)
-         (sut/git-not-completely-staged :files [] :impl all-files))))
+  (let [expected (->> not-completely-staged-files
+                      (remove sut.impl/deleted-file?)
+                      (strip-git))]
+    (assert (-> expected count pos?))
+    (is (= expected
+           (sut/git-not-completely-staged :files [] :impl all-files)))))
 
 (deftest git-diff-against-default-branch
   (is (= (sut.impl/absolutize "git" ["a.clj"])

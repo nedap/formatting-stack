@@ -100,3 +100,27 @@
               (-> f .getCanonicalPath)))
        (some #{(-> file .getCanonicalPath)})
        (boolean)))
+
+(def deletion-markers
+  ["DD "
+   "DM "
+   "DU "
+   "AD "
+   "CD "
+   "MD "
+   "RD "
+   "UD "
+   " D "
+   "D "])
+
+(speced/defn deleted-file? [^string? s]
+  (->> deletion-markers
+       (some (fn [marker]
+               (string/starts-with? s marker)))
+       (boolean)))
+
+(speced/defn remove-deletion-markers [^string? s]
+  (->> deletion-markers
+       (reduce (fn [result marker]
+                 (string/replace-first result marker ""))
+               s)))

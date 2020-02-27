@@ -10,7 +10,7 @@
 
   A strategy may not return nil."
   (:require
-   [clojure.string :as str]
+   [clojure.string :as string]
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
@@ -28,10 +28,18 @@
   (let [tracked (->> (impl/file-entries git-command "ls-files")
                      (impl/absolutize git-command))
         untracked (->> (impl/file-entries git-command "ls-files" "--others" "--exclude-standard")
-                       (impl/absolutize git-command))]
+                       (impl/absolutize git-command))
+
+        deleted (binding [impl/*skip-existing-files-check?* true]
+                  (->> (impl/file-entries git-command "status" "--porcelain")
+                       (filter impl/deleted-file?)
+                       (map impl/remove-deletion-markers)
+                       (impl/absolutize git-command)))]
     (->> files
          (into tracked)
          (into untracked)
+         (remove (set deleted))
+         (impl/absolutize git-command)
          (impl/extract-clj-files))))
 
 (speced/defn git-completely-staged
@@ -40,10 +48,11 @@
       :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
-       (map #(str/replace-first % impl/git-completely-staged-regex ""))
+       (remove impl/deleted-file?)
+       (map #(string/replace-first % impl/git-completely-staged-regex ""))
        (map (fn [s]
               ;; for renames:
-              (-> s (str/split #" -> ") last)))
+              (-> s (string/split #" -> ") last)))
        (impl/absolutize git-command)
        (impl/extract-clj-files)
        (into files)))
@@ -53,8 +62,9 @@
   [& {:keys [^::protocols.spec/filenames files, impl]
       :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
+       (remove impl/deleted-file?)
        (filter #(re-find impl/git-not-completely-staged-regex %))
-       (map #(str/replace-first % impl/git-not-completely-staged-regex ""))
+       (map #(string/replace-first % impl/git-not-completely-staged-regex ""))
        (impl/absolutize git-command)
        (impl/extract-clj-files)
        (into files)))
@@ -64,9 +74,10 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries git-command "diff" "--name-only" target-branch)
+             impl          (impl/file-entries git-command "diff" "--name-status" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
+       (remove impl/deleted-file?)
        (impl/absolutize git-command)
        (remove (set blacklist))
        (impl/extract-clj-files)
