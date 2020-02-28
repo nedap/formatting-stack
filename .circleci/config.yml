@@ -89,6 +89,11 @@ workflows:
           lein_test_command: lein with-profile -dev,+ci do clean, test
           <<: *test_code_filters
       - test_code:
+          name: "JDK 8, with an old clojurescript dependency on the classpath"
+          jdk_version: openjdk8
+          lein_test_command: lein with-profile -dev,-provided,+ci,+cljs-old do clean, test
+          <<: *test_code_filters
+      - test_code:
           name: "JDK 11 including refactor-nrepl"
           jdk_version: openjdk11
           lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
@@ -101,6 +106,7 @@ workflows:
       - deploy:
           context: JFrog
           requires:
+            - "JDK 8, with an old clojurescript dependency on the classpath"
             - "JDK 8 including refactor-nrepl"
             - "JDK 8 excluding refactor-nrepl"
             - "JDK 11 including refactor-nrepl"
