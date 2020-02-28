@@ -5,6 +5,7 @@
    [nedap.speced.def :as speced]))
 
 (def deletion-markers
+  ;; NOTE: order matters (there are tests covering this), particularly for the last two members.
   ["DD "
    "DM "
    "DU "
