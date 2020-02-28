@@ -16,6 +16,7 @@
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
+   [formatting-stack.strategies.impl.git-diff :as git-diff]
    [formatting-stack.strategies.impl.git-status :as git-status]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
@@ -83,9 +84,8 @@
              impl          (impl/file-entries git-command "diff" "--name-status" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
-       (remove (fn [s]
-                 (-> s (string/starts-with? "D\t"))))
-       (map #(string/replace-first % #"(A|C|D|M|R|T|U|X|B)\t" "")) ;; See: `git diff --help`, `diff-filter` section
+       (remove git-diff/deletion?)
+       (map git-diff/remove-markers)
        (impl/absolutize git-command)
        (remove (set blacklist))
        (impl/extract-clj-files)

@@ -1,6 +1,7 @@
 (ns integration.formatting-stack.strategies
   (:require
    [clojure.java.shell :refer [sh]]
+   [clojure.string :as string]
    [clojure.test :refer [deftest is testing]]
    [formatting-stack.strategies :as sut])
   (:import
@@ -56,35 +57,37 @@
         (sh "git" "checkout" (str deletable-file))
         (assert (-> deletable-file .exists))))))
 
+(def root-commit
+  "f-stack's first ever commit. This ensures a large, diverse corpus."
+  (delay
+    (-> (sh "git" "rev-list" "--max-parents=0" "HEAD")
+        (:out)
+        (string/split #"\n")
+        (first))))
+
 (deftest git-diff-against-default-branch
 
   (assert-pristine-git-status!)
 
   (testing "It runs without errors, exercising its specs, even in face of deleted (but not staged) files"
-    (let [;; f-stack's first ever commit. This ensures a large, diverse corpus:
-          first-commit "ebb0ca8"]
-
-      (try
-        (-> deletable-file .delete)
-        (expect-sane-output! (sut/git-diff-against-default-branch :target-branch first-commit))
-        (finally
-          (sh "git" "checkout" (str deletable-file))
-          (assert (-> deletable-file .exists))))))
+    (try
+      (-> deletable-file .delete)
+      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
+      (finally
+        (sh "git" "checkout" (str deletable-file))
+        (assert (-> deletable-file .exists)))))
 
   (assert-pristine-git-status!)
 
   (testing "It runs without errors, exercising its specs, even in face of files staged for deletion"
-    (let [;; f-stack's first ever commit. This ensures a large, diverse corpus:
-          first-commit "ebb0ca8"]
-
-      (try
-        (-> deletable-file .delete)
-        (sh "git" "add" "-A")
-        (expect-sane-output! (sut/git-diff-against-default-branch :target-branch first-commit))
-        (finally
-          (sh "git" "reset" "--" (str deletable-file))
-          (sh "git" "checkout" (str deletable-file))
-          (assert (-> deletable-file .exists)))))))
+    (try
+      (-> deletable-file .delete)
+      (sh "git" "add" "-A")
+      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
+      (finally
+        (sh "git" "reset" "--" (str deletable-file))
+        (sh "git" "checkout" (str deletable-file))
+        (assert (-> deletable-file .exists))))))
 
 (deftest git-not-completely-staged
 
