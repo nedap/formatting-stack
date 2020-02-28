@@ -1,7 +1,7 @@
 (ns formatting-stack.strategies
   "Strategies are concerned with generating a seq of filenames to process (format, lint, or compile).
 
-  Said filenames must follow `::protocols.spec/filenames`, and represent an existing file.
+  Said filenames must satisf the `::protocols.spec/filename` spec, and represent an existing file.
 
   They are configured to run in a determinate order.
 

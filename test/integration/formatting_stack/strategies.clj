@@ -122,7 +122,7 @@
 
   (assert-pristine-git-status!)
 
-  (testing "Non-ompletely-added files don't show up"
+  (testing "Non-completely-added files don't show up"
     (try
       (spit createable-filename creatable-contents)
 
