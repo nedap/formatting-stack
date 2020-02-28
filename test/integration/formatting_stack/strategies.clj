@@ -63,7 +63,8 @@
     (-> (sh "git" "rev-list" "--max-parents=0" "HEAD")
         (:out)
         (string/split #"\n")
-        (first))))
+        (first)
+        (doto assert))))
 
 (deftest git-diff-against-default-branch
 
