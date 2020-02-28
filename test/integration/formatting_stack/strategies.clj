@@ -23,8 +23,8 @@
 
 (deftest git-diff-against-default-branch
   (testing "It runs without errors, exercising its specs"
-    (let [first-commit "ebb0ca8" ;; f-stack's first ever commit. This ensures a large, diverse corpus
-          corpus (sut/git-diff-against-default-branch :target-branch first-commit)]
+    (let [ ;; f-stack's first ever commit. This ensures a large, diverse corpus:
+          first-commit "ebb0ca8"]
 
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch first-commit)))))
 
