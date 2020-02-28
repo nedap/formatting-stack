@@ -38,9 +38,15 @@
 
 (assert (not (-> createable-filename File. .exists)))
 
-;; NOTE: naturally, this test can fail if your git stataus contains any changes.
-;; You may need to `git commit` your WIP for these tests to pass.
+(defn assert-pristine-git-status! []
+  (assert (-> (sh "git" "status" "--porcelain")
+              :out
+              #{""})
+          "This test needs the `git status` to be pristine; else it will fail and/or destroy your WIP."))
+
 (deftest git-not-completely-staged
+
+  (assert-pristine-git-status!)
 
   (testing "Non-completely-added files show up"
     (try
@@ -68,9 +74,9 @@
         (sh "git" "checkout" (str deletable-file))
         (assert (-> deletable-file .exists))))))
 
-;; NOTE: naturally, this test can fail if your git stataus contains any changes.
-;; You may need to `git commit` your WIP for these tests to pass.
 (deftest git-completely-staged
+
+  (assert-pristine-git-status!)
 
   (testing "Non-ompletely-added files don't show up"
     (try
