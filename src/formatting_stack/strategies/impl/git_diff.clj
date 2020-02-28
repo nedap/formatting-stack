@@ -11,5 +11,4 @@
 
 ;; See: `git diff --help`, `diff-filter` section
 (speced/defn remove-markers [^string? s]
-  ;; XXX ^
   (-> s (string/replace-first #"^(A|C|D|M|R|T|U|X|B)\t" "")))
