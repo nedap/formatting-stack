@@ -1,7 +1,7 @@
-(ns unit.formatting-stack.strategies.impl
+(ns unit.formatting-stack.strategies.impl.git-status
   (:require
    [clojure.test :refer [are deftest is testing]]
-   [formatting-stack.strategies.impl :as sut]))
+   [formatting-stack.strategies.impl.git-status :as sut]))
 
 (deftest deleted-file?
   (are [input expected] (testing input

@@ -16,6 +16,7 @@
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
+   [formatting-stack.strategies.impl.git-status :as git-status]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
    [nedap.utils.spec.api :refer [check!]])
@@ -30,8 +31,8 @@
   ;; This first `binding` is necessary for obtaining an absolutized list of deletions
   (binding [impl/*skip-existing-files-check?* true]
     (let [deleted (->> (impl/file-entries git-command "status" "--porcelain")
-                       (filter impl/deleted-file?)
-                       (map impl/remove-deletion-markers)
+                       (filter git-status/deleted-file?)
+                       (map git-status/remove-deletion-markers)
                        (impl/absolutize git-command)
                        (set))
           tracked (->> (impl/file-entries git-command "ls-files")
@@ -53,7 +54,7 @@
       :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
-       (remove impl/deleted-file?)
+       (remove git-status/deleted-file?)
        (map #(string/replace-first % impl/git-completely-staged-regex ""))
        (map (fn [s]
               ;; for renames:
@@ -67,7 +68,7 @@
   [& {:keys [^::protocols.spec/filenames files, impl]
       :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
   (->> impl
-       (remove impl/deleted-file?)
+       (remove git-status/deleted-file?)
        (filter #(re-find impl/git-not-completely-staged-regex %))
        (map #(string/replace-first % impl/git-not-completely-staged-regex ""))
        (impl/absolutize git-command)

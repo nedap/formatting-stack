@@ -3,7 +3,8 @@
    [clojure.string :as str]
    [clojure.test :refer [deftest is use-fixtures]]
    [formatting-stack.strategies :as sut]
-   [formatting-stack.strategies.impl :as sut.impl]))
+   [formatting-stack.strategies.impl :as sut.impl]
+   [formatting-stack.strategies.impl.git-status :as git-status]))
 
 (use-fixtures :once (fn [tests]
                       (binding [sut.impl/*filter-existing-files?* false
@@ -40,7 +41,7 @@
 
 (deftest git-not-completely-staged
   (let [expected (->> not-completely-staged-files
-                      (remove sut.impl/deleted-file?)
+                      (remove git-status/deleted-file?)
                       (strip-git))]
     (assert (-> expected count pos?))
     (is (= expected
