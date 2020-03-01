@@ -24,7 +24,7 @@
               (-> f .getCanonicalFile)))))
 
 (speced/defn ^{::speced/spec (spec/coll-of any? :min-count 1)} classpath-directories
-  "A replacement for `#'classpath/classpath-directories` with whiich external tooling cannot interfere.
+  "A replacement for `#'classpath/classpath-directories` with which external tooling cannot interfere.
 
   See: https://github.com/clojure-emacs/cider-nrepl/pull/668"
   []
