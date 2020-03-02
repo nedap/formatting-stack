@@ -9,7 +9,7 @@
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
-                 [jonase/eastwood "0.3.5"]
+                 [jonase/eastwood "0.3.10"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
