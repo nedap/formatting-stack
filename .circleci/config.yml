@@ -84,6 +84,11 @@ workflows:
           lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
           <<: *test_code_filters
       - test_code:
+          name: "JDK 8 including refactor-nrepl (at its latest version)"
+          jdk_version: openjdk8
+          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
+          <<: *test_code_filters
+      - test_code:
           name: "JDK 8 excluding refactor-nrepl"
           jdk_version: openjdk8
           lein_test_command: lein with-profile -dev,+ci do clean, test
@@ -97,6 +102,11 @@ workflows:
           name: "JDK 11 including refactor-nrepl"
           jdk_version: openjdk11
           lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+          <<: *test_code_filters
+      - test_code:
+          name: "JDK 11 including refactor-nrepl (at its latest version)"
+          jdk_version: openjdk11
+          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 excluding refactor-nrepl"

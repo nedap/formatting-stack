@@ -53,15 +53,19 @@
                                                                                               (sut/cljfmt-indents-for {}))]
                     (case e
                       :unqualified-too
-                      (is (= u
-                             q
-                             [[:block 0]]))
+                      (do
+                        (is (= [[:block 0]]
+                               u))
+                        (is (= [[:block 0]]
+                               q)))
 
                       :qualified-only
                       (do
                         (is (nil? u))
                         (is (= q
-                               [[:block 0]])))))
+                               [[:block 0]]))))
+
+                    true)
 
       this-file      :unqualified-too
       related-file   :unqualified-too
@@ -72,18 +76,23 @@
                          q 'unit.formatting-stack.formatters.cljfmt.impl.sample-data/do} (-> file
                                                                                              str
                                                                                              (sut/cljfmt-indents-for {}))]
+
                     (case e
                       :unqualified-too
-                      (is (= u
-                             q
-                             [[:block 7]]))
+                      (do
+                        (is (= [[:block 7]]
+                               u))
+                        (is (= [[:block 7]]
+                               q)))
 
                       :qualified-only
                       (do
-                        (is (= u
-                               [[:block 0]]))
-                        (is (= q
-                               [[:block 7]])))))
+                        (is (= [[:block 0]]
+                               u))
+                        (is (= [[:block 7]]
+                               q))))
+
+                    true)
 
       this-file    :qualified-only
       related-file :unqualified-too)))
