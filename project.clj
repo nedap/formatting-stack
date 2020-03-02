@@ -94,10 +94,12 @@
 
              :cljs-old              {:dependencies [[com.stuartsierra/component "0.4.0"]
                                                     [integrant "0.8.0"]
+                                                    [mount "0.1.16"]
                                                     [org.clojure/clojurescript "1.7.228"
                                                      :exclusions [com.cognitect/transit-clj
                                                                   com.google.code.findbugs/jsr305
-                                                                  com.google.errorprone/error_prone_annotations]]]}
+                                                                  com.google.errorprone/error_prone_annotations]]
+                                                    [tolitius/mount-up "0.1.2"]]}
 
              :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"
                                                      :exclusions [com.cognitect/transit-clj
@@ -110,7 +112,6 @@
                                                     [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]
                                                     [com.stuartsierra/component "0.4.0"]
                                                     [integrant "0.8.0"]
-
                                                     [mount "0.1.16"]
                                                     [tolitius/mount-up "0.1.2"]]}
 
