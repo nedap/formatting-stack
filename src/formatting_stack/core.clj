@@ -3,6 +3,7 @@
    [clojure.main]
    [formatting-stack.background]
    [formatting-stack.defaults :refer [default-formatters default-linters default-processors default-strategies]]
+   [formatting-stack.impl.overrides :refer [apply-overrides]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
@@ -46,26 +47,37 @@
                              :level     :exception}])))))
            (doall)))))
 
-(defn format! [& {:keys [strategies
-                         third-party-indent-specs
-                         formatters
-                         linters
-                         processors
-                         reporter
-                         in-background?]}]
+(defn format! [& {:keys                             [strategies
+                                                     third-party-indent-specs
+                                                     formatters
+                                                     linters
+                                                     processors
+                                                     reporter
+                                                     in-background?]
+                  {formatter-overrides :formatters
+                   linter-overrides    :linters
+                   processor-overrides :processors} :overrides}]
   ;; the following `or` clauses ensure that Components don't pass nil values
-  (let [strategies               (or strategies default-strategies)
-        third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
-        formatters               (or formatters (default-formatters third-party-indent-specs))
-        linters                  (or linters default-linters)
-        processors               (or processors (default-processors third-party-indent-specs))
-        reporter                 (or reporter (reporters.pretty-printer/new {}))
-        in-background?           (if (some? in-background?)
-                                   in-background?
-                                   true)
+  (let [strategies                          (or strategies default-strategies)
+        third-party-indent-specs            (or third-party-indent-specs default-third-party-indent-specs)
+        formatters                          (or formatters (default-formatters third-party-indent-specs))
+        linters                             (or linters default-linters)
+        processors                          (or processors (default-processors third-party-indent-specs))
+        reporter                            (or reporter (reporters.pretty-printer/new {}))
+        formatter-overrides                 (or formatter-overrides {})
+        linter-overrides                    (or linter-overrides {})
+        processor-overrides                 (or processor-overrides {})
+        in-background?                      (if (some? in-background?)
+                                              in-background?
+                                              true)
         {formatters-strategies :formatters
          linters-strategies    :linters
          processors-strategies :processors} strategies
+
+        formatters                          (apply-overrides formatters formatter-overrides)
+        linters                             (apply-overrides linters linter-overrides)
+        processors                          (apply-overrides processors processor-overrides)
+
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
                (->> [(process! protocols.formatter/format!  formatters  formatters-strategies strategies)
                      (process! protocols.linter/lint!       linters     linters-strategies    strategies)
