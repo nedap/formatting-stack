@@ -4,7 +4,8 @@
    [clojure.test :refer [are deftest is testing]]
    [formatting-stack.processors.test-runner.impl :as sut]
    [formatting-stack.project-parsing :refer [project-namespaces]]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.spec.api :refer [check!]]))
 
 (speced/defn make-ns [^keyword? k]
   (-> k
@@ -22,9 +23,13 @@
 
 (deftest sut-consumers
   (let [corpus (project-namespaces)]
+
+    (check! (partial < 100) (-> corpus count))
+
     (are [input expected] (= expected
                              (sut/sut-consumers corpus input))
-      (the-ns 'formatting-stack.strategies) [(the-ns 'unit.formatting-stack.strategies)])))
+      (the-ns 'formatting-stack.strategies) [(the-ns 'integration.formatting-stack.strategies)
+                                             (the-ns 'unit.formatting-stack.strategies)])))
 
 (deftest permutations
   (testing "Multi-segment ns"
@@ -66,4 +71,5 @@
 
     ;; `sut` alias detection
     ["src/formatting_stack/strategies.clj"]
-    [(the-ns 'unit.formatting-stack.strategies)]))
+    [(the-ns 'integration.formatting-stack.strategies)
+     (the-ns 'unit.formatting-stack.strategies)]))
