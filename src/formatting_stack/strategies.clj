@@ -36,10 +36,10 @@
                        (map git-status/remove-deletion-markers)
                        (impl/absolutize git-command)
                        (set))
-          tracked (->> (impl/file-entries git-command "ls-files")
+          tracked (->> (impl/file-entries git-command "ls-files" "--full-name")
                        (impl/absolutize git-command)
                        (remove deleted))
-          untracked (->> (impl/file-entries git-command "ls-files" "--others" "--exclude-standard")
+          untracked (->> (impl/file-entries git-command "ls-files" "--full-name" "--others" "--exclude-standard")
                          (impl/absolutize git-command)
                          (remove deleted))]
       ;; Second `binding`, to ensure correct results
