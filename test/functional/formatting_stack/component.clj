@@ -26,9 +26,9 @@
           ;; pass an empty stack (except for the `proof`), so that no side-effects will be triggered (would muddy the test suite):
           opts {:strategies               []
                 :third-party-indent-specs {}
-                :formatters               []
-                :linters                  [(proof p)]
-                :processors               []
+                :formatters               (constantly [])
+                :linters                  (constantly [(proof p)])
+                :processors               (constantly [])
                 :in-background?           false
                 :reporter                 (reporters.passthrough/new)}
           instance (sut/new opts)]

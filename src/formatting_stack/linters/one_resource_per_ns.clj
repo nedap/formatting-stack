@@ -19,6 +19,34 @@
                                     (fn [x]
                                       (re-find #"\.clj([cs])?$" x))))
 
+;; XXX cljc
+(defmacro file-of
+  "`x` can be symbol, quoted or unquoted, denoting a namespace or a var.
+
+  Returns its location in the classpath/filesystem."
+  [x]
+  `(let [sym# ~(cond
+                 (symbol? x)              (list 'quote (or (namespace x)
+                                                           x))
+                 (and (sequential? x)
+                      (-> x first #{'quote 'var})
+                      (-> x second name)) (let [xx (-> x second str symbol)]
+                                            (list 'quote (or (namespace xx)
+                                                             xx)))
+                 true                     (assert false))
+         resource-path# (-> sym#
+                            str
+                            munge
+                            (clojure.string/replace "." "/")
+                            (str ".clj"))]
+     (println sym#)
+     (->> (-> (Thread/currentThread)
+              (.getContextClassLoader)
+              (.getResources resource-path#))
+          (enumeration-seq)
+          (distinct)
+          (mapv str))))
+
 (speced/defn ^::resource-path ns-decl->resource-path [^::util.ns/ns-form ns-decl, extension]
   (-> ns-decl
       second

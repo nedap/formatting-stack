@@ -2,7 +2,7 @@
   "A set of defaults apt for formatting/linting a git branch
   (namely, the files that a branch has modified, respective to another).
 
-  See also: `formatting-stack.defaults`, `formatting-stack.project-formatter`"
+  See also: `formatting-stack.git-status-formatter`, `formatting-stack.project-formatter`"
   (:require
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
@@ -75,6 +75,7 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
+;; XXX defn
 (def default-processors
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 

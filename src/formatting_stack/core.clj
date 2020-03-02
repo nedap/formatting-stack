@@ -1,8 +1,9 @@
 (ns formatting-stack.core
   (:require
    [clojure.main]
+   [clojure.spec.alpha :as spec]
    [formatting-stack.background]
-   [formatting-stack.defaults :refer [default-formatters default-linters default-processors default-strategies]]
+   [formatting-stack.impl.overrides :refer [apply-overrides]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
@@ -10,7 +11,8 @@
    [formatting-stack.protocols.reporter :refer [report]]
    [formatting-stack.reporters.impl :refer [normalize-filenames]]
    [formatting-stack.reporters.pretty-printer :as reporters.pretty-printer]
-   [formatting-stack.util :refer [with-serialized-output]]))
+   [formatting-stack.util :refer [with-serialized-output]]
+   [nedap.speced.def :as speced]))
 
 (defn files-from-strategies [strategies]
   (->> strategies
@@ -19,7 +21,7 @@
                [])
        distinct))
 
-(defn process! [method members category-strategies default-strategies]
+(speced/defn process! [method members ^vector? strategies]
   ;; `memoize` rationale: results are cached not for performance,
   ;; but for avoiding the scenario where one `member` alters the git status,
   ;; so the subsequent `member`s' strategies won't perceive the same set of files than the first one.
@@ -32,7 +34,7 @@
       (->> members
            (mapcat (fn [member]
                      (let [{specific-strategies :strategies} member
-                           strategies (or specific-strategies category-strategies default-strategies)]
+                           strategies (into strategies specific-strategies)]
                        (try
                          (->> strategies files (method member))
                          (catch Exception e
@@ -47,30 +49,49 @@
                              :level     :exception}])))))
            (doall)))))
 
-(defn format! [& {:keys [strategies
-                         third-party-indent-specs
-                         formatters
-                         linters
-                         processors
-                         reporter
-                         in-background?]}]
+;; XXX rf to protocol:
+(spec/def ::function (spec/and ifn?
+                               (complement coll?)))
+
+;; XXX this breaks component/integrant. must be updated to use git-status
+(speced/defn format! [& {:keys                                             [^vector? strategies
+                                                                            ^::function formatters
+                                                                            ^::function linters
+                                                                            ^::function processors
+                                                                            third-party-indent-specs
+                                                                            reporter
+                                                                            in-background?]
+                         {formatter-overrides                 :formatters
+                          linter-overrides                    :linters
+                          processor-overrides                 :processors
+                          {formatters-strategies :formatters
+                           linters-strategies    :linters
+                           processors-strategies :processors} :strategies} :overrides}]
   ;; the following `or` clauses ensure that Components don't pass nil values
-  (let [strategies               (or strategies default-strategies)
-        third-party-indent-specs (or third-party-indent-specs default-third-party-indent-specs)
-        formatters               (or formatters (default-formatters third-party-indent-specs))
-        linters                  (or linters default-linters)
-        processors               (or processors (default-processors third-party-indent-specs))
-        reporter                 (or reporter (reporters.pretty-printer/new {}))
-        in-background?           (if (some? in-background?)
-                                   in-background?
-                                   true)
-        {formatters-strategies :formatters
-         linters-strategies    :linters
-         processors-strategies :processors} strategies
+  (let [third-party-indent-specs            (or third-party-indent-specs default-third-party-indent-specs)
+        reporter                            (or reporter (reporters.pretty-printer/new {}))
+        formatter-overrides                 (or formatter-overrides {})
+        linter-overrides                    (or linter-overrides {})
+        processor-overrides                 (or processor-overrides {})
+        in-background?                      (if (some? in-background?)
+                                              in-background?
+                                              true)
+
+        formatters-strategies (into strategies formatters-strategies)
+        linters-strategies    (into strategies linters-strategies)
+        processors-strategies (into strategies processors-strategies)
+
+        formatters                          (-> (formatters formatters-strategies third-party-indent-specs)
+                                                (apply-overrides formatter-overrides))
+        linters                             (-> (linters linters-strategies)
+                                                (apply-overrides linter-overrides))
+        processors                          (-> (processors processors-strategies third-party-indent-specs)
+                                                (apply-overrides processor-overrides))
+
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
-               (->> [(process! protocols.formatter/format!  formatters  formatters-strategies strategies)
-                     (process! protocols.linter/lint!       linters     linters-strategies    strategies)
-                     (process! protocols.processor/process! processors  processors-strategies strategies)]
+               (->> [(process! protocols.formatter/format!  formatters  formatters-strategies)
+                     (process! protocols.linter/lint!       linters     linters-strategies)
+                     (process! protocols.processor/process! processors  processors-strategies)]
                     (apply concat)
                     (mapv normalize-filenames)
                     (report reporter)))]
