@@ -1,4 +1,6 @@
-(ns eastwood-warning)
+(ns eastwood-warning
+  (:require
+   [clojure.spec.alpha :as spec]))
 
 (def x (def y ::z))
 
@@ -32,3 +34,9 @@
   [x]
   {:pre [x *dynamic*]} ;; variation: *dynamic* is not the first member
   logical-false)
+
+;; This shouldn't raise any warnings. See https://github.com/jonase/eastwood/issues/337
+(spec/coll-of any?)
+
+;; This shouldn't raise any warnings. See https://github.com/jonase/eastwood/issues/336
+(defmulti example-mm identity)

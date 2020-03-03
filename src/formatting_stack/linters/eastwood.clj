@@ -19,7 +19,6 @@
         (assoc :linters linters))))
 
 (defn lint! [{:keys [options]} filenames]
-  (reset! eastwood.util/warning-enable-config-atom []) ;; https://github.com/jonase/eastwood/issues/317
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
@@ -32,7 +31,6 @@
     (->> @reports
          :warnings
          (map :warn-data)
-         (remove impl/contains-dynamic-assertions?)
          (map (fn [{:keys [uri-or-file-name linter] :strs [warning-details-url] :as m}]
                 (assoc-some m
                             :level               :warning

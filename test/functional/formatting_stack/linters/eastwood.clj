@@ -22,17 +22,17 @@
       (matchers/in-any-order
        [{:source              :eastwood/warn-on-reflection
          :msg                 "reference to field getPath can't be resolved"
-         :line                6
-         :column              25
+         :line                pos-int?
+         :column              pos-int?
          :warning-details-url matchers/absent
          :filename            "test-resources/eastwood_warning.clj"}
         {:source              :eastwood/def-in-def
-         :line                3
-         :column              13
+         :line                pos-int?
+         :column              pos-int?
          :warning-details-url "https://github.com/jonase/eastwood#def-in-def"
          :filename            "test-resources/eastwood_warning.clj"}
         {:source              :eastwood/wrong-pre-post
-         :line                22
-         :column              9
+         :line                pos-int?
+         :column              pos-int?
          :warning-details-url "https://github.com/jonase/eastwood#wrong-pre-post"
          :filename            "test-resources/eastwood_warning.clj"}]))))
