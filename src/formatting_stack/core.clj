@@ -8,6 +8,7 @@
    [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.protocols.reporter :refer [report]]
+   [formatting-stack.reporters.impl :refer [normalize-filenames]]
    [formatting-stack.reporters.pretty-printer :as reporters.pretty-printer]
    [formatting-stack.util :refer [with-serialized-output]]))
 
@@ -71,6 +72,7 @@
                      (process! protocols.linter/lint!       linters     linters-strategies    strategies)
                      (process! protocols.processor/process! processors  processors-strategies strategies)]
                     (apply concat)
+                    (mapv normalize-filenames)
                     (report reporter)))]
     (if in-background?
       (do
