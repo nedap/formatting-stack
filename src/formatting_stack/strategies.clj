@@ -82,7 +82,7 @@
       :or   {target-branch "master"
              impl          (impl/file-entries git-command "diff" "--name-only" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
-  (let [deleted-files (impl/file-entries git-command "diff" "--name-only" "--diff-filter=D")]
+  (let [deleted-files (impl/file-entries git-command "diff" "--name-only" "--diff-filter=D" target-branch)]
     (->> impl
          (remove (set deleted-files))
          (impl/absolutize git-command)
