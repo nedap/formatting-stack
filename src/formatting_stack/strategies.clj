@@ -83,10 +83,10 @@
              impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
-    (impl/absolutize git-command)
-    (remove (set blacklist))
-    (impl/extract-clj-files)
-    (into files)))
+       (impl/absolutize git-command)
+       (remove (set blacklist))
+       (impl/extract-clj-files)
+       (into files)))
 
 (speced/defn exclude-clj
   "This strategy excludes .clj files; .cljc files are not excluded in any case."
