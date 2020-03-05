@@ -30,6 +30,17 @@
     "B\tfoo.clj" "foo.clj"
     "foo.cljB\t" "foo.cljB\t"
 
+    ;; merge conflicts are replaced
+    "DU\t"        ""
+    "DU\tfoo.clj" "foo.clj"
+    "foo.cljDU\t" "foo.cljDU\t"
+
+    ;; `R` is replaced including optional previous path
+    "R001\tfoo.clj"          "foo.clj"
+    "R100\tfoo.clj\tbar.clj" "bar.clj"
+    "R087\tfoo.clj\tbar.clj" "bar.clj"
+    "foo.cljR100\tbar.clj"   "foo.cljR100\tbar.clj"
+
     ;; `Ñ` is not replaced, because `git-diff` does not emit that
 
     "Ñ\t"        "Ñ\t"
