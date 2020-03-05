@@ -97,6 +97,15 @@
         (first)
         (doto assert))))
 
+(def current-commit
+  "f-stack's most recent commit."
+  (delay
+   (-> (sh "git" "rev-list" "HEAD^..HEAD")
+       (:out)
+       (string/split #"\n")
+       (first)
+       (doto assert))))
+
 (deftest git-diff-against-default-branch
 
   (assert-pristine-git-status!)
@@ -139,7 +148,7 @@
     (try
       (-> deletable-file (.renameTo rename-destination))
       (sh "git" "add" "-A")
-      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
+      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @current-commit))
       (finally
         (sh "git" "reset" "--" (str deletable-file))
         (sh "git" "reset" "--" (str rename-destination))
