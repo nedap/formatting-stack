@@ -80,15 +80,13 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries git-command "diff" "--name-only" target-branch)
+             impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
-  (let [deleted-files (impl/file-entries git-command "diff" "--name-only" "--diff-filter=D" target-branch)]
-    (->> impl
-         (remove (set deleted-files))
-         (impl/absolutize git-command)
-         (remove (set blacklist))
-         (impl/extract-clj-files)
-         (into files))))
+  (->> impl
+    (impl/absolutize git-command)
+    (remove (set blacklist))
+    (impl/extract-clj-files)
+    (into files)))
 
 (speced/defn exclude-clj
   "This strategy excludes .clj files; .cljc files are not excluded in any case."
