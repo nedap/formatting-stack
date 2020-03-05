@@ -16,7 +16,6 @@
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
-   [formatting-stack.strategies.impl.git-diff :as git-diff]
    [formatting-stack.strategies.impl.git-status :as git-status]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
@@ -81,15 +80,15 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries git-command "diff" "--name-status" target-branch)
+             impl          (impl/file-entries git-command "diff" "--name-only" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
-  (->> impl
-       (remove git-diff/deletion?)
-       (map git-diff/remove-markers)
-       (impl/absolutize git-command)
-       (remove (set blacklist))
-       (impl/extract-clj-files)
-       (into files)))
+  (let [deleted-files (impl/file-entries git-command "diff" "--name-only" "--diff-filter=D")]
+    (->> impl
+         (remove (set deleted-files))
+         (impl/absolutize git-command)
+         (remove (set blacklist))
+         (impl/extract-clj-files)
+         (into files))))
 
 (speced/defn exclude-clj
   "This strategy excludes .clj files; .cljc files are not excluded in any case."
