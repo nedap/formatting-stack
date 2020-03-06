@@ -80,6 +80,8 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
+             ;; We filter for Added, Copied, Modified and Renamed files,
+             ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
              impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
