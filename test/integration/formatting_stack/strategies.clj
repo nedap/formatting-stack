@@ -9,11 +9,15 @@
 
 (def ^File deletable-file (File. "test-resources/deletable.clj"))
 
+(def ^File rename-destination (File. "test-resources/deletable_moved.clj"))
+
 (def ^String createable-filename "test-resources/createable.clj")
 
 (def creatable-contents (pr-str '(ns foo)))
 
 (assert (-> deletable-file .exists))
+
+(assert (not (-> rename-destination .exists)))
 
 (assert (not (-> createable-filename File. .exists)))
 
@@ -55,12 +59,48 @@
       (finally
         (sh "git" "reset" "--" (str deletable-file))
         (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists))))))
+        (assert (-> deletable-file .exists)))))
+
+  (assert-pristine-git-status!)
+
+  (testing "It runs without errors, exercising its specs, even in face of renamed (but not staged) files"
+    (try
+      (-> deletable-file (.renameTo rename-destination))
+      (expect-sane-output! (sut/all-files :files []))
+      (finally
+        (sh "git" "checkout" (str deletable-file))
+        (sh "rm" (str rename-destination))
+        (assert (-> deletable-file .exists))
+        (assert (not (-> rename-destination .exists))))))
+
+  (assert-pristine-git-status!)
+
+  (testing "It runs without errors, exercising its specs, even in face of files staged for renaming"
+    (try
+      (-> deletable-file (.renameTo rename-destination))
+      (sh "git" "add" "-A")
+      (expect-sane-output! (sut/all-files :files []))
+      (finally
+        (sh "git" "reset" "--" (str deletable-file))
+        (sh "git" "reset" "--" (str rename-destination))
+        (sh "git" "checkout" (str deletable-file))
+        (sh "rm" (str rename-destination))
+        (assert (-> deletable-file .exists))
+        (assert (not (-> rename-destination .exists)))))))
 
 (def root-commit
   "f-stack's first ever commit. This ensures a large, diverse corpus."
   (delay
     (-> (sh "git" "rev-list" "--max-parents=0" "HEAD")
+        (:out)
+        (string/split #"\n")
+        (first)
+        (doto assert))))
+
+(def current-commit
+  "f-stack's most recent commit."
+  (delay
+    (-> (sh "git" "rev-list" "HEAD^..HEAD")
         (:out)
         (string/split #"\n")
         (first)
@@ -88,7 +128,34 @@
       (finally
         (sh "git" "reset" "--" (str deletable-file))
         (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists))))))
+        (assert (-> deletable-file .exists)))))
+
+  (assert-pristine-git-status!)
+
+  (testing "It runs without errors, exercising its specs, even in face of renamed (but not staged) files"
+    (try
+      (-> deletable-file (.renameTo rename-destination))
+      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
+      (finally
+        (sh "git" "checkout" (str deletable-file))
+        (sh "rm" (str rename-destination))
+        (assert (-> deletable-file .exists))
+        (assert (not (-> rename-destination .exists))))))
+
+  (assert-pristine-git-status!)
+
+  (testing "It runs without errors, exercising its specs, even in face of files staged for renaming"
+    (try
+      (-> deletable-file (.renameTo rename-destination))
+      (sh "git" "add" "-A")
+      (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @current-commit))
+      (finally
+        (sh "git" "reset" "--" (str deletable-file))
+        (sh "git" "reset" "--" (str rename-destination))
+        (sh "git" "checkout" (str deletable-file))
+        (sh "rm" (str rename-destination))
+        (assert (-> deletable-file .exists))
+        (assert (not (-> rename-destination .exists)))))))
 
 (deftest git-not-completely-staged
 
@@ -154,4 +221,17 @@
       (finally
         (sh "git" "reset" "--" (str deletable-file))
         (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists))))))
+        (assert (-> deletable-file .exists)))))
+
+  (testing "It can gracefully handle the presence of files staged for renaming"
+    (try
+      (-> deletable-file (.renameTo rename-destination))
+      (sh "git" "add" "-A")
+      (is (sut/git-completely-staged :files []))
+      (finally
+        (sh "git" "reset" "--" (str deletable-file))
+        (sh "git" "reset" "--" (str rename-destination))
+        (sh "git" "checkout" (str deletable-file))
+        (sh "rm" (str rename-destination))
+        (assert (-> deletable-file .exists))
+        (assert (not (-> rename-destination .exists)))))))

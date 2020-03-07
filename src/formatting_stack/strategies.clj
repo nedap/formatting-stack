@@ -16,7 +16,6 @@
    [clojure.tools.namespace.repl :refer [refresh-dirs]]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
-   [formatting-stack.strategies.impl.git-diff :as git-diff]
    [formatting-stack.strategies.impl.git-status :as git-status]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
@@ -81,11 +80,11 @@
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
       :or   {target-branch "master"
-             impl          (impl/file-entries git-command "diff" "--name-status" target-branch)
+             ;; We filter for Added, Copied, Modified and Renamed files,
+             ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
+             impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (->> impl
-       (remove git-diff/deletion?)
-       (map git-diff/remove-markers)
        (impl/absolutize git-command)
        (remove (set blacklist))
        (impl/extract-clj-files)
