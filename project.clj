@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "4.0.1"
+(defproject formatting-stack "4.1.1"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
@@ -18,7 +18,7 @@
                  [rewrite-clj "0.6.1"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
-  ;; avoiding having the global version shadow the local onel
+  ;; avoiding having the global version shadow the local one
   :exclusions [formatting-stack]
 
   :description "An efficient, smart, graceful composition of formatters, linters and such."

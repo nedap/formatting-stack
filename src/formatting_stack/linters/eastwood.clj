@@ -2,7 +2,6 @@
   (:require
    [clojure.string :as str]
    [eastwood.lint]
-   [eastwood.util]
    [formatting-stack.linters.eastwood.impl :as impl]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ns-name-from-filename]]
@@ -22,7 +21,6 @@
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
-        root-dir   (-> (File. "") .getAbsolutePath)
         reports    (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]
@@ -38,9 +36,7 @@
                             :warning-details-url warning-details-url
                             :filename            (if (string? uri-or-file-name)
                                                    uri-or-file-name
-                                                   (str/replace (-> ^File uri-or-file-name .getPath)
-                                                                root-dir
-                                                                "")))))
+                                                   (-> ^File uri-or-file-name .getCanonicalPath)))))
          (concat (impl/warnings->reports output)))))
 
 (defn new [{:keys [eastwood-options]
