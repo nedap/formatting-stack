@@ -9,7 +9,6 @@
     * https://github.com/nedap/formatting-stack/wiki/FAQ"
   (:require
    [formatting-stack.core]
-   [formatting-stack.defaults]
    [formatting-stack.linters.kondo :as kondo]
    [formatting-stack.linters.line-length :as line-length]
    [formatting-stack.linters.ns-aliases :as ns-aliases]))
@@ -49,4 +48,7 @@
 
                                  ;; `:overrides` will be deep-merged against formatting-stack's defauts.
                                  ;; a `nil` value at any depth has the special meaning "remove this entry":
-                                 :overrides {:linters linter-overrides}))
+                                 :overrides {:linters    linter-overrides
+                                             ;; tentative API:
+                                             :strategies {:formatters []
+                                                          :linters    []}}))

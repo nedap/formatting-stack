@@ -1,7 +1,7 @@
 (ns formatting-stack.project-formatter
   "A set of defaults apt for formatting/linting a whole project.
 
-  See also: `formatting-stack.branch-formatter`, `formatting-stack.defaults`"
+  See also: `formatting-stack.branch-formatter`, `formatting-stack.git-status-formatter`"
   (:require
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
@@ -28,6 +28,7 @@
 (def default-reporter
   (pretty-printer/new {}))
 
+;; XXX defn
 (def default-formatters
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
         (-> (formatters.how-to-ns/new {})
