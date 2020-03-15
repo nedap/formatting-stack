@@ -26,13 +26,10 @@
         reports    (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]
-                       (let [options (cond-> options
-                                       true                 (assoc :namespaces namespaces)
-                                       parallelize-linters? (update :builtin-config-files
-                                                                    conj
-                                                                    "formatting_stack/eastwood/linter_parallelization.clj"))]
-                         (eastwood.lint/eastwood options
-                                                 (impl/->TrackingReporter reports)))))]
+                       (cond-> options
+                         true                 (assoc :namespaces namespaces)
+                         parallelize-linters? (update :builtin-config-files conj "formatting_stack.clj")
+                         true                 (eastwood.lint/eastwood (impl/->TrackingReporter reports)))))]
     (->> @reports
          :warnings
          (map :warn-data)
