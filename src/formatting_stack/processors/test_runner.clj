@@ -34,8 +34,8 @@
   [& {:keys [target-branch]
       :or   {target-branch "master"}}]
   (let [filenames (->> (git-diff-against-default-branch :target-branch target-branch)
-                       (concat (git-completely-staged))
-                       (concat (git-not-completely-staged))
+                       (concat (git-completely-staged :files []))
+                       (concat (git-not-completely-staged :files []))
                        (distinct))]
     (process! {} filenames)))
 
