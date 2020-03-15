@@ -17,6 +17,8 @@
     (-> eastwood.lint/default-opts
         (assoc :linters linters))))
 
+(def parallelize-linters? (System/getProperty "formatting-stack.eastwood.parallelize-linters"))
+
 (defn lint! [{:keys [options]} filenames]
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
@@ -24,8 +26,13 @@
         reports    (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]
-                       (eastwood.lint/eastwood (assoc options :namespaces namespaces)
-                                               (impl/->TrackingReporter reports))))]
+                       (let [options (cond-> options
+                                       true                 (assoc :namespaces namespaces)
+                                       parallelize-linters? (update :builtin-config-files
+                                                                    conj
+                                                                    "formatting_stack/eastwood/linter_parallelization.clj"))]
+                         (eastwood.lint/eastwood options
+                                                 (impl/->TrackingReporter reports)))))]
     (->> @reports
          :warnings
          (map :warn-data)
