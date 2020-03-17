@@ -26,9 +26,27 @@ executors:
       LEIN_ROOT: "true"
       JVM_OPTS: -Xmx3200m
     <<: *executor_defaults
+  openjdk8-parallel:
+    docker:
+      - image: circleci/clojure:openjdk-8-lein-2.9.1
+    # NOTE: the following is good to shrink to `large` after a couple weeks:
+    resource_class: xlarge
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xmx3200m
+    <<: *executor_defaults
   openjdk11:
     docker:
       - image: circleci/clojure:openjdk-11-lein-2.9.1
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xmx3200m --illegal-access=deny
+    <<: *executor_defaults
+  openjdk11-parallel:
+    docker:
+      - image: circleci/clojure:openjdk-11-lein-2.9.1
+    # NOTE: the following is good to shrink to `large` after a couple weeks:
+    resource_class: xlarge
     environment:
       LEIN_ROOT: "true"
       JVM_OPTS: -Xmx3200m --illegal-access=deny
@@ -85,7 +103,7 @@ workflows:
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 including refactor-nrepl, and parallel Eastwood linters"
-          jdk_version: openjdk8
+          jdk_version: openjdk8-parallel
           lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
           <<: *test_code_filters
       - test_code:
@@ -110,7 +128,7 @@ workflows:
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl, and parallel Eastwood linters"
-          jdk_version: openjdk11
+          jdk_version: openjdk11-parallel
           lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
           <<: *test_code_filters
       - test_code:
