@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "4.1.1"
+(defproject formatting-stack "4.2.0"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
@@ -9,7 +9,7 @@
                  [com.nedap.staffing-solutions/utils.collections "2.0.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
-                 [jonase/eastwood "0.3.10"]
+                 [jonase/eastwood "0.3.11"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
@@ -130,6 +130,8 @@
                                      ;; exercise the latest cider-nrepl, increasingly typical
                                      ;; (and shipped with this refactor-nrepl):
                                      :plugins      [[cider/cider-nrepl "0.24.0"]]}
+
+             :parallel-eastwood     {:jvm-opts ["-Dformatting-stack.eastwood.parallelize-linters=true"]}
 
              :ci                    {:pedantic?    :abort
                                      :jvm-opts     ["-Dclojure.main.report=stderr"]

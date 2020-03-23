@@ -1,5 +1,6 @@
 (ns formatting-stack.linters.eastwood
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as str]
    [eastwood.lint]
    [formatting-stack.linters.eastwood.impl :as impl]
@@ -17,6 +18,14 @@
     (-> eastwood.lint/default-opts
         (assoc :linters linters))))
 
+(def parallelize-linters? (System/getProperty "formatting-stack.eastwood.parallelize-linters"))
+
+(def config-filename "formatting_stack.clj")
+
+(assert (io/resource (str (io/file "eastwood" "config" config-filename)))
+        "The formatting-stack config file must exist and be prefixed by `eastwood/config`
+(note that this prefix must not be passed to Eastwood itself).")
+
 (defn lint! [{:keys [options]} filenames]
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
@@ -24,8 +33,10 @@
         reports    (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]
-                       (eastwood.lint/eastwood (assoc options :namespaces namespaces)
-                                               (impl/->TrackingReporter reports))))]
+                       (cond-> options
+                         true                 (assoc :namespaces namespaces)
+                         parallelize-linters? (update :builtin-config-files conj config-filename)
+                         true                 (eastwood.lint/eastwood (impl/->TrackingReporter reports)))))]
     (->> @reports
          :warnings
          (map :warn-data)
