@@ -19,17 +19,14 @@
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
-   [formatting-stack.strategies :as strategies]))
-
-(def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
-
-(def default-strategies [strategies/all-files])
+   [formatting-stack.strategies :as strategies]
+   [nedap.speced.def :as speced]))
 
 (def default-reporter
   (pretty-printer/new {}))
 
-;; XXX defn
-(def default-formatters
+(speced/defn default-formatters [^vector? default-strategies
+                                 ^map? third-party-indent-specs]
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
         (-> (formatters.how-to-ns/new {})
             (assoc :strategies (conj default-strategies
@@ -53,7 +50,7 @@
 
        (filterv some?)))
 
-(def default-linters
+(defn default-linters [default-strategies]
   [(-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
@@ -79,13 +76,13 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
-(def default-processors
+(speced/defn default-processors [^vector? processors-strategies, ^map? third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (defn format-and-lint-project! [& {:keys [in-background? reporter]
                                    :or   {in-background? false
                                           reporter       default-reporter}}]
-  (formatting-stack.core/format! :strategies default-strategies
+  (formatting-stack.core/format! :strategies [strategies/all-files]
                                  :formatters default-formatters
                                  :linters default-linters
                                  :reporter reporter
@@ -95,8 +92,8 @@
 (defn lint-project! [& {:keys [in-background? reporter]
                         :or   {in-background? false
                                reporter       default-reporter}}]
-  (formatting-stack.core/format! :strategies default-strategies
-                                 :formatters []
+  (formatting-stack.core/format! :strategies [strategies/all-files]
+                                 :formatters (constantly [])
                                  :processors default-processors
                                  :reporter reporter
                                  :linters default-linters
