@@ -48,7 +48,6 @@
                              :level     :exception}])))))
            (doall)))))
 
-;; XXX this breaks component/integrant. must be updated to use git-status
 (speced/defn format! [& {:keys                                             [^vector? strategies
                                                                             ^::protocols.formatter/formatter-factory formatters
                                                                             ^::protocols.linter/linter-factory linters
@@ -72,9 +71,9 @@
                                               in-background?
                                               true)
 
-        formatters-strategies (into strategies formatters-strategies)
-        linters-strategies    (into strategies linters-strategies)
-        processors-strategies (into strategies processors-strategies)
+        formatters-strategies (apply-overrides strategies formatters-strategies)
+        linters-strategies    (apply-overrides strategies linters-strategies)
+        processors-strategies (apply-overrides strategies processors-strategies)
 
         formatters                          (-> formatters
                                                 (protocols.formatter/formatters formatters-strategies third-party-indent-specs)

@@ -4,6 +4,6 @@
    [nedap.speced.def :as speced]))
 
 (speced/defn parse-options [^map? this]
-  (->> this
-       (remove (rcomp val nil?))
-       (apply concat)))
+  (into {}
+        (remove (rcomp val nil?))
+        this))
