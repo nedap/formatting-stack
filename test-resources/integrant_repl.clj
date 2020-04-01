@@ -14,19 +14,18 @@
    [formatting-stack.protocols.spec :as protocols.spec]
    [integrant.repl]))
 
-(def sample-linters
-  #_(conj formatting-stack.defaults/default-linters
-          (reify formatting-stack.protocols.linter/Linter
-            (--lint! [this filenames]
-              [{:source   ::my-linter
-                :level    :warning
-                :column   40
-                :line     6
-                :msg      "Hello, I am a sample linter!"
-                :filename "path.clj"}]))))
+(def linter-overrides
+  {::id (reify formatting-stack.protocols.linter/Linter
+          (--lint! [this filenames]
+            [{:source   ::my-linter
+              :level    :warning
+              :column   40
+              :line     6
+              :msg      "Hello, I am a sample linter!"
+              :filename "path.clj"}]))})
 
 (comment
 
-  (integrant.repl/set-prep! (constantly {:formatting-stack.integrant/component {:linters sample-linters}}))
+  (integrant.repl/set-prep! (constantly {:formatting-stack.integrant/component {:overrides {:linters linter-overrides}}}))
 
   (integrant.repl/reset))
