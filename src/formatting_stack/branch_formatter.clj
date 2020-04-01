@@ -19,12 +19,17 @@
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
+   [formatting-stack.protocols.linter :as protocols.linter]
+   [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
    [medley.core :refer [mapply]]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(speced/defn default-formatters [^vector? default-strategies
+(speced/defn default-formatters [_
+                                 ^vector? default-strategies
                                  ^map? third-party-indent-specs]
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
         (-> (formatters.how-to-ns/new {})
@@ -49,7 +54,8 @@
 
        (filterv some?)))
 
-(defn default-linters [default-strategies]
+(defn default-linters [_
+                       default-strategies]
   [(-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
@@ -75,11 +81,31 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
-(speced/defn default-processors [^vector? processors-strategies, ^map? third-party-indent-specs]
+(speced/defn default-processors [_
+                                 ^vector? processors-strategies
+                                 ^map? third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (def default-reporter
   (pretty-printer/new {}))
+
+(def formatter-factory
+  (implement {}
+    protocols.formatter/--formatters default-formatters))
+
+(def no-formatters (constantly []))
+
+(def empty-formatter-factory
+  (implement {}
+    protocols.formatter/--formatters no-formatters))
+
+(def linter-factory
+  (implement {}
+    protocols.linter/--linters default-linters))
+
+(def processor-factory
+  (implement {}
+    protocols.processor/--processors default-processors))
 
 (defn format-and-lint-branch!
   "Note that files that are not completely staged will not be affected.
@@ -94,10 +120,10 @@
                                                                                    true      (assoc :target-branch target-branch)
                                                                                    blacklist (assoc :blacklist blacklist))))]]
     (formatting-stack.core/format! :strategies default-strategies
-                                   :processors default-processors
-                                   :formatters (or formatters default-formatters)
+                                   :formatters (or formatters formatter-factory)
+                                   :linters linter-factory
+                                   :processors processor-factory
                                    :reporter reporter
-                                   :linters default-linters
                                    :in-background? in-background?)))
 
 (defn lint-branch! [& {:keys [target-branch in-background? reporter]
@@ -107,6 +133,6 @@
   (format-and-lint-branch! :target-branch target-branch
                            :in-background? in-background?
                            :reporter reporter
-                           :formatters (constantly [])
+                           :formatters empty-formatter-factory
                            ;; analyze a broader selection of files:
                            :blacklist []))

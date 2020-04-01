@@ -17,11 +17,16 @@
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
+   [formatting-stack.protocols.linter :as protocols.linter]
+   [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(speced/defn default-formatters [^vector? formatters-strategies
+(speced/defn default-formatters [_
+                                 ^vector? formatters-strategies
                                  ^map? third-party-indent-specs]
   (let [;; the following exists (for now) to guarantee that how-to-ns uses cached git results from cljfmt.
         ;; ideally the how-to-ns formatter would have an extra `files-with-a-namespace` strategy but that would break git caching,
@@ -49,7 +54,8 @@
                                          strategies/do-not-use-cached-results!))))]
          (filterv some?))))
 
-(speced/defn default-linters [^vector? linters-strategies]
+(speced/defn default-linters [_
+                              ^vector? linters-strategies]
   [(-> (linters.kondo/new {})
        (assoc :strategies (conj linters-strategies
                                 strategies/exclude-edn)))
@@ -75,21 +81,40 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
-(speced/defn default-processors [^vector? processors-strategies, ^map? third-party-indent-specs]
+(speced/defn default-processors [_
+                                 ^vector? processors-strategies, ^map? third-party-indent-specs]
   [(-> (processors.cider/new {:third-party-indent-specs third-party-indent-specs})
        (assoc :strategies processors-strategies))])
 
 (def default-reporter
   (pretty-printer/new {}))
 
+(def formatter-factory
+  (implement {}
+    protocols.formatter/--formatters default-formatters))
+
+(def no-formatters (constantly []))
+
+(def empty-formatter-factory
+  (implement {}
+    protocols.formatter/--formatters no-formatters))
+
+(def linter-factory
+  (implement {}
+    protocols.linter/--linters default-linters))
+
+(def processor-factory
+  (implement {}
+    protocols.processor/--processors default-processors))
+
 (defn format-and-lint! [& {:keys [in-background? reporter]
                            :or   {in-background? false
                                   reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/git-completely-staged]
                                  :overrides {:strategies {:linters [strategies/git-not-completely-staged]}}
-                                 :formatters default-formatters
-                                 :linters default-linters
-                                 :processors default-processors
+                                 :formatters formatter-factory
+                                 :linters linter-factory
+                                 :processors processor-factory
                                  :reporter reporter
                                  :in-background? in-background?))
 
@@ -98,8 +123,8 @@
                        reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/git-completely-staged
                                               strategies/git-not-completely-staged]
-                                 :formatters (constantly [])
-                                 :processors default-processors
+                                 :formatters empty-formatter-factory
+                                 :processors processor-factory
                                  :reporter reporter
-                                 :linters default-linters
+                                 :linters linter-factory
                                  :in-background? in-background?))
