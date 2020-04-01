@@ -11,8 +11,7 @@
    (if-not (map? a)
      a
      (-> (into {}
-               (filter (fn [[k v]]
-                         (some? v)))
+               (filter (rcomp val some?))
                a)
          (with-meta (meta a)))))
 
