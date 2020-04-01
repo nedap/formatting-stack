@@ -25,7 +25,8 @@
                 :msg      "Hello, I am a sample linter!"
                 :filename "path.clj"}]))))
 
-(integrant.repl/set-prep! (constantly {:formatting-stack.integrant/component {:linters sample-linters}}))
-
 (comment
+
+  (integrant.repl/set-prep! (constantly {:formatting-stack.integrant/component {:linters sample-linters}}))
+
   (integrant.repl/reset))

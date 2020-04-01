@@ -35,10 +35,25 @@
       {:a/id {:foo {3 4} :bar {:m 222}}}
       [{:id :a/id, :age 42, :bar {:baz 42, :m 222}, :foo {3 4}}],
 
-      "Empty overrides result in no changes"
+      "Empty overrides, passed as a map, result in no changes"
       sample-members
       {}
       sample-members,
+
+      "Empty overrides, passed as nil, result in no changes"
+      sample-members
+      nil
+      sample-members,
+
+      "Empty overrides, passed as a vector, result in in an entire replacement of the members (empty case)"
+      sample-members
+      []
+      [],
+
+      "Empty overrides, passed as a vector, result in in an entire replacement of the members (non-empty case)"
+      sample-members
+      [1 {:foo :bar}]
+      [1 {:foo :bar}],
 
       "Members can be removed"
       sample-members
@@ -49,7 +64,7 @@
       sample-members
       {:reified/id reified-member}
       (conj sample-members reified-member)
-      
+
       "Members' scalar attributes can be removed"
       sample-members
       {:a/id {:age nil}}

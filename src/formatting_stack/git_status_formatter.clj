@@ -22,6 +22,7 @@
    [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
+   [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -107,11 +108,14 @@
   (implement {}
     protocols.processor/--processors default-processors))
 
-(defn format-and-lint! [& {:keys [in-background? reporter]
+(defn format-and-lint! [& {:keys [in-background? reporter overrides]
                            :or   {in-background? false
                                   reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/git-completely-staged]
-                                 :overrides {:strategies {:linters [strategies/git-not-completely-staged]}}
+                                 :overrides (deep-merge {:strategies {:linters [strategies/git-not-completely-staged]}}
+                                                        (or overrides
+                                                            ;; Avoid deletions:
+                                                            {}))
                                  :formatters formatter-factory
                                  :linters linter-factory
                                  :processors processor-factory

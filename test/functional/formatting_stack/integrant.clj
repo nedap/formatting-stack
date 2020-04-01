@@ -2,9 +2,7 @@
   (:require
    [clojure.test :refer [deftest is testing]]
    [formatting-stack.integrant :as sut]
-   [formatting-stack.protocols.formatter :as protocols.formatter]
    [formatting-stack.protocols.linter :as protocols.linter]
-   [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.passthrough :as reporters.passthrough]
    [integrant.core :as integrant]
    [nedap.utils.spec.api :refer [check!]]))
@@ -27,13 +25,14 @@
   (testing "It can be started/stopped without errors"
     (let [p (atom nil)
           ;; pass an empty stack (except for the `proof`), so that no side-effects will be triggered (would muddy the test suite):
-          opts {:strategies               []
-                :third-party-indent-specs {}
-                :formatters               ^{`protocols.formatter/--formatters (constantly [])} {}
-                :linters                  ^{`protocols.linter/--linters (constantly [(proof p)])} {}
-                :processors               ^{`protocols.processor/--processors (constantly [])} {}
-                :in-background?           false
-                :reporter                 (reporters.passthrough/new)}
+          opts {:overrides      {:strategies {:formatters []
+                                              :linters    []
+                                              :processors []}
+                                 :formatters []
+                                 :processors []
+                                 :linters    [(proof p)]}
+                :in-background? false
+                :reporter       (reporters.passthrough/new)}
           system {:formatting-stack.integrant/component opts}
           started-system (integrant/init system)]
 
