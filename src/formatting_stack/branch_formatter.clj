@@ -21,11 +21,11 @@
    [formatting-stack.processors.cider :as processors.cider]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
-   [medley.core :refer [mapply]]))
+   [medley.core :refer [mapply]]
+   [nedap.speced.def :as speced]))
 
-(def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
-
-(defn default-formatters [default-strategies]
+(speced/defn default-formatters [^vector? default-strategies
+                                 ^map? third-party-indent-specs]
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
         (-> (formatters.how-to-ns/new {})
             (assoc :strategies (conj default-strategies
@@ -75,38 +75,38 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
-;; XXX defn
-(def default-processors
+(speced/defn default-processors [^vector? processors-strategies, ^map? third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (def default-reporter
   (pretty-printer/new {}))
 
-(defn format-and-lint-branch! [& {:keys [target-branch in-background? reporter]
-                                  :or   {target-branch  "master"
-                                         in-background? (not (System/getenv "CI"))
-                                         reporter       default-reporter}}]
+(defn format-and-lint-branch!
+  "Note that files that are not completely staged will not be affected.
+
+  You can override that with `:blacklist []`."
+  [& {:keys [target-branch in-background? reporter formatters blacklist]
+      :or   {target-branch  "master"
+             in-background? (not (System/getenv "CI"))
+             reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
-                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
-        formatters (default-formatters default-strategies)
-        linters (default-linters default-strategies)]
+                              (mapply strategies/git-diff-against-default-branch (cond-> options
+                                                                                   true      (assoc :target-branch target-branch)
+                                                                                   blacklist (assoc :blacklist blacklist))))]]
     (formatting-stack.core/format! :strategies default-strategies
                                    :processors default-processors
-                                   :formatters formatters
+                                   :formatters (or formatters default-formatters)
                                    :reporter reporter
-                                   :linters linters
+                                   :linters default-linters
                                    :in-background? in-background?)))
 
 (defn lint-branch! [& {:keys [target-branch in-background? reporter]
                        :or   {target-branch  "master"
                               in-background? false
                               reporter       default-reporter}}]
-  (let [default-strategies [(fn [& {:as options}]
-                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
-        linters (default-linters default-strategies)]
-    (formatting-stack.core/format! :strategies default-strategies
-                                   :formatters []
-                                   :processors default-processors
-                                   :reporter reporter
-                                   :linters linters
-                                   :in-background? in-background?)))
+  (format-and-lint-branch! :target-branch target-branch
+                           :in-background? in-background?
+                           :reporter reporter
+                           :formatters (constantly [])
+                           ;; analyze a broader selection of files:
+                           :blacklist []))
