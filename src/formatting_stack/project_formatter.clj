@@ -105,20 +105,22 @@
   (implement {}
     protocols.processor/--processors default-processors))
 
-(defn format-and-lint-project! [& {:keys [in-background? reporter]
+(defn format-and-lint-project! [& {:keys [in-background? reporter overrides]
                                    :or   {in-background? false
                                           reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/all-files]
+                                 :overrides overrides
                                  :formatters formatter-factory
                                  :linters linter-factory
                                  :processors processor-factory
                                  :reporter reporter
                                  :in-background? in-background?))
 
-(defn lint-project! [& {:keys [in-background? reporter]
+(defn lint-project! [& {:keys [in-background? reporter overrides]
                         :or   {in-background? false
                                reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/all-files]
+                                 :overrides overrides
                                  :formatters empty-formatter-factory
                                  :processors processor-factory
                                  :reporter reporter

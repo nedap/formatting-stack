@@ -111,7 +111,7 @@
   "Note that files that are not completely staged will not be affected.
 
   You can override that with `:blacklist []`."
-  [& {:keys [target-branch in-background? reporter formatters blacklist]
+  [& {:keys [target-branch in-background? reporter formatters blacklist overrides]
       :or   {target-branch  "master"
              in-background? (not (System/getenv "CI"))
              reporter       default-reporter}}]
@@ -120,17 +120,19 @@
                                                                                    true      (assoc :target-branch target-branch)
                                                                                    blacklist (assoc :blacklist blacklist))))]]
     (formatting-stack.core/format! :strategies default-strategies
+                                   :overrides overrides
                                    :formatters (or formatters formatter-factory)
                                    :linters linter-factory
                                    :processors processor-factory
                                    :reporter reporter
                                    :in-background? in-background?)))
 
-(defn lint-branch! [& {:keys [target-branch in-background? reporter]
+(defn lint-branch! [& {:keys [target-branch in-background? reporter overrides]
                        :or   {target-branch  "master"
                               in-background? false
                               reporter       default-reporter}}]
   (format-and-lint-branch! :target-branch target-branch
+                           :overrides overrides
                            :in-background? in-background?
                            :reporter reporter
                            :formatters empty-formatter-factory
