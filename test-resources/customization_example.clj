@@ -11,7 +11,8 @@
    [formatting-stack.core]
    [formatting-stack.linters.kondo :as kondo]
    [formatting-stack.linters.line-length :as line-length]
-   [formatting-stack.linters.ns-aliases :as ns-aliases]))
+   [formatting-stack.linters.ns-aliases :as ns-aliases]
+   [formatting-stack.strategies]))
 
 ;; You an implement your own linters:
 (def custom-linter
@@ -40,15 +41,14 @@
                      ;; remember there are different options, for clj and cljs.
                      :kondo-cljs-options {:linters {:duplicate-require {:level :warning}}}}})
 
-;; XXX a key customizable thing should be the strategies.
 (comment
-  (formatting-stack.core/format! :formatters [] ;; disable all formatters (as an example of how to do that)
-
-                                 :in-background? false
-
-                                 ;; `:overrides` will be deep-merged against formatting-stack's defauts.
-                                 ;; a `nil` value at any depth has the special meaning "remove this entry":
-                                 :overrides {:linters    linter-overrides
-                                             ;; tentative API:
-                                             :strategies {:formatters []
-                                                          :linters    []}}))
+  (formatting-stack.git-status-formatter/format-and-lint! :in-background? false
+                                                          ;; `:overrides` will be deep-merged against formatting-stack's defaults.
+                                                          ;; a `nil` value at any depth has the special meaning "remove this entry".
+                                                          ;; a vector  (empty or not) will perform a whole-value replacement.
+                                                          :overrides {:linters    linter-overrides ;; map syntax
+                                                                      :processors []               ;; disable all processors, via vector syntax (as an example of how to do that)
+                                                                      ;; an example of a totally custom strategy setup:
+                                                                      :strategies {:formatters [formatting-stack.strategies/git-completely-staged
+                                                                                                formatting-stack.strategies/git-not-completely-staged]
+                                                                                   :linters    [formatting-stack.strategies/git-diff-against-default-branch]}}))

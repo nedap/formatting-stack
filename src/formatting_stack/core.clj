@@ -49,6 +49,10 @@
            (doall)))))
 
 (speced/defn format! [& {:keys                                             [^vector? strategies
+                                                                            ;; XXX rename `formatters` to `formatter-factories`
+                                                                            ;; and forbid `formatters`.
+                                                                            ;; this will avoid confusion from the legacy API.
+                                                                            ;; same for `linters`, `processors`
                                                                             ^::protocols.formatter/formatter-factory formatters
                                                                             ^::protocols.linter/linter-factory linters
                                                                             ^::protocols.processor/processor-factory processors
