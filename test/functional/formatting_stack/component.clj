@@ -3,6 +3,9 @@
    [clojure.test :refer [deftest is testing]]
    [com.stuartsierra.component :as component]
    [formatting-stack.component :as sut]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
+   [formatting-stack.protocols.linter :as protocols.linter]
+   [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.passthrough :as reporters.passthrough]
    [nedap.utils.spec.api :refer [check!]]))
 
@@ -26,9 +29,9 @@
           ;; pass an empty stack (except for the `proof`), so that no side-effects will be triggered (would muddy the test suite):
           opts {:strategies               []
                 :third-party-indent-specs {}
-                :formatters               (constantly [])
-                :linters                  (constantly [(proof p)])
-                :processors               (constantly [])
+                :formatters               ^{`protocols.formatter/--formatters (constantly [])} {}
+                :linters                  ^{`protocols.linter/--linters (constantly [(proof p)])} {}
+                :processors               ^{`protocols.processor/--processors (constantly [])} {}
                 :in-background?           false
                 :reporter                 (reporters.passthrough/new)}
           instance (sut/new opts)]

@@ -1,7 +1,6 @@
 (ns formatting-stack.core
   (:require
    [clojure.main]
-   [clojure.spec.alpha :as spec]
    [formatting-stack.background]
    [formatting-stack.impl.overrides :refer [apply-overrides]]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
@@ -49,15 +48,11 @@
                              :level     :exception}])))))
            (doall)))))
 
-;; XXX rf to protocol:
-(spec/def ::function (spec/and ifn?
-                               (complement coll?)))
-
 ;; XXX this breaks component/integrant. must be updated to use git-status
 (speced/defn format! [& {:keys                                             [^vector? strategies
-                                                                            ^::function formatters
-                                                                            ^::function linters
-                                                                            ^::function processors
+                                                                            ^::protocols.formatter/formatter-factory formatters
+                                                                            ^::protocols.linter/linter-factory linters
+                                                                            ^::protocols.processor/processor-factory processors
                                                                             third-party-indent-specs
                                                                             reporter
                                                                             in-background?]
@@ -81,11 +76,14 @@
         linters-strategies    (into strategies linters-strategies)
         processors-strategies (into strategies processors-strategies)
 
-        formatters                          (-> (formatters formatters-strategies third-party-indent-specs)
+        formatters                          (-> formatters
+                                                (protocols.formatter/formatters formatters-strategies third-party-indent-specs)
                                                 (apply-overrides formatter-overrides))
-        linters                             (-> (linters linters-strategies)
+        linters                             (-> linters
+                                                (protocols.linter/linters linters-strategies)
                                                 (apply-overrides linter-overrides))
-        processors                          (-> (processors processors-strategies third-party-indent-specs)
+        processors                          (-> processors
+                                                (protocols.processor/processors processors-strategies third-party-indent-specs)
                                                 (apply-overrides processor-overrides))
 
         impl (bound-fn [] ;; important that it's a bound-fn (for an undetermined reason)
