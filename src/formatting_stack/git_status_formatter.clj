@@ -122,11 +122,12 @@
                                  :reporter reporter
                                  :in-background? in-background?))
 
-(defn lint! [& {:keys [in-background? reporter]
+(defn lint! [& {:keys [in-background? reporter overrides]
                 :or   {in-background? false
                        reporter       default-reporter}}]
   (formatting-stack.core/format! :strategies [strategies/git-completely-staged
                                               strategies/git-not-completely-staged]
+                                 :overrides overrides
                                  :formatters empty-formatter-factory
                                  :processors processor-factory
                                  :reporter reporter
