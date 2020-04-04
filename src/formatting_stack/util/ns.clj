@@ -57,11 +57,10 @@
        :final-ns-form-str    (how-to-ns/format-ns-str clean-ns-form how-to-ns-opts)})))
 
 (speced/defn replace-ns-form!
-  [^string? filename, ^ifn? ns-cleaner, ^string? message, ^map? how-to-ns-opts]
+  [^string? filename, ^ifn? ns-cleaner, ^map? how-to-ns-opts]
   (when-let [{:keys [final-ns-form-str
                      original-ns-form-str
                      buffer]} (replaceable-ns-form filename ns-cleaner how-to-ns-opts)]
-    (println message filename)
     (->> original-ns-form-str
          count
          (subs buffer)
