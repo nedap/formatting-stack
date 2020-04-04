@@ -19,14 +19,14 @@
 
 (defn lint! [{:keys [expected-newline-count]} files]
   (binding [*out* (StringWriter.)
-            *err* *out*]
+            *err* (StringWriter.)]
     (->> files
          (process-in-parallel! (fn [filename]
                                  (when-not (zero? (impl/but-do-they? [filename] :expected-newline-count expected-newline-count))
                                    {:filename filename
                                     :source   :formatting-stack/newlines
                                     :level    :warning
-                                    :line     (-> filename slurp (str/split "\n") count)
+                                    :line     (-> filename slurp str/split-lines count)
                                     :msg      (str "File should end in " expected-newline-count " newlines")
                                     :column   1})))
          (remove nil?))))
