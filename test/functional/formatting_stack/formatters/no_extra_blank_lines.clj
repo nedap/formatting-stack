@@ -1,4 +1,4 @@
-(ns functional.formatting-stack.linters.no-extra-blank-lines
+(ns functional.formatting-stack.formatters.no-extra-blank-lines
   (:require
    [clojure.test :refer [are deftest]]
    [formatting-stack.formatters.no-extra-blank-lines :as sut]
