@@ -3,18 +3,19 @@
 
   Compensates for some `refactor-nrepl.clean-ns` intricacies, and also provides .cljs compatibility."
   (:require
+   [cljfmt.diff]
    [clojure.set :as set]
    [clojure.spec.alpha :as spec]
    [clojure.walk :as walk]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
+   [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp read-ns-decl]]
    [formatting-stack.util.ns :as util.ns :refer [replaceable-ns-form replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
-   [nedap.utils.spec.api :refer [check!]]
-   [formatting-stack.protocols.linter :as linter]))
+   [nedap.utils.spec.api :refer [check!]]))
 
 (spec/def ::libspec coll?)
 

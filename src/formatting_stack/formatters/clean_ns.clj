@@ -1,5 +1,6 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
+   [cljfmt.diff]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
