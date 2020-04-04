@@ -1,4 +1,4 @@
-(ns functional.formatting-stack.linters.how-to-ns
+(ns functional.formatting-stack.formatters.how-to-ns
   (:require
    [clojure.test :refer [are deftest]]
    [formatting-stack.formatters.how-to-ns :as sut]
