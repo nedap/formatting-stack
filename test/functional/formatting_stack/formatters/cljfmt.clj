@@ -16,7 +16,7 @@
 
       "test-resources/wrong_indent.clj"
       [{:source :cljfmt/indent
-        :msg "Indentation is wrong between 1-7"
-        :line 1
-        :column 1
+        :msg "Indentation is wrong"
+        :line 0
+        :column 0
         :filename "test-resources/wrong_indent.clj"}])))
