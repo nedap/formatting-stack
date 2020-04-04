@@ -23,17 +23,13 @@
                                      {{:keys [okay]} :counts
                                       :keys [file diff]} (#'cljfmt.main/check-one {:indents indents} filename)]
                                  (when (zero? okay)
-                                   (->> diff
-                                        (re-seq #".*\@\@\ -(\d),(\d) \+\d,\d \@\@*") ;; fixme
-                                        (map #(take-last 2 %))
-                                        (mapv (fn [[start stop]]
-                                                {:filename file
-                                                 :diff diff
-                                                 :level :warning
-                                                 :column 1
-                                                 :line (Long/parseLong start)
-                                                 :msg (str "Indentation is wrong between " start "-" stop)
-                                                 :source :cljfmt/indent})))))))
+                                   {:filename file
+                                    :diff diff
+                                    :level :warning
+                                    :column 0 ;; todo extract from diff
+                                    :line 0
+                                    :msg (str "Indentation is wrong")
+                                    :source :cljfmt/indent}))))
        (mapcat ensure-sequential)))
 
 (speced/defn new [{:keys [third-party-indent-specs]
