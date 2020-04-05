@@ -6,7 +6,7 @@
    [clojure.string :as string]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [process-in-parallel! ensure-sequential]]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]))
 
 (def ^:const extra-newline-pattern

@@ -2,6 +2,7 @@
   (:require
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
+   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
@@ -141,3 +142,19 @@
 
 (defn colorize [s color]
   (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))
+
+(speced/defn ^coll? diff->line-numbers
+  "parses a diff/patch into a coll of maps containing `:filename` + `:begin` + `:end` per section" ;; fixme
+  [^string? diff]
+  (->> diff
+       (re-seq #".*\+\+\+ b(.*)\n.*@@ -(\d),\d \+\d,\d @@\n((.|\n)*)")
+       (map (fn [[_, filename, begin, d]]
+              (let [begin        (Long/parseLong begin)
+                    line-numbers (->> (string/split-lines d)
+                                      (remove (fn [line] (#{\+} (first line)))) ;; remove added lines
+                                      (map-indexed (fn [idx line] [(+ idx begin) line])) ;; add initial begin
+                                      (filter (fn [[_ line]] (#{\-} (first line)))) ;; filter removed lines (e.g. discard context)
+                                      (map first))]
+                {:filename filename
+                 :begin    (first line-numbers)
+                 :end      (last line-numbers)})))))
