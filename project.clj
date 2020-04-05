@@ -6,7 +6,7 @@
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
-                 [com.nedap.staffing-solutions/utils.collections "2.0.0"]
+                 [com.nedap.staffing-solutions/utils.collections "2.1.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [jonase/eastwood "0.3.11"]
@@ -133,7 +133,8 @@
 
              :parallel-eastwood     {:jvm-opts ["-Dformatting-stack.eastwood.parallelize-linters=true"]}
 
-             :ci                    {:pedantic?    :abort
-                                     :jvm-opts     ["-Dclojure.main.report=stderr"]
-                                     :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                                     :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
+             :ncrw                  {:global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                                     :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}
+             :pedantic              {:pedantic?    :abort
+                                     :jvm-opts     ["-Dclojure.main.report=stderr"]}
+             :ci                    [:ncrw :pedantic]})

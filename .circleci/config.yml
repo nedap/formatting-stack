@@ -9,7 +9,7 @@ commands:
             - v1-dependencies-{{ checksum "project.clj" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: lein with-profile -dev,+test,+ci,+refactor-nrepl deps
+      - run: lein with-profile -dev,+pedantic,+test,+refactor-nrepl deps
       - save_cache:
           paths:
             - ~/.m2
@@ -99,47 +99,47 @@ workflows:
       - test_code:
           name: "JDK 8 including refactor-nrepl"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 including refactor-nrepl, and parallel Eastwood linters"
           jdk_version: openjdk8-parallel
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl,+parallel-eastwood do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 including refactor-nrepl (at its latest version)"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl-latest do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 excluding refactor-nrepl"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8, with an old clojurescript dependency on the classpath"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,-provided,+ci,+cljs-old do clean, test
+          lein_test_command: lein with-profile -dev,-provided,+pedantic,+cljs-old do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl, and parallel Eastwood linters"
           jdk_version: openjdk11-parallel
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl,+parallel-eastwood do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl (at its latest version)"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic,+refactor-nrepl-latest do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 excluding refactor-nrepl"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci do clean, test
+          lein_test_command: lein with-profile -dev,+pedantic do clean, test
           <<: *test_code_filters
       - deploy:
           context: JFrog
