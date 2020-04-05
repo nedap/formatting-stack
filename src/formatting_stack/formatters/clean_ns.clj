@@ -4,7 +4,7 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
-   [formatting-stack.util :refer [process-in-parallel! try-require]]
+   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel! try-require]]
    [formatting-stack.util.ns :refer [replaceable-ns-form replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -72,7 +72,6 @@
                                          filename)))))
   nil)
 
-
 (defn lint! [{:keys [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]} files]
   (->> files
        (process-in-parallel! (fn [filename]
@@ -81,13 +80,17 @@
                                           (replaceable-ns-form filename
                                                                (make-cleaner how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename)
                                                                how-to-ns-opts)]
-                                 {:filename filename
-                                  :diff     (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)
-                                  :msg      "ns can be cleaned"
-                                  :column   0 ;; FIXME extract from diff
-                                  :line     0
-                                  :level    :warning
-                                  :source   :formatting-stack/clean-ns})))))
+                                 (let [diff (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                   (->> (diff->line-numbers diff)
+                                        (mapv (fn [{:keys [begin]}]
+                                                {:filename filename
+                                                 :diff diff
+                                                 :level :warning
+                                                 :column 0
+                                                 :line begin
+                                                 :msg "ns can be cleaned"
+                                                 :source :formatting-stack/clean-ns})))))))
+       (map ensure-sequential)))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
             :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned

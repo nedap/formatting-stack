@@ -5,7 +5,7 @@
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [process-in-parallel! ensure-sequential]]
+   [formatting-stack.util :refer [diff->line-numbers ensure-sequential ensure-sequential process-in-parallel!]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -29,17 +29,17 @@
                                (let [contents  (slurp filename)
                                      formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
                                  (when-not (= contents formatted)
-                                   {:filename filename
-                                    :diff (#'how-to-ns.main/unified-diff
-                                           (str filename)
-                                           contents
-                                           formatted)
-                                    :line 0 ;; todo extract from diff
-                                    :column 0
-                                    :level :warning
-                                    :msg "Badly formatted namespace"
-                                    :source :how-to-ns/ns}))))
-       (remove nil?)))
+                                   (let [diff (#'how-to-ns.main/unified-diff (str filename) contents formatted)]
+                                     (->> (diff->line-numbers diff)
+                                          (mapv (fn [{:keys [begin]}]
+                                                  {:filename filename
+                                                   :diff diff
+                                                   :line begin
+                                                   :column 0
+                                                   :level :warning
+                                                   :msg "Badly formatted namespace"
+                                                   :source :how-to-ns/ns}))))))))
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-options]
             :or   {how-to-ns-options {}}}]

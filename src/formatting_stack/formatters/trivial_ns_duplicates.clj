@@ -10,8 +10,8 @@
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.ns :as util.ns :refer [replaceable-ns-form replace-ns-form!]]
+   [formatting-stack.util :refer [diff->line-numbers ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! replaceable-ns-form]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
@@ -152,13 +152,17 @@
                                (when-let [{:keys [final-ns-form-str
                                                   original-ns-form-str]}
                                           (replaceable-ns-form filename duplicate-cleaner how-to-ns-opts)]
-                                 {:filename filename
-                                  :diff     (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)
-                                  :msg      "Duplicate ns forms found"
-                                  :column   0 ;; FIXME extract from diff
-                                  :line     0
-                                  :level    :warning
-                                  :source   :formatting-stack/trivial-ns-duplicates})))))
+                                 (let [diff (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                   (->> (diff->line-numbers diff)
+                                        (mapv (fn [{:keys [begin]}]
+                                                {:filename filename
+                                                 :diff     diff
+                                                 :msg      "Duplicate ns forms found"
+                                                 :column   0
+                                                 :line     begin
+                                                 :level    :warning
+                                                 :source   :formatting-stack/trivial-ns-duplicates})))))))
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-opts]
             :or   {how-to-ns-opts {}}}]

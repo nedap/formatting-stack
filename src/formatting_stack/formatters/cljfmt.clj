@@ -5,7 +5,7 @@
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel!]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -23,13 +23,15 @@
                                      {{:keys [okay]} :counts
                                       :keys [file diff]} (#'cljfmt.main/check-one {:indents indents} filename)]
                                  (when (zero? okay)
-                                   {:filename file
-                                    :diff diff
-                                    :level :warning
-                                    :column 0 ;; todo extract from diff
-                                    :line 0
-                                    :msg (str "Indentation is wrong")
-                                    :source :cljfmt/indent}))))
+                                   (->> (diff->line-numbers diff)
+                                        (mapv (fn [{:keys [begin end]}]
+                                                {:filename file
+                                                 :diff diff
+                                                 :level :warning
+                                                 :column 0
+                                                 :line begin
+                                                 :msg (str "Indentation is wrong between " begin "-" end)
+                                                 :source :cljfmt/indent})))))))
        (mapcat ensure-sequential)))
 
 (speced/defn new [{:keys [third-party-indent-specs]
