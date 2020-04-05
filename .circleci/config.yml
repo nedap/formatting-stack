@@ -6,14 +6,14 @@ commands:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "project.clj" }}
+            - v2-dependencies-{{ checksum "project.clj" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v2-dependencies-
       - run: lein with-profile -dev,+pedantic,+test,+refactor-nrepl deps
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "project.clj" }}
+          key: v2-dependencies-{{ checksum "project.clj" }}
 
 executor_defaults: &executor_defaults
   working_directory: ~/repo
