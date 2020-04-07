@@ -48,6 +48,8 @@
 
   :target-path "target/%s"
 
+  :test-paths ["src" "test"]
+
   :monkeypatch-clojure-test false
 
   :plugins [[lein-pprint "1.1.2"]]
