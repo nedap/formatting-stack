@@ -24,7 +24,7 @@
   * [ ] Security
   * [ ] Performance
   * [ ] Breaking API changes
-* [ ] Cross-compatibility (Clojure/ClojureScript)
+  * [ ] Cross-compatibility (Clojure/ClojureScript)
 
 ## Reviewer checklist
 
