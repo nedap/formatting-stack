@@ -8,13 +8,14 @@
 *~
 .*.swo
 .*.swp
-.clj-kondo/
 .DS_Store
 .eastwood
+.history
 .idea/
 .nrepl-port
 .rebl/
 .repl
+/.clj-kondo
 /.lein-*
 /checkouts
 /classes
