@@ -9,7 +9,7 @@
    [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]))
 
-(def ^:const extra-newline-pattern
+(def extra-newline-pattern
   #"(\n\n)(\n)+")
 
 (defn without-extra-newlines [s]
@@ -27,10 +27,15 @@
 
 (defn lint! [this files]
   (letfn [(extra-line-seq [content]
-            (let [m (re-matcher extra-newline-pattern content)]
-              ((fn step []
-                 (when (. m (find)) ;; fixme might need some cleanup
-                   (cons (+ 2 (count (re-seq #"\n" (subs content 0 (.start m))))) (lazy-seq (step))))))))]
+            (let [matcher        (re-matcher extra-newline-pattern content)
+                  current-offset (fn [] (->> (.start matcher)
+                                             (subs content 0) ;; remove content after cursor
+                                             (re-seq #"\n")
+                                             (count)  ;; count all newlines from 0 -> cursor
+                                             (+ 2)))] ;; account for offset
+              ((fn next-offset []
+                 (when (.find matcher)
+                   (cons (current-offset) (lazy-seq (next-offset))))))))]
     (->> files
          (process-in-parallel! (fn [filename]
                                  (->> (extra-line-seq (slurp filename))

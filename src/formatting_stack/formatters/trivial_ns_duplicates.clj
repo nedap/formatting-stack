@@ -11,7 +11,7 @@
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [diff->line-numbers ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! replaceable-ns-form]]
+   [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement! replace-ns-form!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
@@ -138,12 +138,17 @@
 (speced/defn ^{::speced/spec (complement #{"nil"})} duplicate-cleaner [ns-form]
   (some-> ns-form remove-exact-duplicates pr-str))
 
+(defn replaceable-ns-form
+  [how-to-ns-opts filename]
+  (when (read-ns-decl filename)
+    (util.ns/replaceable-ns-form filename duplicate-cleaner how-to-ns-opts)))
+
 (defn format! [{:keys [how-to-ns-opts]} files]
   (->> files
        (process-in-parallel! (fn [filename]
-                               (when (read-ns-decl filename)
+                               (when-let [replacement (replaceable-ns-form how-to-ns-opts filename)]
                                  (println "Removing trivial duplicates in `ns` form:" filename)
-                                 (replace-ns-form! filename duplicate-cleaner how-to-ns-opts)))))
+                                 (write-ns-replacement! filename replacement)))))
   nil)
 
 (defn lint! [{:keys [how-to-ns-opts]} files]
@@ -151,7 +156,7 @@
        (process-in-parallel! (fn [filename]
                                (when-let [{:keys [final-ns-form-str
                                                   original-ns-form-str]}
-                                          (replaceable-ns-form filename duplicate-cleaner how-to-ns-opts)]
+                                          (replaceable-ns-form how-to-ns-opts filename)]
                                  (let [diff (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin]}]
