@@ -1,0 +1,11 @@
+diff --git a/test-resources/component_repl.clj b/test-resources/component_repl.clj
+index cc517b3..803aead 100644
+--- a/test-resources/component_repl.clj
++++ b/test-resources/component_repl.clj
+@@ -32,3 +32,6 @@
+
+ (comment
+   (component.repl/reset))
++
++(comment
++ "this is an addition")

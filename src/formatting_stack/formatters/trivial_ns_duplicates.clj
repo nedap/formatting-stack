@@ -11,7 +11,7 @@
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [diff->line-numbers ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement! replace-ns-form!]]
+   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]

@@ -1,8 +1,8 @@
 (ns formatting-stack.util
   (:require
+   [clojure.java.data :as data]
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
-   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
@@ -13,6 +13,7 @@
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
    (clojure.lang IBlockingDeref IPending)
+   (io.reflectoring.diffparser.api UnifiedDiffParser)
    (java.io File)))
 
 (defmacro rcomp
@@ -143,18 +144,33 @@
 (defn colorize [s color]
   (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))
 
+(spec/def ::grouping-spec
+  (spec/cat ::neutral (spec/* (comp #{"NEUTRAL"} :lineType))
+            ::from    (spec/+ (comp #{"FROM"} :lineType))
+            ::rest    (spec/* any?)))
+
 (speced/defn ^coll? diff->line-numbers
-  "parses a diff/patch into a coll of maps containing `:filename` + `:begin` + `:end` per section" ;; fixme
+  "Returns maps of consecutive removals/changes (as `:begin` to `:end`) per `:filename` in `diff`."
   [^string? diff]
-  (->> diff
-       (re-seq #".*\+\+\+ b(.*)\n.*@@ -(\d),\d \+\d,\d @@\n((.|\n)*)")
-       (map (fn [[_, filename, begin, d]]
-              (let [begin        (Long/parseLong begin)
-                    line-numbers (->> (string/split-lines d)
-                                      (remove (fn [line] (#{\+} (first line)))) ;; remove added lines
-                                      (map-indexed (fn [idx line] [(+ idx begin) line])) ;; add initial begin
-                                      (filter (fn [[_ line]] (#{\-} (first line)))) ;; filter removed lines (e.g. discard context)
-                                      (map first))]
-                {:filename filename
-                 :begin    (first line-numbers)
-                 :end      (last line-numbers)})))))
+  (->> (io/input-stream (.getBytes diff))
+       (.parse (UnifiedDiffParser.))
+       (data/from-java)
+       (mapcat (fn [{:keys [toFileName hunks]}]
+                 (->> (loop [{::keys [from rest]}
+                             (->> hunks
+                                  (mapcat (fn [{:keys [lines] {:keys [lineStart]} :fromFileRange}]
+                                            (->> lines
+                                                 (remove (comp #{"TO"} :lineType))
+                                                 (map-indexed (fn [idx line] (assoc line :lineNumber (+ idx lineStart)))))))
+                                  (spec/conform ::grouping-spec)) ;; group consecutive FROM-changes
+                             result []]
+                        (if (seq rest)
+                          (recur (spec/conform ::grouping-spec rest)
+                                 (conj result from))
+                          (if from
+                            (conj result from)
+                            result)))
+                      (map (fn [grouped-lines]
+                             {:filename toFileName
+                              :begin (apply min (map :lineNumber grouped-lines))
+                              :end (apply max (map :lineNumber grouped-lines))})))))))
