@@ -21,11 +21,11 @@
        (process-in-parallel! (fn [filename]
                                (let [indents (impl/cljfmt-indents-for filename third-party-indent-specs)
                                      {{:keys [okay]} :counts
-                                      :keys [file diff]} (#'cljfmt.main/check-one {:indents indents} filename)]
+                                      :keys [diff]} (#'cljfmt.main/check-one {:indents indents} filename)]
                                  (when (zero? okay)
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin end]}]
-                                                {:filename file
+                                                {:filename filename
                                                  :diff diff
                                                  :level :warning
                                                  :column 0

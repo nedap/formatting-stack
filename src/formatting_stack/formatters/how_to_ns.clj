@@ -5,7 +5,7 @@
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [diff->line-numbers ensure-sequential ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel!]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 

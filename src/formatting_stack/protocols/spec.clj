@@ -38,7 +38,7 @@ so that final users can locate them and configure them."
 
 (spec/def ::warning-details-url present-string?)
 
-(spec/def ::diff string?)
+(spec/def ::diff present-string?)
 
 (spec/def ::level #{:warning :error :exception})
 

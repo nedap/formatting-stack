@@ -56,13 +56,17 @@
        :original-ns-form-str original-ns-form-str
        :final-ns-form-str    (how-to-ns/format-ns-str clean-ns-form how-to-ns-opts)})))
 
+(speced/defn write-ns-replacement!
+  [filename {:keys [final-ns-form-str
+                    original-ns-form-str
+                    buffer]}]
+  (->> original-ns-form-str
+       count
+       (subs buffer)
+       (str final-ns-form-str)
+       (spit filename)))
+
 (speced/defn replace-ns-form!
   [^string? filename, ^ifn? ns-cleaner, ^map? how-to-ns-opts]
-  (when-let [{:keys [final-ns-form-str
-                     original-ns-form-str
-                     buffer]} (replaceable-ns-form filename ns-cleaner how-to-ns-opts)]
-    (->> original-ns-form-str
-         count
-         (subs buffer)
-         (str final-ns-form-str)
-         (spit filename))))
+  (some->> (replaceable-ns-form filename ns-cleaner how-to-ns-opts)
+           (write-ns-replacement! filename)))
