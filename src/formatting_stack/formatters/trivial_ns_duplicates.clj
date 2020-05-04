@@ -167,6 +167,7 @@
                                                  :line     begin
                                                  :level    :warning
                                                  :source   :formatting-stack/trivial-ns-duplicates})))))))
+       (remove nil?)
        (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-opts]
