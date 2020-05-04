@@ -1,5 +1,6 @@
 (ns formatting-stack.formatters.how-to-ns
   (:require
+   [cljfmt.diff]
    [clojure.string :as str]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
