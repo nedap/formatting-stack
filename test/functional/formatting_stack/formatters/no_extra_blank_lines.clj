@@ -17,4 +17,10 @@
         :msg "File has extra blank lines"
         :line 4
         :column 1
-        :filename "test-resources/extra_newlines_warning.clj"}])))
+        :filename "test-resources/extra_newlines_warning.clj"}
+       {:filename "test-resources/extra_newlines_warning.clj"
+        :msg "File has extra blank lines"
+        :column 1
+        :line 5
+        :level :warning
+        :source :formatting-stack/no-extra-blank-lines}])))
