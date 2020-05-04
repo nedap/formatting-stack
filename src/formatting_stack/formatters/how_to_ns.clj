@@ -29,7 +29,7 @@
                                (let [contents  (slurp filename)
                                      formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
                                  (when-not (= contents formatted)
-                                   (let [diff (#'how-to-ns.main/unified-diff (str filename) contents formatted)]
+                                   (let [diff (#'cljfmt.diff/unified-diff filename contents formatted)]
                                      (->> (diff->line-numbers diff)
                                           (mapv (fn [{:keys [begin]}]
                                                   {:filename filename
@@ -39,6 +39,7 @@
                                                    :level :warning
                                                    :msg "Badly formatted namespace"
                                                    :source :how-to-ns/ns}))))))))
+       (remove nil?)
        (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-options]

@@ -86,7 +86,8 @@
                                                  :line begin
                                                  :msg "ns can be cleaned"
                                                  :source :formatting-stack/clean-ns})))))))
-       (map ensure-sequential)))
+       (remove nil?)
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
             :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned

@@ -1,6 +1,7 @@
 (ns formatting-stack.formatters.cljfmt
   (:require
    [cljfmt.main]
+   [clojure.string :as string]
    [formatting-stack.formatters.cljfmt.impl :as impl]
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as formatter]
@@ -26,12 +27,14 @@
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin end]}]
                                                 {:filename filename
-                                                 :diff diff
-                                                 :level :warning
-                                                 :column 0
-                                                 :line begin
-                                                 :msg (str "Indentation is wrong between " begin "-" end)
-                                                 :source :cljfmt/indent})))))))
+                                                 :diff     diff
+                                                 :level    :warning
+                                                 :column   0
+                                                 :line     begin
+                                                 :msg      (str "Indentation is wrong at " (->> (dedupe [begin end])
+                                                                                                (string/join "-")))
+                                                 :source   :cljfmt/indent})))))))
+       (remove nil?)
        (mapcat ensure-sequential)))
 
 (speced/defn new [{:keys [third-party-indent-specs]
