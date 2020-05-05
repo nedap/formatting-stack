@@ -6,7 +6,8 @@
    [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
+   [formatting-stack.util.diff :refer [diff->line-numbers]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -34,7 +35,7 @@
                                                  :msg      (str "Indentation is wrong at " (->> (dedupe [begin end])
                                                                                                 (string/join "-")))
                                                  :source   :cljfmt/indent})))))))
-       (remove nil?)
+       (filter some?)
        (mapcat ensure-sequential)))
 
 (speced/defn new [{:keys [third-party-indent-specs]

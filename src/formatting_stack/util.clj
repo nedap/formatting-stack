@@ -1,9 +1,7 @@
 (ns formatting-stack.util
   (:require
-   [clojure.java.data :as data]
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
-   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
@@ -14,8 +12,7 @@
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
    (clojure.lang IBlockingDeref IPending)
-   (io.reflectoring.diffparser.api UnifiedDiffParser)
-   (java.io File)))
+   (java.io File StringWriter)))
 
 (defmacro rcomp
   "Like `comp`, but in reverse order.
@@ -145,29 +142,10 @@
 (defn colorize [s color]
   (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))
 
-(speced/defn ^coll? diff->line-numbers
-  "Returns maps of consecutive removals/changes (as `:begin` to `:end`) per `:filename` in `diff`."
-  [^string? diff]
-  (->> (io/input-stream (.getBytes diff))
-       (.parse (UnifiedDiffParser.))
-       (data/from-java)
-       (mapcat (fn [{:keys [toFileName hunks]}]
-                 (->> hunks
-                      (mapcat (fn [{:keys [lines] {:keys [lineStart]} :fromFileRange}]
-                                (->> lines
-                                     (remove (comp #{"TO"} :lineType))
-                                     (map-indexed (fn [idx line] (assoc line :lineNumber (+ idx lineStart)))))))
-                      (reduce (fn [ret {:keys [lineType lineNumber]}]
-                                (let [{:keys [end] :as current} (last ret)]
-                                  (cond
-                                    (#{"NEUTRAL"} lineType)
-                                    ret
-
-                                    (= end (dec lineNumber))
-                                    (assoc ret (dec (count ret)) (assoc current :end lineNumber)) ;; update last map
-
-                                    :else
-                                    (conj ret {:filename (string/replace-first toFileName "b/" "")
-                                               :begin    lineNumber
-                                               :end      lineNumber}))))
-                              []))))))
+(defmacro silence
+  "Execute body without printing to `*out*` or `*err*`"
+  [& body]
+  `(let [s# (StringWriter.)]
+     (binding [*out* s#
+               *err* s#]
+       ~@body)))
