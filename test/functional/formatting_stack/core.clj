@@ -6,7 +6,8 @@
    [formatting-stack.protocols.reporter :as protocols.reporter]
    [matcher-combinators.test :refer [match?]]
    [nedap.utils.modular.api :refer [implement]])
-  (:import (clojure.lang ExceptionInfo)))
+  (:import
+   (clojure.lang ExceptionInfo)))
 
 (defn throw-exception [& args]
   (throw (ex-info "Kaboom!" {})))
@@ -18,20 +19,20 @@
 (defn store-in-latest [{::keys [latest]} args]
   (reset! latest args))
 
-(defn recording-recorder [latest]
+(defn recording-reporter [latest]
   (implement {::latest latest}
     protocols.reporter/--report store-in-latest))
 
 (deftest format!
   (testing "exceptions are passed to the reporter"
-    (let [x (atom nil)]
+    (let [latest (atom nil)]
       (sut/format! :formatters [failing-formatter]
                    :linters []
                    :processors []
-                   :reporter (recording-recorder x)
+                   :reporter (recording-reporter latest)
                    :in-background? false)
       (is (match? [{:source    :formatting-stack/process!
                     :msg       "Exception during {:id :functional.formatting-stack.core/failing-formatter}"
                     :level     :exception
                     :exception #(instance? ExceptionInfo %)}]
-                  @x)))))
+                  @latest)))))
