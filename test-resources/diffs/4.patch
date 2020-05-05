@@ -1,11 +1,14 @@
-diff --git a/test-resources/component_repl.clj b/test-resources/component_repl.clj
-index cc517b3..803aead 100644
---- a/test-resources/component_repl.clj
-+++ b/test-resources/component_repl.clj
-@@ -32,3 +32,6 @@
+diff --git a/test/unit/formatting_stack/strategies.clj b/test/unit/formatting_stack/strategies.clj
+index 78b6a35..4f5695e 100644
+--- a/test/unit/formatting_stack/strategies.clj
++++ b/test/unit/formatting_stack/strategies.clj
+@@ -2,8 +2,8 @@
+   (:require
+    [clojure.string :as str]
+    [clojure.test :refer [deftest is use-fixtures]]
+-   [formatting-stack.strategies :as sut]
+    [formatting-stack.strategies.impl :as sut.impl]
++   [formatting-stack.strategies :as sut]
+    [formatting-stack.strategies.impl.git-status :as git-status]))
 
- (comment
-   (component.repl/reset))
-+
-+(comment
-+ "this is an addition")
+ (use-fixtures :once (fn [tests]
