@@ -9,7 +9,7 @@
                             (is (= {:filename expected}
                                    (sut/normalize-filenames {:filename input})))
                             true)
-      ""                      ""
+      nil                     nil
       "a"                     "a"
       cwd                     ""
       (str cwd "/a.clj")      "a.clj"
