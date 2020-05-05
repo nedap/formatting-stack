@@ -1,14 +1,14 @@
 (ns formatting-stack.formatters.how-to-ns
   (:require
+   [cljfmt.diff :as diff]
    [cljfmt.diff]
-   [clojure.string :as str]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.strategies :as strategies]
    [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
-   [formatting-stack.util.diff :refer [diff->line-numbers unified-diff]]
+   [formatting-stack.util.diff :refer [diff->line-numbers]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -32,7 +32,7 @@
                                (let [contents  (slurp filename)
                                      formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
                                  (when-not (= contents formatted)
-                                   (let [diff (unified-diff filename contents formatted)]
+                                   (let [diff (diff/unified-diff filename contents formatted)]
                                      (->> (diff->line-numbers diff)
                                           (mapv (fn [{:keys [begin]}]
                                                   {:filename filename

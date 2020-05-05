@@ -10,12 +10,13 @@
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.diff :refer [diff->line-numbers unified-diff]]
+   [formatting-stack.util.diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
-   [nedap.utils.spec.api :refer [check!]]))
+   [nedap.utils.spec.api :refer [check!]]
+   [cljfmt.diff :as diff]))
 
 (spec/def ::libspec coll?)
 
@@ -157,7 +158,7 @@
                                (when-let [{:keys [final-ns-form-str
                                                   original-ns-form-str]}
                                           (replaceable-ns-form how-to-ns-opts filename)]
-                                 (let [diff (unified-diff filename original-ns-form-str final-ns-form-str)]
+                                 (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin]}]
                                                 {:filename filename
