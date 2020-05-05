@@ -10,14 +10,14 @@
   (:require
    [formatting-stack.core]
    [formatting-stack.defaults :refer [default-linters]]
-   [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
-   [formatting-stack.strategies :as strategies]
-   [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
-   [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
-   [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
+   [formatting-stack.formatters.cljfmt :as formatters.cljfmt]
+   [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]
    [formatting-stack.formatters.newlines :as formatters.newlines]
-   [formatting-stack.formatters.how-to-ns :as formatters.how-to-ns]))
+   [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
+   [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
+   [formatting-stack.indent-specs :refer [default-third-party-indent-specs]]
+   [formatting-stack.strategies :as strategies]))
 
 (def formatters
   (->> [(-> (formatters.cljfmt/new {:third-party-indent-specs default-third-party-indent-specs})

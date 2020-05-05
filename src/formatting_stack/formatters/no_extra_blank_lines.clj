@@ -6,7 +6,7 @@
    [clojure.string :as string]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [rcomp ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]))
 
 (defn without-extra-newlines [s]
@@ -23,23 +23,26 @@
   nil)
 
 (defn lint! [this files]
-  (letfn [(extra-line-seq [content]
-            (->> (string/split-lines content)
-                 (map-indexed (fn [idx line] {:lineNumber idx :line line}))
-                 (partition 2 1)
-                 (filter (fn [[{left :line} {right :line}]] (= "" left right)))
-                 (map (comp inc :lineNumber first))))]
-    (->> files
-         (process-in-parallel! (fn [filename]
-                                 (->> (extra-line-seq (slurp filename))
-                                      (mapv (fn [line]
-                                              {:filename filename
-                                               :msg      "File has extra blank lines"
-                                               :column   1
-                                               :line     line
-                                               :level    :warning
-                                               :source   :formatting-stack/no-extra-blank-lines})))))
-         (mapcat ensure-sequential))))
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (->> (slurp filename)
+                                    (string/split-lines)
+                                    (map-indexed (fn [idx line] {:lineNumber idx :line line}))
+                                    (partition 2 1)
+                                    (filter (fn [[{left :line} {right :line}]] (= "" left right)))
+                                    (map (rcomp first :lineNumber inc))
+                                    (reduce (fn [ret line-number]
+                                              (if (= (:line (last ret))
+                                                     (dec line-number))
+                                                ret ;; group consecutive warnings
+                                                (conj ret {:filename filename
+                                                           :msg      "File has two or more consecutive blank lines"
+                                                           :column   1
+                                                           :line     line-number
+                                                           :level    :warning
+                                                           :source   :formatting-stack/no-extra-blank-lines})))
+                                            []))))
+       (mapcat ensure-sequential)))
 
 (defn new []
   (implement {:id ::id}

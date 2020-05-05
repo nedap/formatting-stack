@@ -1,11 +1,11 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
-   [cljfmt.diff]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel! try-require]]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel! try-require]]
+   [formatting-stack.util.diff :refer [diff->line-numbers unified-diff]]
    [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -76,7 +76,7 @@
        (process-in-parallel! (fn [filename]
                                (when-let [{:keys [final-ns-form-str
                                                   original-ns-form-str]} (replaceable-ns-form this filename)]
-                                 (let [diff (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                 (let [diff (unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin]}]
                                                 {:filename filename
@@ -86,7 +86,7 @@
                                                  :line begin
                                                  :msg "ns can be cleaned"
                                                  :source :formatting-stack/clean-ns})))))))
-       (remove nil?)
+       (filter some?)
        (mapcat ensure-sequential)))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]

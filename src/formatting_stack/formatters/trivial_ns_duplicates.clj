@@ -3,14 +3,14 @@
 
   Compensates for some `refactor-nrepl.clean-ns` intricacies, and also provides .cljs compatibility."
   (:require
-   [cljfmt.diff]
    [clojure.set :as set]
    [clojure.spec.alpha :as spec]
    [clojure.walk :as walk]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [diff->line-numbers ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util.diff :refer [diff->line-numbers unified-diff]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -157,7 +157,7 @@
                                (when-let [{:keys [final-ns-form-str
                                                   original-ns-form-str]}
                                           (replaceable-ns-form how-to-ns-opts filename)]
-                                 (let [diff (#'cljfmt.diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                 (let [diff (unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
                                         (mapv (fn [{:keys [begin]}]
                                                 {:filename filename
@@ -167,7 +167,7 @@
                                                  :line     begin
                                                  :level    :warning
                                                  :source   :formatting-stack/trivial-ns-duplicates})))))))
-       (remove nil?)
+       (filter some?)
        (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-opts]

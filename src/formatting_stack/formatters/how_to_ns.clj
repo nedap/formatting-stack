@@ -6,7 +6,9 @@
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [diff->line-numbers ensure-sequential process-in-parallel!]]
+   [formatting-stack.strategies :as strategies]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
+   [formatting-stack.util.diff :refer [diff->line-numbers unified-diff]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -19,18 +21,18 @@
                              :import-square-brackets? false})
 
 (defn format! [{:keys [how-to-ns-options]} files]
-  (->> (remove #(str/ends-with? % ".edn") files)
+  (->> (strategies/exclude-edn :files files)
        (process-in-parallel! (fn [filename]
                                (how-to-ns.main/fix [filename] how-to-ns-options))))
   nil)
 
 (defn lint! [{:keys [how-to-ns-options]} files]
-  (->> (remove #(str/ends-with? % ".edn") files)
+  (->> (strategies/exclude-edn :files files)
        (process-in-parallel! (fn [filename]
                                (let [contents  (slurp filename)
                                      formatted (how-to-ns/format-initial-ns-str contents how-to-ns-options)]
                                  (when-not (= contents formatted)
-                                   (let [diff (#'cljfmt.diff/unified-diff filename contents formatted)]
+                                   (let [diff (unified-diff filename contents formatted)]
                                      (->> (diff->line-numbers diff)
                                           (mapv (fn [{:keys [begin]}]
                                                   {:filename filename
@@ -40,7 +42,7 @@
                                                    :level :warning
                                                    :msg "Badly formatted namespace"
                                                    :source :how-to-ns/ns}))))))))
-       (remove nil?)
+       (filter some?)
        (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-options]
