@@ -1,6 +1,6 @@
 (ns formatting-stack.util.diff
   (:require
-   [clojure.java.data :as data]
+   [clojure.java.data :refer [from-java]]
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
    [clojure.string :as string]
@@ -8,18 +8,7 @@
    [nedap.speced.def :as speced]
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
-   (difflib DiffUtils)
    (io.reflectoring.diffparser.api UnifiedDiffParser)))
-
-(defn unified-diff
-  [filename original revised]
-  (->> (DiffUtils/generateUnifiedDiff
-        (->> filename (str "a"))
-        (->> filename (str "b"))
-        (string/split-lines original)
-        (DiffUtils/diff (string/split-lines original) (string/split-lines revised))
-        3)
-       (string/join "\n")))
 
 (spec/def ::begin pos-int?)
 (spec/def ::end pos-int?)
@@ -33,7 +22,7 @@
   [^string? diff]
   (->> (io/input-stream (.getBytes diff))
        (.parse (UnifiedDiffParser.))
-       (data/from-java)
+       (from-java)
        (mapcat (speced/fn [{:keys [^present-string? toFileName ^coll? hunks]}]
                  (->> hunks
                       (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^pos-int? lineStart]} :fromFileRange}]
