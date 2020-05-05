@@ -26,8 +26,7 @@
                                    :line     (-> filename slurp str/split-lines count)
                                    :msg      (str "File should end in " expected-newline-count " newlines")
                                    :column   1})))
-        (filter some?)
-        (vec)))) ;; realize collection
+        (filterv some?))))
 
 (speced/defn new [{:keys [^{::speced/spec #{0 1}} expected-newline-count]
                    :or {expected-newline-count 1}}]

@@ -22,8 +22,7 @@
                                     :msg      (str "Longer than " max-lines-per-ns " LOC.")
                                     :line     lines
                                     :column   0}))))
-       (filter some?)
-       (vec))) ;; realize collection
+       (filterv some?)))
 
 (defn new [{:keys [max-lines-per-ns]
             :or   {max-lines-per-ns 350}}]
