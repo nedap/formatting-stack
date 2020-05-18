@@ -52,7 +52,11 @@
 
     "Can print `:msg-extra-data` (at the correct indentation level)"
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0, :msg-extra-data ["Foo" "Bar"]}]
-    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"))
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"
+
+    "Can print missing `:column` and `:line`"
+    [{:filename "filename", :msg "message", :source ::source, :level :warning}]
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    ?:? message\n\n"))
 
 (deftest print-summary
   (are [input expected] (= expected
