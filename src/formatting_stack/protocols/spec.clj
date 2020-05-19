@@ -54,7 +54,7 @@ so that final users can locate them and configure them."
                       ::source
                       ::msg
                       ::level]
-             :opt-un [::column
+             :opt-un [::column ;; not every linter reports column/line, see https://git.io/JfuoJ
                       ::line
                       ::msg-extra-data
                       ::warning-details-url]))
