@@ -87,7 +87,7 @@ As you can see in the screenshot, **formatting-stack** presents linters' outputs
 #### Coordinates
 
 ```clojure
-[formatting-stack "4.2.3-alpha1"]
+[formatting-stack "4.2.3"]
 ```
 
 **Also** you might have to add the [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl) dependency.
