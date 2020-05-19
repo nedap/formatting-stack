@@ -34,7 +34,7 @@ so that final users can locate them and configure them."
 
 (spec/def ::column nat-int?)
 
-(spec/def ::line ::column)
+(spec/def ::line nat-int?)
 
 (spec/def ::warning-details-url present-string?)
 
@@ -53,10 +53,10 @@ so that final users can locate them and configure them."
   (spec/keys :req-un [::filename
                       ::source
                       ::msg
-                      ::level
-                      ::column
-                      ::line]
-             :opt-un [::msg-extra-data
+                      ::level]
+             :opt-un [::column ;; not every linter reports column/line, see https://git.io/JfuoJ
+                      ::line
+                      ::msg-extra-data
                       ::warning-details-url]))
 
 (spec/def ::report

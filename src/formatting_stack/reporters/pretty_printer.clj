@@ -80,8 +80,8 @@
                                  (cond-> (str "    See: " url)
                                    colorize? (colorize :grey)
                                    true      println))]
-                       {:keys [msg column line source level msg-extra-data warning-details-url]} (->> group-entries
-                                                                                                      (sort-by :line))]
+                       {:keys [msg column line msg-extra-data] :or {column "?", line "?"}} (->> group-entries
+                                                                                                (sort-by :line))]
 
                  (println (cond-> (str "    " line ":" column)
                             colorize? (colorize :grey))
