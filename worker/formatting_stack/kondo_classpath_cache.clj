@@ -17,7 +17,7 @@
 (def cache-dir (str cache-parent-dir File/separator cache-subdir))
 
 (def classpath-cache
-  (future
+  (delay
     (let [files (-> (System/getProperty "java.class.path")
                     (string/split #"\:"))]
       (-> (File. cache-parent-dir cache-subdir) .mkdirs)
