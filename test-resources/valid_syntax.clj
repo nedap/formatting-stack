@@ -1,2 +1,1 @@
-(ns valid-syntax
-  "This file should raise no warnings")
+(ns valid-syntax)
