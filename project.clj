@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "4.2.0"
+(defproject formatting-stack "4.2.3"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.01.13"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
@@ -49,6 +49,8 @@
   :source-paths ["src" "worker"]
 
   :target-path "target/%s"
+
+  :test-paths ["src" "test"]
 
   :monkeypatch-clojure-test false
 

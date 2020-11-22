@@ -18,7 +18,6 @@
 * Additionally, I have code-reviewed iteratively the PR considering the following aspects in isolation:
   * [ ] Correctness
   * [ ] Robustness (red paths, failure handling etc)
-  * [ ] Modular design
   * [ ] Test coverage
   * [ ] Spec coverage
   * [ ] Documentation
@@ -35,7 +34,6 @@
 * Additionally, I have code-reviewed iteratively the PR considering the following aspects in isolation:
   * [ ] Correctness
   * [ ] Robustness (red paths, failure handling etc)
-  * [ ] Modular design
   * [ ] Test coverage
   * [ ] Spec coverage
   * [ ] Documentation

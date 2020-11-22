@@ -55,6 +55,10 @@
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0, :msg-extra-data ["Foo" "Bar"]}]
     "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"
 
+    "Can print missing `:column` and `:line`"
+    [{:filename "filename", :msg "message", :source ::source, :level :warning}]
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    ?:? message\n\n"
+
     "Can print `:diff`"
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0 :diff (slurp "test-resources/diffs/files/1.patch")}]
     "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n--- a/mocked/absolute/path/test-resources/diffs/files/1.txt\n+++ b/mocked/absolute/path/test-resources/diffs/files/1.txt\n@@ -1,1 +1,1 @@\n-\n+Hello World!\n\n"))
