@@ -1,0 +1,5 @@
+--- a/mocked/absolute/path/test-resources/diffs/files/1_revised.txt
++++ b/mocked/absolute/path/test-resources/diffs/files/1_revised.txt
+@@ -1,1 +1,1 @@
+-Hello World!
++

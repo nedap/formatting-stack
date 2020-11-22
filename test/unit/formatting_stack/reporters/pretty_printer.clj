@@ -22,6 +22,7 @@
                                (is (= expected
                                       (with-out-str
                                         (sut/print-warnings {:colorize? false
+                                                             :print-diff? true
                                                              :max-msg-length 20}
                                                             input))))
                                true)
@@ -52,7 +53,11 @@
 
     "Can print `:msg-extra-data` (at the correct indentation level)"
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0, :msg-extra-data ["Foo" "Bar"]}]
-    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"))
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n        Foo\n        Bar\n\n"
+
+    "Can print `:diff`"
+    [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0 :diff (slurp "test-resources/diffs/files/1.patch")}]
+    "filename\n  :unit.formatting-stack.reporters.pretty-printer/source\n    0:0 message\n--- a/mocked/absolute/path/test-resources/diffs/files/1.txt\n+++ b/mocked/absolute/path/test-resources/diffs/files/1.txt\n@@ -1,1 +1,1 @@\n-\n+Hello World!\n\n"))
 
 (deftest print-summary
   (are [input expected] (= expected

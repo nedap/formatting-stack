@@ -11,6 +11,9 @@
                                              :linters {:unused-binding {:level :warning}}}})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
+      "test-resources/valid_syntax.clj"
+      []
+
       "test-resources/invalid_syntax.clj"
       (matchers/embeds
        [{:level    :error,

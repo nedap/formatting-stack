@@ -1,14 +1,12 @@
 (ns formatting-stack.formatters.how-to-ns
   (:require
-   [cljfmt.diff :as diff]
-   [cljfmt.diff]
    [com.gfredericks.how-to-ns :as how-to-ns]
    [com.gfredericks.how-to-ns.main :as how-to-ns.main]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.strategies :as strategies]
    [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
-   [formatting-stack.util.diff :refer [diff->line-numbers]]
+   [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [medley.core :refer [deep-merge]]
    [nedap.utils.modular.api :refer [implement]]))
 
@@ -34,10 +32,10 @@
                                  (when-not (= contents formatted)
                                    (let [diff (diff/unified-diff filename contents formatted)]
                                      (->> (diff->line-numbers diff)
-                                          (mapv (fn [{:keys [begin]}]
+                                          (mapv (fn [{:keys [start]}]
                                                   {:filename filename
                                                    :diff diff
-                                                   :line begin
+                                                   :line start
                                                    :column 0
                                                    :level :warning
                                                    :msg "Badly formatted namespace"
