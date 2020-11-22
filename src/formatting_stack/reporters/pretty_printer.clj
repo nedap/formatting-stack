@@ -5,7 +5,7 @@
    [clojure.string :as string]
    [formatting-stack.protocols.reporter :as reporter]
    [formatting-stack.protocols.spec :as protocols.spec]
-   [formatting-stack.util :refer [colorize]]
+   [formatting-stack.util :refer [colorize colorize-diff]]
    [medley.core :refer [map-vals]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
@@ -58,6 +58,7 @@
                  (println))))))
 
 (speced/defn print-warnings [{:keys [max-msg-length
+                                     ^boolean print-diff?
                                      ^boolean? colorize?]}
                              ^::protocols.spec/reports reports]
   (->> reports
@@ -80,12 +81,16 @@
                                  (cond-> (str "    See: " url)
                                    colorize? (colorize :grey)
                                    true      println))]
-                       {:keys [msg column line msg-extra-data] :or {column "?", line "?"}} (->> group-entries
-                                                                                                (sort-by :line))]
+                       {:keys [msg column line msg-extra-data msg-extra-data warning-details-url diff]
+                        :or {column "?", line "?"}} (->> group-entries
+                                                         (sort-by :line))]
 
                  (println (cond-> (str "    " line ":" column)
                             colorize? (colorize :grey))
                           (truncate-line-wise msg max-msg-length))
+                 (when (and diff print-diff?)
+                   (println (cond-> diff
+                              colorize? colorize-diff)))
                  (doseq [entry msg-extra-data]
                    (println "       "
                             (truncate-line-wise entry max-msg-length))))
@@ -96,12 +101,14 @@
   (print-warnings this reports)
   (print-summary this reports))
 
-(defn new [{:keys [max-msg-length print-stacktraces? summary? colorize?]
+(defn new [{:keys [max-msg-length print-diff? print-stacktraces? summary? colorize?]
             :or   {max-msg-length     200
+                   print-diff?        false
                    print-stacktraces? true
                    summary?           true
                    colorize?          true}}]
   (implement {:max-msg-length max-msg-length
+              :print-diff? print-diff?
               :print-stacktraces? print-stacktraces?
               :summary? summary?
               :colorize? colorize?}

@@ -3,6 +3,8 @@
 
   Not a part of the test suite.
 
+  NOTE: Highly subject to change! see https://github.com/nedap/formatting-stack/pull/152
+
   See also:
 
     * https://github.com/nedap/formatting-stack/blob/master/README.md

@@ -1,7 +1,10 @@
 (ns unit.formatting-stack.util.diff
   (:require
-   [clojure.test :refer [are deftest is testing]]
+   [clojure.test :refer [are deftest is testing use-fixtures]]
+   [formatting-stack.test-helpers :refer [with-mocked-diff-path]]
    [formatting-stack.util.diff :as sut]))
+
+(use-fixtures :once with-mocked-diff-path)
 
 (deftest diff->line-numbers
   (are [description filename expected] (testing description
@@ -9,39 +12,67 @@
                                                 (sut/diff->line-numbers (slurp filename))))
                                          true)
 
-    "only additions yields empty result"
+    "Additions do not report a line number"
     "test-resources/diffs/1.patch"
     []
 
-    "3 sections for one file"
+    "Multiple sections are reported individually"
     "test-resources/diffs/2.patch"
-    [{:begin    14
+    [{:start    14
       :end      14
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}
-     {:begin    144
+     {:start    144
       :end      144
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}
-     {:begin    146
+     {:start    146
       :end      146
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}
-     {:begin    154
+     {:start    154
       :end      154
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}]
 
-    "multiple changed lines in one section"
+    "consecutive removed lines are grouped"
     "test-resources/diffs/3.patch"
-    [{:begin    12
+    [{:start    12
       :end      12
       :filename "src/formatting_stack/formatters/no_extra_blank_lines.clj"}
-     {:begin    30
+     {:start    30
       :end      33
       :filename "src/formatting_stack/formatters/no_extra_blank_lines.clj"}
-     {:begin    41
+     {:start    41
       :end      41
       :filename "src/formatting_stack/protocols/spec.clj"}]
 
-    "moved code"
+    "Moving code reports on the removed line"
     "test-resources/diffs/4.patch"
-    [{:begin    5
+    [{:start    5
       :end      5
       :filename "test/unit/formatting_stack/strategies.clj"}]))
+
+(deftest unified-diff
+  (are [description filename revised-filename expected] (testing description
+                                                          (is (= (slurp expected)
+                                                                 (sut/unified-diff filename
+                                                                                   (slurp filename)
+                                                                                   (slurp revised-filename))))
+                                                          true)
+
+    "Adding to an empty file"
+    "test-resources/diffs/files/1.txt"
+    "test-resources/diffs/files/1_revised.txt"
+    "test-resources/diffs/files/1.patch"
+
+    "Removing all contents"
+    "test-resources/diffs/files/1_revised.txt"
+    "test-resources/diffs/files/1.txt"
+    "test-resources/diffs/files/1_reversed.patch"
+
+    "Removing newlines"
+    "test-resources/diffs/files/2.txt"
+    "test-resources/diffs/files/2_revised.txt"
+    "test-resources/diffs/files/2.patch"
+
+    "Adding newlines"
+    "test-resources/diffs/files/2_revised.txt"
+    "test-resources/diffs/files/2.txt"
+    "test-resources/diffs/files/2_reversed.patch"))

@@ -9,6 +9,9 @@
   (let [linter (sut/new)]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
+      "test-resources/valid_syntax.clj"
+      []
+
       "test-resources/invalid_syntax.clj"
       []
 

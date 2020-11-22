@@ -1,6 +1,6 @@
 (ns formatting-stack.util.diff
   (:require
-   [clojure.java.data :refer [from-java]]
+   [clojure.java.data :as data]
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
    [clojure.string :as string]
@@ -8,21 +8,23 @@
    [nedap.speced.def :as speced]
    [nedap.utils.spec.predicates :refer [present-string?]])
   (:import
-   (io.reflectoring.diffparser.api UnifiedDiffParser)))
+   (difflib DiffUtils)
+   (io.reflectoring.diffparser.api UnifiedDiffParser)
+   (java.io File)
+   (java.util.regex Pattern)))
 
-(spec/def ::begin pos-int?)
+(spec/def ::start pos-int?)
 (spec/def ::end pos-int?)
 (spec/def ::filename present-string?)
 
-(spec/def ::line-numbers
-  (spec/coll-of (spec/keys :req-un [::begin ::end ::filename])))
+(speced/def-with-doc ::line-numbers
+  "maps of consecutive removals/changes (as `:start` to `:end`) per `:filename`."
+  (spec/coll-of (spec/keys :req-un [::start ::end ::filename])))
 
 (speced/defn ^::line-numbers diff->line-numbers
-  "Returns maps of consecutive removals/changes (as `:begin` to `:end`) per `:filename` in `diff`."
   [^string? diff]
-  (->> (io/input-stream (.getBytes diff))
-       (.parse (UnifiedDiffParser.))
-       (from-java)
+  (->> (.parse (UnifiedDiffParser.) (io/input-stream (.getBytes diff)))
+       (data/from-java)
        (mapcat (speced/fn [{:keys [^present-string? toFileName ^coll? hunks]}]
                  (->> hunks
                       (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^pos-int? lineStart]} :fromFileRange}]
@@ -41,6 +43,27 @@
 
                                     :else
                                     (conj ret {:filename (string/replace-first toFileName "b/" "")
-                                               :begin    lineNumber
-                                               :end      lineNumber}))))
+                                               :start lineNumber
+                                               :end   lineNumber}))))
                               []))))))
+
+(def diff-context-size 3)
+
+(defn to-absolute-path [filename]
+  (->> (string/split filename (re-pattern (Pattern/quote File/separator)))
+       ^File (apply io/file)
+       .getCanonicalPath))
+
+(speced/defn ^string? unified-diff
+  "derives a patch derived from the original and revised file contents in a Unified Diff format"
+  ([^string? filename ^string? original ^string? revised]
+   (letfn [(lines [s]
+             (string/split s #"\n"))
+           (unlines [ss]
+             (string/join "\n" ss))]
+     (unlines (DiffUtils/generateUnifiedDiff
+               (->> filename to-absolute-path (str "a"))
+               (->> filename to-absolute-path (str "b"))
+               (lines original)
+               (DiffUtils/diff (lines original) (lines revised))
+               diff-context-size)))))

@@ -2,6 +2,7 @@
   (:require
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
+   [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
    [clojure.tools.namespace.parse :as parse]
    [clojure.tools.reader.reader-types :refer [indexing-push-back-reader push-back-reader]]
@@ -142,8 +143,17 @@
 (defn colorize [s color]
   (str \u001b (ansi-colors color) s \u001b (ansi-colors :reset)))
 
+(defn colorize-diff
+  "Colorizes a diff-text extracted from #'cljfmt.diff"
+  [diff-text] ;; see https://git.io/Jkoqb
+  (-> diff-text
+      (string/replace #"(?m)^(@@.*@@)$" (colorize "$1" :cyan))
+      (string/replace #"(?m)^(\+(?!\+\+).*)$" (colorize "$1" :green))
+      (string/replace #"(?m)^(-(?!--).*)$" (colorize "$1" :red))))
+
 (defmacro silence
   "Execute body without printing to `*out*` or `*err*`"
+  {:style/indent 0}
   [& body]
   `(let [s# (StringWriter.)]
      (binding [*out* s#

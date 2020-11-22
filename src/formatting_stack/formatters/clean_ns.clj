@@ -1,12 +1,11 @@
 (ns formatting-stack.formatters.clean-ns
   (:require
-   [cljfmt.diff :as diff]
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-sequential process-in-parallel! try-require]]
-   [formatting-stack.util.diff :refer [diff->line-numbers]]
+   [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
@@ -79,12 +78,12 @@
                                                   original-ns-form-str]} (replaceable-ns-form this filename)]
                                  (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
-                                        (mapv (fn [{:keys [begin]}]
+                                        (mapv (fn [{:keys [start]}]
                                                 {:filename filename
                                                  :diff diff
                                                  :level :warning
                                                  :column 0
-                                                 :line begin
+                                                 :line start
                                                  :msg "ns can be cleaned"
                                                  :source :formatting-stack/clean-ns})))))))
        (filter some?)

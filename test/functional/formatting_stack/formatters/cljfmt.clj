@@ -9,6 +9,9 @@
   (let [linter (sut/new {})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
+      "test-resources/valid_syntax.clj"
+      []
+
       "test-resources/invalid_syntax.clj"
       [{:source :formatting-stack/report-processing-error
         :level :exception
@@ -16,12 +19,12 @@
 
       "test-resources/wrong_indent.clj"
       [{:source :cljfmt/indent
-        :msg "Indentation is wrong at 4-5"
+        :msg "Indentation or whitespace is wrong at 4-5"
         :line 4
         :column 0
         :filename "test-resources/wrong_indent.clj"}
        {:source :cljfmt/indent
-        :msg "Indentation is wrong at 7"
+        :msg "Indentation or whitespace is wrong at 7"
         :line 7
         :column 0
         :filename "test-resources/wrong_indent.clj"}])))

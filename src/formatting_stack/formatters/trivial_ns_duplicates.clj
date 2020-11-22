@@ -10,13 +10,12 @@
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.diff :refer [diff->line-numbers]]
+   [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
-   [nedap.utils.spec.api :refer [check!]]
-   [cljfmt.diff :as diff]))
+   [nedap.utils.spec.api :refer [check!]]))
 
 (spec/def ::libspec coll?)
 
@@ -160,12 +159,12 @@
                                           (replaceable-ns-form how-to-ns-opts filename)]
                                  (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
                                    (->> (diff->line-numbers diff)
-                                        (mapv (fn [{:keys [begin]}]
+                                        (mapv (fn [{:keys [start]}]
                                                 {:filename filename
                                                  :diff     diff
                                                  :msg      "Duplicate ns forms found"
                                                  :column   0
-                                                 :line     begin
+                                                 :line     start
                                                  :level    :warning
                                                  :source   :formatting-stack/trivial-ns-duplicates})))))))
        (filter some?)
