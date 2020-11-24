@@ -38,7 +38,8 @@
                                                    :line start
                                                    :column 0
                                                    :level :warning
-                                                   :msg "Badly formatted namespace"
+                                                   :msg "Detected unsorted, renamed or extra clauses in the ns format"
+                                                   :warning-details-url "https://stuartsierra.com/2016/clojure-how-to-ns.html"
                                                    :source :how-to-ns/ns}))))))))
        (filter some?)
        (mapcat ensure-sequential)))

@@ -13,6 +13,6 @@
 (defn with-mocked-diff-path
   "Fixture to stub the absolute path in #'util.diff/unified-diff"
   [t]
-  (with-redefs [util.diff/to-absolute-path (fn [filename]
-                                             (str "/mocked/absolute/path/" filename))]
+  (binding [util.diff/*to-absolute-path-fn* (fn [filename]
+                                              (str "/mocked/absolute/path/" filename))]
     (t)))

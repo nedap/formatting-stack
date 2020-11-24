@@ -56,10 +56,10 @@
        :original-ns-form-str original-ns-form-str
        :final-ns-form-str    (how-to-ns/format-ns-str clean-ns-form how-to-ns-opts)})))
 
-(speced/defn write-ns-replacement!
-  [filename {:keys [final-ns-form-str
-                    original-ns-form-str
-                    buffer]}]
+(speced/defn ^nil? write-ns-replacement!
+  [^string? filename {:keys [^string? final-ns-form-str
+                             ^string? original-ns-form-str
+                             ^string? buffer]}]
   (->> original-ns-form-str
        count
        (subs buffer)
