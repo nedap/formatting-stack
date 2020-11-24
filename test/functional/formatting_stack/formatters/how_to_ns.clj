@@ -19,6 +19,6 @@
 
       "test-resources/ns_unordered.clj"
       [{:source :how-to-ns/ns
-        :msg "Badly formatted namespace"
+        :msg "Detected unsorted, renamed or extra clauses in the ns format"
         :diff string?
         :filename "test-resources/ns_unordered.clj"}])))

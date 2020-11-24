@@ -49,10 +49,11 @@
 
 (def diff-context-size 3)
 
-(defn to-absolute-path [filename]
-  (->> (string/split filename (re-pattern (Pattern/quote File/separator)))
-       ^File (apply io/file)
-       .getCanonicalPath))
+(def ^:dynamic *to-absolute-path-fn*
+  (fn [filename]
+    (->> (string/split filename (re-pattern (Pattern/quote File/separator)))
+         ^File (apply io/file)
+         .getCanonicalPath)))
 
 (speced/defn ^string? unified-diff
   "derives a patch derived from the original and revised file contents in a Unified Diff format"
@@ -62,8 +63,8 @@
            (unlines [ss]
              (string/join "\n" ss))]
      (unlines (DiffUtils/generateUnifiedDiff
-               (->> filename to-absolute-path (str "a"))
-               (->> filename to-absolute-path (str "b"))
+               (->> filename *to-absolute-path-fn* (str "a"))
+               (->> filename *to-absolute-path-fn* (str "b"))
                (lines original)
                (DiffUtils/diff (lines original) (lines revised))
                diff-context-size)))))
