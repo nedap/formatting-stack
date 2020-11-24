@@ -13,8 +13,8 @@
    (java.io File)
    (java.util.regex Pattern)))
 
-(spec/def ::start pos-int?)
-(spec/def ::end pos-int?)
+(spec/def ::start nat-int?)
+(spec/def ::end nat-int?)
 (spec/def ::filename present-string?)
 
 (speced/def-with-doc ::line-numbers
@@ -27,7 +27,7 @@
        (data/from-java)
        (mapcat (speced/fn [{:keys [^present-string? toFileName ^coll? hunks]}]
                  (->> hunks
-                      (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^pos-int? lineStart]} :fromFileRange}]
+                      (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^nat-int? lineStart]} :fromFileRange}]
                                 (->> lines
                                      (remove (rcomp :lineType #{"TO"}))
                                      (map-indexed (fn [idx line] (assoc line :lineNumber (+ idx lineStart)))))))

@@ -47,7 +47,21 @@
     "test-resources/diffs/4.patch"
     [{:start    5
       :end      5
-      :filename "test/unit/formatting_stack/strategies.clj"}]))
+      :filename "test/unit/formatting_stack/strategies.clj"}]
+
+    "Renaming does not report anything"
+    "test-resources/diffs/5.patch"
+    []
+
+    "Deleting reports entire file"
+    "test-resources/diffs/6.patch"
+    [{:end      82
+      :start    1
+      :filename "/dev/null"}]
+
+    "Adding a new file does not report anything"
+    "test-resources/diffs/7.patch"
+    []))
 
 (deftest unified-diff
   (are [description filename revised-filename expected] (testing description
