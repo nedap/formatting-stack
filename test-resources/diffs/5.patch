@@ -1,0 +1,4 @@
+diff --git a/src/formatting_stack/linters/line_length.clj b/src/formatting_stack/linters/line_length2.clj
+similarity index 100%
+rename from src/formatting_stack/linters/line_length.clj
+rename to src/formatting_stack/linters/line_length2.clj
