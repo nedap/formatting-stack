@@ -16,7 +16,8 @@
   (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
                         eastwood.lint/default-linters)]
     (-> eastwood.lint/default-opts
-        (assoc :linters linters))))
+        (assoc :linters linters
+               :rethrow-exceptions? true))))
 
 (def parallelize-linters? (System/getProperty "formatting-stack.eastwood.parallelize-linters"))
 
@@ -31,12 +32,16 @@
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
         reports    (atom nil)
+        exceptions (atom nil)
         output     (with-out-str
                      (binding [*warn-on-reflection* true]
-                       (cond-> options
-                         true                 (assoc :namespaces namespaces)
-                         parallelize-linters? (update :builtin-config-files conj config-filename)
-                         true                 (eastwood.lint/eastwood (impl/->TrackingReporter reports)))))]
+                       (try
+                         (cond-> options
+                           true                 (assoc :namespaces namespaces)
+                           parallelize-linters? (update :builtin-config-files conj config-filename)
+                           true                 (eastwood.lint/eastwood (impl/->TrackingReporter reports)))
+                         (catch Exception e
+                           (swap! exceptions conj e)))))]
     (->> @reports
          :warnings
          (map :warn-data)
@@ -48,7 +53,8 @@
                             :filename            (if (string? uri-or-file-name)
                                                    uri-or-file-name
                                                    (-> ^File uri-or-file-name .getCanonicalPath)))))
-         (concat (impl/warnings->reports output)))))
+         (concat (impl/warnings->reports output)
+                 (impl/exceptions->reports @exceptions)))))
 
 (defn new [{:keys [eastwood-options]
             :or   {eastwood-options {}}}]

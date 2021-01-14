@@ -1,7 +1,7 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.2.3"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2020.01.13"]
+  :dependencies [[clj-kondo "2020.11.07"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
                  [com.gfredericks/how-to-ns "0.2.6"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
@@ -10,7 +10,7 @@
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
-                 [jonase/eastwood "0.3.11"]
+                 [jonase/eastwood "0.3.12"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
