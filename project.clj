@@ -64,7 +64,6 @@
   ;; * Genuinely dev-only dependencies allowing 'basic science'
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
-  ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
                                                     [com.stuartsierra/component "0.4.0"]
                                                     [com.taoensso/timbre "4.10.0"]
@@ -98,22 +97,16 @@
 
              :cljs-old              {:dependencies [[com.stuartsierra/component "0.4.0"]
                                                     [integrant "0.8.0"]
-                                                    [org.clojure/clojurescript "1.7.228"
-                                                     :exclusions [com.cognitect/transit-clj
-                                                                  com.google.code.findbugs/jsr305
-                                                                  com.google.errorprone/error_prone_annotations]]]}
+                                                    [org.clojure/clojurescript "1.7.228"]]}
 
-             :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"
-                                                     :exclusions [com.cognitect/transit-clj
-                                                                  com.google.code.findbugs/jsr305
-                                                                  com.google.errorprone/error_prone_annotations]]
-                                                    [com.google.guava/guava "25.1-jre" #_"transitive"]
-                                                    [com.google.protobuf/protobuf-java "3.4.0" #_"transitive"]
-                                                    [com.cognitect/transit-clj "0.8.313" #_"transitive"]
-                                                    [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
-                                                    [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]
+             :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"]
                                                     [com.stuartsierra/component "0.4.0"]
-                                                    [integrant "0.8.0"]]}
+                                                    [integrant "0.8.0"]]
+                                     :managed-dependencies [[com.cognitect/transit-clj "1.0.324"]
+                                                            [com.google.code.findbugs/jsr305 "3.0.2"]
+                                                            [com.google.errorprone/error_prone_annotations "2.1.3"]
+                                                            [com.google.guava/guava "25.1-jre"]
+                                                            [com.google.protobuf/protobuf-java "3.4.0"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
