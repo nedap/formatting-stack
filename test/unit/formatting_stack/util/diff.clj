@@ -61,7 +61,11 @@
 
     "Adding a new file does not report anything"
     "test-resources/diffs/7.diff"
-    []))
+    [])
+
+  (testing "exceptions are passed through"
+    (is (thrown? IllegalStateException
+                 (sut/diff->line-numbers (slurp "test-resources/diffs/incorrect.diff"))))))
 
 (deftest unified-diff
   (are [description filename revised-filename expected] (testing description

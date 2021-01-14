@@ -3,6 +3,7 @@
    [clojure.string :as str]
    [clojure.test :refer :all]
    [formatting-stack.util :as sut]
+   [formatting-stack.util.diff :as diff]
    [matcher-combinators.test :refer [match?]]))
 
 (deftest read-ns-decl
@@ -32,6 +33,13 @@
       (fn [_] (assert false "expected"))
       ["made_up_name.clj"]
       [{:exception #(= "Assert failed: expected\nfalse" (ex-message %))
+        :level     :exception
+        :filename  "made_up_name.clj"
+        :msg       #(str/starts-with? % "Encountered an exception while running")}]
+
+      (fn [_] (diff/diff->line-numbers (slurp "test-resources/diffs/incorrect.diff")))
+      ["made_up_name.clj"]
+      [{:exception #(= "A FROM_FILE line ('---') must be directly followed by a TO_FILE line ('+++')!" (ex-message %))
         :level     :exception
         :filename  "made_up_name.clj"
         :msg       #(str/starts-with? % "Encountered an exception while running")}])))
