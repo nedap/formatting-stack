@@ -19,7 +19,11 @@
       []
 
       "test-resources/invalid_syntax.clj"
-      []
+      (matchers/equals
+       [{:source    :formatting-stack/report-processing-error
+         :level     :exception
+         :msg       "Encountered an exception while running Eastwood"
+         :exception #(= "Unmatched delimiter ]." (ex-message %))}])
 
       "test-resources/eastwood_warning.clj"
       (matchers/in-any-order

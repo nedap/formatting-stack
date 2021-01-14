@@ -15,6 +15,7 @@
    :linters   {:cond-else            off ;; undesired
                :missing-docstring    off ;; undesired
                :unused-binding       off ;; undesired
+               :private-call         off ;; undesired
                :unresolved-symbol    off ;; can give false positives
                :unused-symbol        off ;; can give false positives
                :unused-private-var   off ;; can give false positives
