@@ -13,11 +13,11 @@
                                          true)
 
     "Additions do not report a line number"
-    "test-resources/diffs/1.patch"
+    "test-resources/diffs/1.diff"
     []
 
     "Multiple sections are reported individually"
-    "test-resources/diffs/2.patch"
+    "test-resources/diffs/2.diff"
     [{:start    14
       :end      14
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}
@@ -32,7 +32,7 @@
       :filename "src/formatting_stack/formatters/trivial_ns_duplicates.clj"}]
 
     "consecutive removed lines are grouped"
-    "test-resources/diffs/3.patch"
+    "test-resources/diffs/3.diff"
     [{:start    12
       :end      12
       :filename "src/formatting_stack/formatters/no_extra_blank_lines.clj"}
@@ -44,23 +44,23 @@
       :filename "src/formatting_stack/protocols/spec.clj"}]
 
     "Moving code reports on the removed line"
-    "test-resources/diffs/4.patch"
+    "test-resources/diffs/4.diff"
     [{:start    5
       :end      5
       :filename "test/unit/formatting_stack/strategies.clj"}]
 
     "Renaming does not report anything"
-    "test-resources/diffs/5.patch"
+    "test-resources/diffs/5.diff"
     []
 
     "Deleting reports entire file"
-    "test-resources/diffs/6.patch"
+    "test-resources/diffs/6.diff"
     [{:end      82
       :start    1
       :filename "/dev/null"}]
 
     "Adding a new file does not report anything"
-    "test-resources/diffs/7.patch"
+    "test-resources/diffs/7.diff"
     []))
 
 (deftest unified-diff
@@ -74,19 +74,19 @@
     "Adding to an empty file"
     "test-resources/diffs/files/1.txt"
     "test-resources/diffs/files/1_revised.txt"
-    "test-resources/diffs/files/1.patch"
+    "test-resources/diffs/files/1.diff"
 
     "Removing all contents"
     "test-resources/diffs/files/1_revised.txt"
     "test-resources/diffs/files/1.txt"
-    "test-resources/diffs/files/1_reversed.patch"
+    "test-resources/diffs/files/1_reversed.diff"
 
     "Removing newlines"
     "test-resources/diffs/files/2.txt"
     "test-resources/diffs/files/2_revised.txt"
-    "test-resources/diffs/files/2.patch"
+    "test-resources/diffs/files/2.diff"
 
     "Adding newlines"
     "test-resources/diffs/files/2_revised.txt"
     "test-resources/diffs/files/2.txt"
-    "test-resources/diffs/files/2_reversed.patch"))
+    "test-resources/diffs/files/2_reversed.diff"))
