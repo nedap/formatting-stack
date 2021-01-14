@@ -35,8 +35,8 @@
                               :level    :warning
                               :column   0
                               :line     start
-                              :msg      (str "Indentation or whitespace is wrong at " (->> (dedupe [start end])
-                                                                                           (string/join "-")))
+                              :msg      (str "Indentation or whitespace is off on line" (->> (dedupe [start end])
+                                                                                             (string/join "-")))
                               :source   :cljfmt/indent}))))))))
        (filter some?)
        (mapcat ensure-sequential)))
