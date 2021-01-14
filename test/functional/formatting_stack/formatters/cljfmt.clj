@@ -19,12 +19,12 @@
 
       "test-resources/wrong_indent.clj"
       [{:source :cljfmt/indent
-        :msg "Indentation or whitespace is wrong at 4-5"
+        :msg "Indentation or whitespace is off on line 4-5"
         :line 4
         :column 0
         :filename "test-resources/wrong_indent.clj"}
        {:source :cljfmt/indent
-        :msg "Indentation or whitespace is wrong at 7"
+        :msg "Indentation or whitespace is off on line 7"
         :line 7
         :column 0
         :filename "test-resources/wrong_indent.clj"}])))
