@@ -3,7 +3,7 @@
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2020.11.07"]
                  [cljfmt "0.6.5" :exclusions [rewrite-clj]]
-                 [com.gfredericks/how-to-ns "0.2.6"]
+                 [com.gfredericks/how-to-ns "0.2.8"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.1.0"]
@@ -64,6 +64,7 @@
   ;; * Genuinely dev-only dependencies allowing 'basic science'
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
+  ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
                                                     [com.stuartsierra/component "0.4.0"]
                                                     [com.taoensso/timbre "4.10.0"]
