@@ -132,6 +132,11 @@
              :parallel-eastwood     {:jvm-opts ["-Dformatting-stack.eastwood.parallelize-linters=true"]}
 
              :ncrw                  {:global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                                     :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}
+                                     :source-paths   ^:replace []
+                                     :test-paths     ^:replace []
+                                     :resource-paths ^:replace []
+                                     :plugins        ^:replace []
+                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.12.0"]]}
+
              :ci                    {:pedantic?    :abort
                                      :jvm-opts     ["-Dclojure.main.report=stderr"]}})
