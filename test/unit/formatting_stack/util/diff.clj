@@ -63,7 +63,7 @@
     "test-resources/diffs/7.diff"
     []
 
-    "Can handle `\ No newline at end of file`"
+    "Can handle `\\ No newline at end of file`"
     "test-resources/diffs/8.diff"
     [])
 
