@@ -61,6 +61,10 @@
 
     "Adding a new file does not report anything"
     "test-resources/diffs/7.diff"
+    []
+
+    "Can handle `\ No newline at end of file`"
+    "test-resources/diffs/8.diff"
     [])
 
   (testing "exceptions are passed through"
