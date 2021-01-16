@@ -3,6 +3,7 @@
    [clojure.java.data :as data]
    [clojure.java.io :as io]
    [clojure.spec.alpha :as spec]
+   [formatting-stack.protocols.spec :as protocols.spec]
    [clojure.string :as string]
    [formatting-stack.util :refer [rcomp]]
    [nedap.speced.def :as speced]
@@ -13,8 +14,8 @@
    (java.io File)
    (java.util.regex Pattern)))
 
-(spec/def ::start nat-int?)
-(spec/def ::end nat-int?)
+(spec/def ::start ::protocols.spec/line)
+(spec/def ::end ::protocols.spec/line)
 (spec/def ::filename present-string?)
 
 (speced/def-with-doc ::line-numbers
@@ -27,12 +28,12 @@
        (data/from-java)
        (mapcat (speced/fn [{:keys [^present-string? toFileName ^coll? hunks]}]
                  (->> hunks
-                      (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^nat-int? lineStart]} :fromFileRange}]
+                      (mapcat (speced/fn [{:keys [^coll? lines] {:keys [^::start lineStart]} :fromFileRange}]
                                 (->> lines
                                      (remove (rcomp :lineType #{"TO"}))
                                      (map-indexed (fn [idx line] (assoc line :lineNumber (+ idx lineStart)))))))
                       (reduce (speced/fn [ret {:keys [^{::speced/spec #{"FROM" "NEUTRAL"}} lineType
-                                                      ^nat-int? lineNumber]}]
+                                                      ^::protocols.spec/line lineNumber]}]
                                 (let [{:keys [end] :as current} (last ret)]
                                   (cond
                                     (#{"NEUTRAL"} lineType)
