@@ -32,7 +32,7 @@
                                      (remove (rcomp :lineType #{"TO"}))
                                      (map-indexed (fn [idx line] (assoc line :lineNumber (+ idx lineStart)))))))
                       (reduce (speced/fn [ret {:keys [^{::speced/spec #{"FROM" "NEUTRAL"}} lineType
-                                                      ^pos-int? lineNumber]}]
+                                                      ^nat-int? lineNumber]}]
                                 (let [{:keys [end] :as current} (last ret)]
                                   (cond
                                     (#{"NEUTRAL"} lineType)
