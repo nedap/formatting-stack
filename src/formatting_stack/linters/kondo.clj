@@ -19,6 +19,7 @@
                :unresolved-symbol    off ;; can give false positives
                :unused-symbol        off ;; can give false positives
                :unused-private-var   off ;; can give false positives
+               :unresolved-var       off ;; already offered by clj
                :consistent-alias     off ;; already offered by how-to-ns
                :duplicate-require    off ;; already offered by clean-ns
                :unused-import        off ;; already offered by clean-ns

@@ -1,8 +1,8 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.3.0-alpha1"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2020.11.07"]
-                 [cljfmt "0.6.5" :exclusions [rewrite-clj]]
+  :dependencies [[clj-kondo "2021.01.20"]
+                 [cljfmt "0.7.0"]
                  [com.gfredericks/how-to-ns "0.2.8"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
@@ -10,14 +10,15 @@
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
-                 [jonase/eastwood "0.3.12"]
+                 [jonase/eastwood "0.3.13"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
                  [org.clojure/java.data "1.0.64"]
                  [org.clojure/tools.namespace "0.3.1"]
-                 [org.clojure/tools.reader "1.3.2"]
-                 [rewrite-clj "0.6.1"]]
+                 [org.clojure/tools.reader "1.3.4"]]
+
+  :managed-dependencies [[rewrite-clj "0.6.1"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
   ;; avoiding having the global version shadow the local one
@@ -96,7 +97,8 @@
                                                                                                         vec))))))
                                                        'user/nedap-ensure-exclusions)]}
 
-             :cljs-old              {:dependencies [[com.stuartsierra/component "0.4.0"]
+             :cljs-old              {:dependencies [[cljfmt "0.6.5"]
+                                                    [com.stuartsierra/component "0.4.0"]
                                                     [integrant "0.8.0"]
                                                     [org.clojure/clojurescript "1.7.228"]]}
 
