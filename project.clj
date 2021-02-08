@@ -10,7 +10,7 @@
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
-                 [jonase/eastwood "0.3.13"]
+                 [jonase/eastwood "0.3.14"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
