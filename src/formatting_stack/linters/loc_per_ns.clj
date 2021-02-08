@@ -8,7 +8,7 @@
 (defn count-lines [filename]
   (-> filename
       slurp
-      (string/split #"\n")
+      (string/split-lines)
       (count)))
 
 (defn lint! [{:keys [max-lines-per-ns]} filenames]
@@ -22,7 +22,7 @@
                                     :msg      (str "Longer than " max-lines-per-ns " LOC.")
                                     :line     lines
                                     :column   0}))))
-       (remove nil?)))
+       (filterv some?)))
 
 (defn new [{:keys [max-lines-per-ns]
             :or   {max-lines-per-ns 350}}]

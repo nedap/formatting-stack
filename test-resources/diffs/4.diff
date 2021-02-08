@@ -1,0 +1,14 @@
+diff --git a/test/unit/formatting_stack/strategies.clj b/test/unit/formatting_stack/strategies.clj
+index 78b6a35..4f5695e 100644
+--- a/test/unit/formatting_stack/strategies.clj
++++ b/test/unit/formatting_stack/strategies.clj
+@@ -2,8 +2,8 @@
+   (:require
+    [clojure.string :as str]
+    [clojure.test :refer [deftest is use-fixtures]]
+-   [formatting-stack.strategies :as sut]
+    [formatting-stack.strategies.impl :as sut.impl]
++   [formatting-stack.strategies :as sut]
+    [formatting-stack.strategies.impl.git-status :as git-status]))
+
+ (use-fixtures :once (fn [tests]

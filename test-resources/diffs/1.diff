@@ -1,0 +1,12 @@
+diff --git a/test/unit/formatting_stack/util.clj b/test/unit/formatting_stack/util.clj
+index 0649d14..af8a181 100644
+--- a/test/unit/formatting_stack/util.clj
++++ b/test/unit/formatting_stack/util.clj
+@@ -15,3 +15,7 @@
+     "test-resources/sample_cljs_ns.cljs" '(ns sample-cljs-ns
+                                             (:require [foo.bar.baz :as baz])
+                                             (:require-macros [sample-cljs-ns :refer [the-macro]]))))
++(deftest diff->line-numbers
++  (are [input expected] (= expected
++                           (sut/diff->line-numbers input))))
++

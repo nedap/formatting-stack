@@ -3,8 +3,10 @@
    [formatting-stack.formatters.clean-ns.impl :as impl]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
-   [formatting-stack.util :refer [process-in-parallel! try-require]]
-   [formatting-stack.util.ns :refer [replace-ns-form!]]
+   [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel! try-require]]
+   [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
+   [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
@@ -18,12 +20,6 @@
                                  :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
                                  :libspec-whitelist                    libspec-whitelist})
             pr-str)))
-
-(defn clean! [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename]
-  (replace-ns-form! filename
-                    (make-cleaner how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename)
-                    "Cleaning unused imports:"
-                    how-to-ns-opts))
 
 (def default-libspecs
   ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load" "migration" "migrations"])
@@ -57,19 +53,41 @@
 (def default-namespaces-that-should-never-cleaned
   #{'user 'dev})
 
+(defn replaceable-ns-form
+  [{:keys [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]} filename]
+  (when (and (try-require filename)
+             (not (impl/has-duplicate-requires? filename)))
+    (util.ns/replaceable-ns-form
+     filename
+     (make-cleaner how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename)
+     how-to-ns-opts)))
+
 (defn format!
-  [{:keys [how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist]}
-   files]
+  [this files]
   (->> files
        (process-in-parallel! (fn [filename]
-                               (when (and (try-require filename)
-                                          (not (impl/has-duplicate-requires? filename)))
-                                 (clean! how-to-ns-opts
-                                         refactor-nrepl-opts
-                                         namespaces-that-should-never-cleaned
-                                         libspec-whitelist
-                                         filename)))))
+                               (when-let [ns-replacement (replaceable-ns-form this filename)]
+                                 (println "Cleaning unused imports:" filename)
+                                 (write-ns-replacement! filename ns-replacement)))))
   nil)
+
+(defn lint! [this files]
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (when-let [{:keys [final-ns-form-str
+                                                  original-ns-form-str]} (replaceable-ns-form this filename)]
+                                 (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                   (->> (diff->line-numbers diff)
+                                        (mapv (fn [{:keys [start]}]
+                                                {:filename filename
+                                                 :diff diff
+                                                 :level :warning
+                                                 :column 0
+                                                 :line start
+                                                 :msg "ns can be cleaned"
+                                                 :source :formatting-stack/clean-ns})))))))
+       (filter some?)
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
             :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned
@@ -81,4 +99,5 @@
               :how-to-ns-opts      (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)
               :libspec-whitelist   libspec-whitelist
               :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned}
-    formatter/--format! format!))
+    formatter/--format! format!
+    linter/--lint!      lint!))

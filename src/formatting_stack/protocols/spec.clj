@@ -38,6 +38,8 @@ so that final users can locate them and configure them."
 
 (spec/def ::warning-details-url present-string?)
 
+(spec/def ::diff present-string?)
+
 (spec/def ::level #{:warning :error :exception})
 
 (defmulti reportmm :level)
@@ -57,7 +59,8 @@ so that final users can locate them and configure them."
              :opt-un [::column ;; not every linter reports column/line, see https://git.io/JfuoJ
                       ::line
                       ::msg-extra-data
-                      ::warning-details-url]))
+                      ::warning-details-url
+                      ::diff]))
 
 (spec/def ::report
   (spec/multi-spec reportmm :level))

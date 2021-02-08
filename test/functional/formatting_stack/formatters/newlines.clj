@@ -1,12 +1,12 @@
-(ns functional.formatting-stack.linters.loc-per-ns
+(ns functional.formatting-stack.formatters.newlines
   (:require
    [clojure.test :refer [are deftest]]
-   [formatting-stack.linters.loc-per-ns :as sut]
+   [formatting-stack.formatters.newlines :as sut]
    [formatting-stack.protocols.linter :as linter]
    [matcher-combinators.test :refer [match?]]))
 
 (deftest lint!
-  (let [linter (sut/new {:max-lines-per-ns 4})]
+  (let [linter (sut/new {})]
     (are [filename expected] (match? expected
                                      (linter/lint! linter [filename]))
       "test-resources/valid_syntax.clj"
@@ -15,9 +15,9 @@
       "test-resources/invalid_syntax.clj"
       []
 
-      "test-resources/sample_clj_ns.clj"
-      [{:source   :formatting-stack/loc-per-ns
-        :line     5
-        :column   0
-        :msg      "Longer than 4 LOC."
-        :filename "test-resources/sample_clj_ns.clj"}])))
+      "test-resources/extra_newlines_warning.clj"
+      [{:source :formatting-stack/newlines
+        :msg "File should end in 1 newlines"
+        :line 7
+        :column 1
+        :filename "test-resources/extra_newlines_warning.clj"}])))

@@ -1,21 +1,24 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "4.2.3"
+(defproject formatting-stack "4.3.0-apha4"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2020.01.13"]
-                 [cljfmt "0.6.5" :exclusions [rewrite-clj]]
-                 [com.gfredericks/how-to-ns "0.2.6"]
+  :dependencies [[clj-kondo "2021.01.20"]
+                 [cljfmt "0.7.0"]
+                 [com.gfredericks/how-to-ns "0.2.8"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
                  [com.nedap.staffing-solutions/speced.def "2.0.0"]
                  [com.nedap.staffing-solutions/utils.collections "2.1.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
-                 [jonase/eastwood "0.3.11"]
+                 [io.reflectoring.diffparser/diffparser "1.4"]
+                 [jonase/eastwood "0.3.14"]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
+                 [org.clojure/java.data "1.0.64"]
                  [org.clojure/tools.namespace "0.3.1"]
-                 [org.clojure/tools.reader "1.3.2"]
-                 [rewrite-clj "0.6.1"]]
+                 [org.clojure/tools.reader "1.3.4"]]
+
+  :managed-dependencies [[rewrite-clj "0.6.1"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
   ;; avoiding having the global version shadow the local one
@@ -62,7 +65,7 @@
   ;; * Genuinely dev-only dependencies allowing 'basic science'
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
-  ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
+  ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
                                                     [com.stuartsierra/component "0.4.0"]
                                                     [com.taoensso/timbre "4.10.0"]
@@ -94,24 +97,19 @@
                                                                                                         vec))))))
                                                        'user/nedap-ensure-exclusions)]}
 
-             :cljs-old              {:dependencies [[com.stuartsierra/component "0.4.0"]
-                                                    [integrant "0.8.0"]
-                                                    [org.clojure/clojurescript "1.7.228"
-                                                     :exclusions [com.cognitect/transit-clj
-                                                                  com.google.code.findbugs/jsr305
-                                                                  com.google.errorprone/error_prone_annotations]]]}
-
-             :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"
-                                                     :exclusions [com.cognitect/transit-clj
-                                                                  com.google.code.findbugs/jsr305
-                                                                  com.google.errorprone/error_prone_annotations]]
-                                                    [com.google.guava/guava "25.1-jre" #_"transitive"]
-                                                    [com.google.protobuf/protobuf-java "3.4.0" #_"transitive"]
-                                                    [com.cognitect/transit-clj "0.8.313" #_"transitive"]
-                                                    [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
-                                                    [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]
+             :cljs-old              {:dependencies [[cljfmt "0.6.5"]
                                                     [com.stuartsierra/component "0.4.0"]
-                                                    [integrant "0.8.0"]]}
+                                                    [integrant "0.8.0"]
+                                                    [org.clojure/clojurescript "1.7.228"]]}
+
+             :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"]
+                                                    [com.stuartsierra/component "0.4.0"]
+                                                    [integrant "0.8.0"]]
+                                     :managed-dependencies [[com.cognitect/transit-clj "1.0.324"]
+                                                            [com.google.code.findbugs/jsr305 "3.0.2"]
+                                                            [com.google.errorprone/error_prone_annotations "2.1.3"]
+                                                            [com.google.guava/guava "25.1-jre"]
+                                                            [com.google.protobuf/protobuf-java "3.4.0"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
@@ -136,6 +134,11 @@
              :parallel-eastwood     {:jvm-opts ["-Dformatting-stack.eastwood.parallelize-linters=true"]}
 
              :ncrw                  {:global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                                     :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}
+                                     :source-paths   ^:replace []
+                                     :test-paths     ^:replace []
+                                     :resource-paths ^:replace []
+                                     :plugins        ^:replace []
+                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.12.0"]]}
+
              :ci                    {:pedantic?    :abort
                                      :jvm-opts     ["-Dclojure.main.report=stderr"]}})

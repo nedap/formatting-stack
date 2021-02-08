@@ -8,8 +8,10 @@
    [clojure.walk :as walk]
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
-   [formatting-stack.util :refer [ensure-coll process-in-parallel! rcomp read-ns-decl]]
-   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form!]]
+   [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
+   [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]
@@ -133,19 +135,44 @@
     (when-not (= replacement ns-form)
       replacement)))
 
+(speced/defn ^{::speced/spec (complement #{"nil"})} duplicate-cleaner [ns-form]
+  (some-> ns-form remove-exact-duplicates pr-str))
+
+(defn replaceable-ns-form
+  [how-to-ns-opts filename]
+  (when (read-ns-decl filename)
+    (util.ns/replaceable-ns-form filename duplicate-cleaner how-to-ns-opts)))
+
 (defn format! [{:keys [how-to-ns-opts]} files]
   (->> files
        (process-in-parallel! (fn [filename]
-                               (when (read-ns-decl filename)
-                                 (replace-ns-form! filename
-                                                   (speced/fn ^{::speced/spec (complement #{"nil"})} [ns-form]
-                                                     (some-> ns-form remove-exact-duplicates pr-str))
-                                                   "Removing trivial duplicates in `ns` form:"
-                                                   how-to-ns-opts)))))
+                               (when-let [replacement (replaceable-ns-form how-to-ns-opts filename)]
+                                 (println "Removing trivial duplicates in `ns` form:" filename)
+                                 (write-ns-replacement! filename replacement)))))
   nil)
+
+(defn lint! [{:keys [how-to-ns-opts]} files]
+  (->> files
+       (process-in-parallel! (fn [filename]
+                               (when-let [{:keys [final-ns-form-str
+                                                  original-ns-form-str]}
+                                          (replaceable-ns-form how-to-ns-opts filename)]
+                                 (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                   (->> (diff->line-numbers diff)
+                                        (mapv (fn [{:keys [start]}]
+                                                {:filename filename
+                                                 :diff     diff
+                                                 :msg      "Duplicate ns forms found"
+                                                 :column   0
+                                                 :line     start
+                                                 :level    :warning
+                                                 :source   :formatting-stack/trivial-ns-duplicates})))))))
+       (filter some?)
+       (mapcat ensure-sequential)))
 
 (defn new [{:keys [how-to-ns-opts]
             :or   {how-to-ns-opts {}}}]
   (implement {:id ::id
               :how-to-ns-opts (deep-merge formatting-stack.formatters.how-to-ns/default-how-to-ns-opts how-to-ns-opts)}
+    linter/--lint! lint!
     formatter/--format! format!))

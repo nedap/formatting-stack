@@ -44,6 +44,15 @@ See https://git.io/fhQTx"
                :level    :warning
                :source   :eastwood/warn-on-reflection}))))
 
+(speced/defn ^::protocols.spec/reports exceptions->reports
+  [exceptions]
+  (->> exceptions
+       (map (fn [exception]
+              {:level     :exception
+               :source    :formatting-stack/report-processing-error
+               :msg       (str "Encountered an exception while running Eastwood")
+               :exception exception}))))
+
 (def vconj (fnil conj []))
 
 (defrecord TrackingReporter [reports])
