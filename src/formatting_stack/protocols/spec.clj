@@ -10,6 +10,9 @@
 so that final users can locate them and configure them."
   keyword?)
 
+(spec/def ::reify (spec/and some?
+                            (complement map?)))
+
 (speced/def-with-doc ::member
   "A 'member' of the stack that does something useful: a formatter, linter or processor.
 
@@ -21,6 +24,23 @@ so that final users can locate them and configure them."
       true
       (check! (spec/keys :req-un [:formatting-stack.protocols.spec.member/id])
               x))))
+
+(spec/def ::members (spec/and (spec/coll-of ::member)
+                              (fn [xs]
+                                (let [ids (->> xs
+                                               (map (fn ^{::speced/spec (rcomp count #{0 1})} [x]
+                                                      (when-not (spec/valid? ::reify x)
+                                                        (let [ks (->> x
+                                                                      keys ;; fails if (reify)
+                                                                      (filter keyword?)
+                                                                      (filter (fn [x]
+                                                                                (-> x name #{"id"}))))]
+                                                          (map (partial get x) ks)))))
+                                               (apply concat))]
+                                  (when (seq ids)
+                                    (assert (apply distinct? ids)
+                                            "Members should have unique ids"))
+                                  true))))
 
 (spec/def ::filename present-string?)
 

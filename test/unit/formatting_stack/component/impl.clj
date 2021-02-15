@@ -8,6 +8,6 @@
                           (is (= expected
                                  (sut/parse-options input)))
                           true)
-    {}            ()
-    {:a 1}        '(:a 1)
-    {:a 1 :b nil} '(:a 1)))
+    {}            {}
+    {:a 1}        {:a 1}
+    {:a 1 :b nil} {:a 1}))

@@ -9,46 +9,46 @@
     * https://github.com/nedap/formatting-stack/wiki/FAQ"
   (:require
    [formatting-stack.core]
-   [formatting-stack.defaults]
    [formatting-stack.linters.kondo :as kondo]
    [formatting-stack.linters.line-length :as line-length]
-   [formatting-stack.linters.ns-aliases :as ns-aliases]))
+   [formatting-stack.linters.ns-aliases :as ns-aliases]
+   [formatting-stack.strategies]))
 
 ;; You an implement your own linters:
-(def custom-linters
-  [(reify formatting-stack.protocols.linter/Linter
-     (--lint! [this filenames]
-       [{:source   ::my-linter
-         :level    :warning
-         :column   40
-         :line     6
-         :msg      "Hello, I am a sample linter!"
-         :filename "path.clj"}]))])
+(def custom-linter
+  (reify formatting-stack.protocols.linter/Linter
+    (--lint! [this filenames]
+      [{:source   ::my-linter
+        :level    :warning
+        :column   40
+        :line     6
+        :msg      "Hello, I am a sample linter!"
+        :filename "path.clj"}])))
 
 ;; You can tweak the default linters' configuration:
-(def tweaked-linters
-  (->> formatting-stack.defaults/default-linters
-       (keep (fn [{:keys [id] :as linter}]
-               ;; all formatters and linters have an `:id`.
-               (case id
-                 ;; change :max-line-length from 130 to 80:
-                 ::line-length/id (assoc linter :max-line-length 80)
+(def linter-overrides
+  {;; add a linter:
+   ::id             custom-linter
 
-                 ;; remove an undesired linter:
-                 ::ns-aliases/id  nil
+   ;; remove an undesired linter:
+   ::ns-aliases/id  nil
 
-                 ;; override some kondo defaults. They will be deep-merged against formatting-stack's kondo config:
-                 ::kondo/id       (assoc linter
-                                         :kondo-clj-options  {:linters {:cond-else {:level :warning}}}
-                                         ;; remember there are different options, for clj and cljs.
-                                         :kondo-cljs-options {:linters {:duplicate-require {:level :warning}}})
-                 linter)))
-       (vec)))
+   ;; change :max-line-length from 130 to 80:
+   ::line-length/id {:max-line-length 80}
 
-(def all-linters
-  (into custom-linters tweaked-linters))
+   ;; override some kondo defaults. They will be deep-merged against formatting-stack's kondo config:
+   ::kondo/id       {:kondo-clj-options  {:linters {:cond-else {:level :warning}}}
+                     ;; remember there are different options, for clj and cljs.
+                     :kondo-cljs-options {:linters {:duplicate-require {:level :warning}}}}})
 
 (comment
-  (formatting-stack.core/format! :linters all-linters
-                                 :formatters [] ;; disable all formatters (as an example of how to do that)
-                                 :in-background? false))
+  (formatting-stack.git-status-formatter/format-and-lint! :in-background? false
+                                                          ;; `:overrides` will be deep-merged against formatting-stack's defaults.
+                                                          ;; a `nil` value at any depth has the special meaning "remove this entry".
+                                                          ;; a vector  (empty or not) will perform a whole-value replacement.
+                                                          :overrides {:linters    linter-overrides ;; map syntax
+                                                                      :processors []               ;; disable all processors, via vector syntax (as an example of how to do that)
+                                                                      ;; an example of a totally custom strategy setup:
+                                                                      :strategies {:formatters [formatting-stack.strategies/git-completely-staged
+                                                                                                formatting-stack.strategies/git-not-completely-staged]
+                                                                                   :linters    [formatting-stack.strategies/git-diff-against-default-branch]}}))

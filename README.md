@@ -122,7 +122,7 @@ For that case, you can create some facility (e.g. shortcut, snippet) for the fol
 If you want to add custom members to the `format!` options (namely: `:formatters`, or `:strategies`, etc), a typical pattern would be:
 
 ```clojure
-(formatting-stack.core/format! :formatters (conj formatting-stack.defaults/default-formatters my-custom-formatter))
+XXX
 ```
 
 You can also pass `[]` for disabling a particular aspect:

@@ -2,7 +2,7 @@
   "A set of defaults apt for formatting/linting a git branch
   (namely, the files that a branch has modified, respective to another).
 
-  See also: `formatting-stack.defaults`, `formatting-stack.project-formatter`"
+  See also: `formatting-stack.git-status-formatter`, `formatting-stack.project-formatter`"
   (:require
    [formatting-stack.core]
    [formatting-stack.formatters.clean-ns :as formatters.clean-ns]
@@ -19,13 +19,18 @@
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
    [formatting-stack.linters.one-resource-per-ns :as linters.one-resource-per-ns]
    [formatting-stack.processors.cider :as processors.cider]
+   [formatting-stack.protocols.formatter :as protocols.formatter]
+   [formatting-stack.protocols.linter :as protocols.linter]
+   [formatting-stack.protocols.processor :as protocols.processor]
    [formatting-stack.reporters.pretty-printer :as pretty-printer]
    [formatting-stack.strategies :as strategies]
-   [medley.core :refer [mapply]]))
+   [medley.core :refer [mapply]]
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]))
 
-(def third-party-indent-specs formatting-stack.indent-specs/default-third-party-indent-specs)
-
-(defn default-formatters [default-strategies]
+(speced/defn default-formatters [_
+                                 ^vector? default-strategies
+                                 ^map? third-party-indent-specs]
   (->> [(formatters.cljfmt/new {:third-party-indent-specs third-party-indent-specs})
         (-> (formatters.how-to-ns/new {})
             (assoc :strategies (conj default-strategies
@@ -49,7 +54,8 @@
 
        (filterv some?)))
 
-(defn default-linters [default-strategies]
+(defn default-linters [_
+                       default-strategies]
   [(-> (linters.kondo/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/exclude-edn)))
@@ -75,37 +81,60 @@
                                 strategies/jvm-requirable-files
                                 strategies/namespaces-within-refresh-dirs-only)))])
 
-(def default-processors
+(speced/defn default-processors [_
+                                 ^vector? processors-strategies
+                                 ^map? third-party-indent-specs]
   [(processors.cider/new {:third-party-indent-specs third-party-indent-specs})])
 
 (def default-reporter
   (pretty-printer/new {}))
 
-(defn format-and-lint-branch! [& {:keys [target-branch in-background? reporter]
-                                  :or   {target-branch  "master"
-                                         in-background? (not (System/getenv "CI"))
-                                         reporter       default-reporter}}]
+(def formatter-factory
+  (implement {}
+    protocols.formatter/--formatters default-formatters))
+
+(def no-formatters (constantly []))
+
+(def empty-formatter-factory
+  (implement {}
+    protocols.formatter/--formatters no-formatters))
+
+(def linter-factory
+  (implement {}
+    protocols.linter/--linters default-linters))
+
+(def processor-factory
+  (implement {}
+    protocols.processor/--processors default-processors))
+
+(defn format-and-lint-branch!
+  "Note that files that are not completely staged will not be affected.
+
+  You can override that with `:blacklist []`."
+  [& {:keys [target-branch in-background? reporter formatters blacklist overrides]
+      :or   {target-branch  "master"
+             in-background? (not (System/getenv "CI"))
+             reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
-                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
-        formatters (default-formatters default-strategies)
-        linters (default-linters default-strategies)]
+                              (mapply strategies/git-diff-against-default-branch (cond-> options
+                                                                                   true      (assoc :target-branch target-branch)
+                                                                                   blacklist (assoc :blacklist blacklist))))]]
     (formatting-stack.core/format! :strategies default-strategies
-                                   :processors default-processors
-                                   :formatters formatters
+                                   :overrides overrides
+                                   :formatters (or formatters formatter-factory)
+                                   :linters linter-factory
+                                   :processors processor-factory
                                    :reporter reporter
-                                   :linters linters
                                    :in-background? in-background?)))
 
-(defn lint-branch! [& {:keys [target-branch in-background? reporter]
+(defn lint-branch! [& {:keys [target-branch in-background? reporter overrides]
                        :or   {target-branch  "master"
                               in-background? false
                               reporter       default-reporter}}]
-  (let [default-strategies [(fn [& {:as options}]
-                              (mapply strategies/git-diff-against-default-branch (assoc options :target-branch target-branch)))]
-        linters (default-linters default-strategies)]
-    (formatting-stack.core/format! :strategies default-strategies
-                                   :formatters []
-                                   :processors default-processors
-                                   :reporter reporter
-                                   :linters linters
-                                   :in-background? in-background?)))
+  (format-and-lint-branch! :target-branch target-branch
+                           :overrides overrides
+                           :in-background? in-background?
+                           :reporter reporter
+                           :formatters empty-formatter-factory
+                           ;; analyze a broader selection of files:
+                           :blacklist []))

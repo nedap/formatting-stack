@@ -3,6 +3,7 @@
    [clojure.test :refer [deftest is testing]]
    [com.stuartsierra.component :as component]
    [formatting-stack.component :as sut]
+   [formatting-stack.protocols.linter :as protocols.linter]
    [formatting-stack.reporters.passthrough :as reporters.passthrough]
    [nedap.utils.spec.api :refer [check!]]))
 
@@ -24,13 +25,14 @@
   (testing "It can be started/stopped without errors"
     (let [p (atom nil)
           ;; pass an empty stack (except for the `proof`), so that no side-effects will be triggered (would muddy the test suite):
-          opts {:strategies               []
-                :third-party-indent-specs {}
-                :formatters               []
-                :linters                  [(proof p)]
-                :processors               []
-                :in-background?           false
-                :reporter                 (reporters.passthrough/new)}
+          opts {:overrides      {:strategies {:formatters []
+                                              :linters    []
+                                              :processors []}
+                                 :formatters []
+                                 :processors []
+                                 :linters    [(proof p)]}
+                :in-background? false
+                :reporter       (reporters.passthrough/new)}
           instance (sut/new opts)]
       (is (= instance
              (component/start instance)))
