@@ -12,12 +12,11 @@
    (java.io File)))
 
 (def default-eastwood-options
-  ;; Avoid false positives or undesired checks:
-  (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
-                        eastwood.lint/default-linters)]
-    (-> eastwood.lint/default-opts
-        (assoc :linters linters
-               :rethrow-exceptions? true))))
+  (assoc eastwood.lint/default-opts
+         ;; Avoid false positives or undesired checks:
+         :exclude-linters     #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
+         :parallel?           :naive
+         :rethrow-exceptions? true))
 
 (def parallelize-linters? (System/getProperty "formatting-stack.eastwood.parallelize-linters"))
 
