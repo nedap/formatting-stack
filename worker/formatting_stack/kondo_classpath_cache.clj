@@ -10,5 +10,6 @@
   (future
     (let [files (-> (System/getProperty "java.class.path")
                     (string/split #"\:"))]
-      (kondo/run! {:lint      files
-                   :cache     true}))))
+      (->> (partition-all 100 files) ;; prevent OOM when classpath is large
+           (mapv #(kondo/run! {:lint      %
+                               :cache     true}))))))
