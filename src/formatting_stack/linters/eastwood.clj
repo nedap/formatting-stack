@@ -44,14 +44,16 @@
     (->> @reports
          :warnings
          (map :warn-data)
-         (map (fn [{:keys [uri-or-file-name linter] :strs [warning-details-url] :as m}]
-                (assoc-some m
-                            :level               :warning
-                            :source              (keyword "eastwood" (name linter))
-                            :warning-details-url warning-details-url
-                            :filename            (if (string? uri-or-file-name)
-                                                   uri-or-file-name
-                                                   (-> ^File uri-or-file-name .getCanonicalPath)))))
+         (map (fn [{:keys [uri-or-file-name msg line column linter] :strs [warning-details-url]}]
+                (assoc-some {:level         :warning
+                             :source        (keyword "eastwood" (name linter))
+                             :filename      (if (string? uri-or-file-name)
+                                              uri-or-file-name
+                                              (-> ^File uri-or-file-name .getCanonicalPath))
+                             :column        column
+                             :msg           msg
+                             :line          line}
+                            :warning-details-url warning-details-url)))
          (concat (impl/warnings->reports output)
                  (impl/exceptions->reports @exceptions)))))
 
