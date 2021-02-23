@@ -2,29 +2,13 @@
   "Prints an optionally colorized, indented, possibly truncated output of the reports."
   (:require
    [clojure.stacktrace :refer [print-stack-trace]]
-   [clojure.string :as string]
    [formatting-stack.protocols.reporter :as reporter]
    [formatting-stack.protocols.spec :as protocols.spec]
+   [formatting-stack.reporters.impl :refer [truncate-line-wise]]
    [formatting-stack.util :refer [colorize colorize-diff]]
    [medley.core :refer [map-vals]]
    [nedap.speced.def :as speced]
    [nedap.utils.modular.api :refer [implement]]))
-
-(speced/defn truncate-line-wise [^string? s, length]
-  (if (= s "\n")
-    s
-    (->> (string/split s #"\n")
-         (map (fn [s]
-                (let [suffix "…"
-                      string-length (count s)
-                      suffix-length (count suffix)]
-                  (if (<= string-length length)
-                    s
-                    (str (subs s
-                               0
-                               (- length suffix-length))
-                         suffix)))))
-         (string/join "\n"))))
 
 (speced/defn print-summary [{:keys [^boolean? summary?
                                     ^boolean? colorize?]} reports]

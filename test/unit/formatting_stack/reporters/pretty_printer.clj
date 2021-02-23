@@ -3,20 +3,6 @@
    [clojure.test :refer [are deftest is testing]]
    [formatting-stack.reporters.pretty-printer :as sut]))
 
-(deftest truncate-line-wise
-  (are [input expected] (testing input
-                          (is (= expected
-                                 (sut/truncate-line-wise input 5)))
-                          true)
-    ""                  ""
-    "a"                 "a"
-    "aaaaa"             "aaaaa"
-    "aaaaaEXCEEDING"    "aaaa…"
-    "\n"                "\n"
-    "a\na"              "a\na"
-    "a\naaaaaEXCEEDING" "a\naaaa…"
-    "aaaaaEXCEEDING\na" "aaaa…\na"))
-
 (deftest print-warnings
   (are [desc input expected] (testing [desc input]
                                (is (= expected
