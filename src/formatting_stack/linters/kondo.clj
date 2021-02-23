@@ -11,7 +11,6 @@
 
 (def default-options
   {:cache     true
-   :cache-dir formatting-stack.kondo-classpath-cache/cache-dir
    :linters   {:cond-else            off ;; undesired
                :missing-docstring    off ;; undesired
                :unused-binding       off ;; undesired
