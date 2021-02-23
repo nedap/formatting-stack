@@ -11,6 +11,7 @@
 
 (def default-options
   {:cache     true
+   :parallel  true
    :linters   {:cond-else            off ;; undesired
                :missing-docstring    off ;; undesired
                :unused-binding       off ;; undesired

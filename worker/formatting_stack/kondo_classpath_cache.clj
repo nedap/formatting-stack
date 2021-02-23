@@ -12,4 +12,5 @@
                     (string/split #"\:"))]
       (->> (partition-all 100 files) ;; prevent OOM when classpath is large
            (mapv #(kondo/run! {:lint      %
+                               :parallel  true
                                :cache     true}))))))
