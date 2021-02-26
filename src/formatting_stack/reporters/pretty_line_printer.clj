@@ -50,8 +50,8 @@
                (println (cond-> title colorize? (colorize :cyan)))
                (doseq [{:keys [msg msg-extra-data column line source level]} (sort-by :line reports)]
                  (println (case level
-                            :error   (cond-> "❌" colorize? (colorize :red))
-                            :warning (cond-> "⚠️" colorize? (colorize :yellow)))
+                            :error   " ❌"
+                            :warning " ⚠️")
                           (if (or column line)
                             (cond-> (format "%3s:%-3s" (or line "?") (or column "?")) colorize? (colorize :grey))
                             "       ")
