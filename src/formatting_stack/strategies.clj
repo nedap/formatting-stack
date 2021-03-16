@@ -19,6 +19,7 @@
    [formatting-stack.strategies.impl.git-status :as git-status]
    [formatting-stack.util :refer [read-ns-decl require-lock try-require]]
    [nedap.speced.def :as speced]
+   [nedap.utils.collections.eager :refer [partitioning-pmap]]
    [nedap.utils.spec.api :refer [check!]])
   (:import
    (java.io File)))
@@ -166,13 +167,15 @@
                                        ;; Temporary, until https://git.io/Jeaah is a thing:
                                        true)))) refresh-dirs)]}
   (->> files
-       (filter (speced/fn [^string? filename]
-                 (if-not (read-ns-decl filename)
-                   true
-                   (let [file (-> filename File.)]
-                     (->> refresh-dirs
-                          (some (fn [dir]
-                                  (impl/dir-contains? dir file))))))))))
+       (partitioning-pmap (speced/fn [^string? filename]
+                            (if-not (read-ns-decl filename)
+                              filename
+                              (let [file (-> filename File.)]
+                                (when (->> refresh-dirs
+                                           (some (fn [dir]
+                                                   (impl/dir-contains? dir file))))
+                                  filename)))))
+       (filter identity)))
 
 (defn refactor-nrepl-available? []
   (locking require-lock
