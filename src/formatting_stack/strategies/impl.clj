@@ -100,3 +100,10 @@
               (-> f .getCanonicalPath)))
        (some #{(-> file .getCanonicalPath)})
        (boolean)))
+
+(speced/defn ^boolean? git-ref-exists?
+  "Does `ref` denote an existing git branch, tag or commit sha?"
+  [^string? ref]
+  (-> (sh "git" "rev-parse" ref)
+      :exit
+      zero?))

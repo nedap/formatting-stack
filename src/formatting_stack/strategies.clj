@@ -84,6 +84,8 @@
              ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
              impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
+  (assert (impl/git-ref-exists? target-branch)
+          (str (pr-str target-branch) " was not recognised as an existing git branch, tag or commit sha."))
   (->> impl
        (impl/absolutize git-command)
        (remove (set blacklist))
