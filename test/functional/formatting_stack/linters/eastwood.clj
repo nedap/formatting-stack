@@ -11,6 +11,11 @@
                       (binding [*print-level* 5]
                         (tests))))
 
+;; Important - these make `safe-the-ns` work, which is part of SUT's read-eval checking.
+;; (these namespaces can be absent when running e.g. `lein test :only`)
+(require 'functional.formatting-stack.linters.eastwood.examples.read-eval)
+(require 'functional.formatting-stack.linters.eastwood.examples.read-eval-2)
+
 (deftest lint!
   (let [linter (sut/new {})]
     (are [filename expected] (match? expected
@@ -24,6 +29,22 @@
          :level     :exception
          :msg       "Encountered an exception while running Eastwood"
          :exception #(= "Unmatched delimiter ]." (ex-message %))}])
+
+      ;; if read-eval happens directly (without read-string being involved), then the exception is thrown by f-s:
+      "test/functional/formatting_stack/linters/eastwood/examples/read_eval.clj"
+      (matchers/equals
+       [{:source    :formatting-stack/report-processing-error
+         :level     :exception
+         :msg       "Encountered an exception while running Eastwood"
+         :exception #(= "#= not allowed when *read-eval* is false" (-> % ex-message))}])
+
+      ;; if read-eval happens via read-string (triggered at compile-time), then the exception is thrown by Eastwood:
+      "test/functional/formatting_stack/linters/eastwood/examples/read_eval_2.clj"
+      (matchers/equals
+       [{:source    :formatting-stack/report-processing-error
+         :level     :exception
+         :msg       "Encountered an exception while running Eastwood"
+         :exception #(= "EvalReader not allowed when *read-eval* is false." (-> % ex-data :exception ex-message))}])
 
       "test-resources/eastwood_warning.clj"
       (matchers/in-any-order

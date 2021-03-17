@@ -10,7 +10,8 @@
    (clojure.lang Namespace)))
 
 (speced/defn safely-read-ns-contents [^string? buffer, ^Namespace ns-obj]
-  (binding [tools.reader/*alias-map* (ns-aliases ns-obj)]
+  (binding [tools.reader/*read-eval* false
+            tools.reader/*alias-map* (ns-aliases ns-obj)]
     (tools.reader/read-string {:read-cond :allow
                                :features  #{:clj}}
                               (str "[ " buffer " ]"))))

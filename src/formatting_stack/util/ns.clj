@@ -27,10 +27,11 @@
          (apply =))))
 
 (speced/defn safely-read-ns-form [^::ns-form-str ns-form-str]
-  (-> (tools.reader/read-string {:read-cond :preserve
-                                 :features  #{:clj :cljs}}
-                                (str "[ " ns-form-str " ]"))
-      first))
+  (binding [tools.reader/*read-eval* false]
+    (-> (tools.reader/read-string {:read-cond :preserve
+                                   :features  #{:clj :cljs}}
+                                  (str "[ " ns-form-str " ]"))
+        first)))
 
 (speced/defn replaceable-ns-form
   [^string? filename, ^ifn? ns-cleaner, ^map? how-to-ns-opts]
