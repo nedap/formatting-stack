@@ -9,7 +9,8 @@
    [criterium.core :refer [quick-bench]]
    [lambdaisland.deep-diff]))
 
-;; the "worker" source-path must be excluded.
+;; * the "worker" source-path must be excluded.
+;; * if updating this, please check if `formatting-stack.global-test-setup` also needs updating.
 (set-refresh-dirs "src" "test" "dev")
 
 (defn prepare-tests []
