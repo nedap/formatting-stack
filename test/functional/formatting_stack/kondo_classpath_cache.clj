@@ -12,7 +12,7 @@
       (is (apply = arglists))))
 
   (let [proof (atom nil)]
-    (are [input expected] (do
+    (are [input expected] (testing "All arguments passed to the `body` are evaluated"
                             (reset! proof [])
                             (is (= expected
                                    input))
