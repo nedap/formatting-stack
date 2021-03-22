@@ -11,22 +11,15 @@
 
 (def default-options
   {:cache     true
-   :cache-dir formatting-stack.kondo-classpath-cache/cache-dir
+   :parallel  true
    :linters   {:cond-else            off ;; undesired
                :missing-docstring    off ;; undesired
                :unused-binding       off ;; undesired
                :private-call         off ;; undesired
                :unresolved-symbol    off ;; can give false positives
                :unused-symbol        off ;; can give false positives
-               :unused-private-var   off ;; can give false positives
-               :unresolved-var       off ;; already offered by clj
-               :consistent-alias     off ;; already offered by how-to-ns
-               :duplicate-require    off ;; already offered by clean-ns
-               :unused-import        off ;; already offered by clean-ns
-               :unused-namespace     off ;; already offered by clean-ns
-               :unused-referred-var  off ;; already offered by clean-ns
-               :unresolved-namespace off ;; already offered by clean-ns
-               }
+               :unused-private-var   off} ;; can give false positives
+
    :lint-as   '{nedap.speced.def/def-with-doc clojure.core/defonce
                 nedap.speced.def/defn         clojure.core/defn
                 nedap.speced.def/defprotocol  clojure.core/defprotocol
@@ -61,9 +54,9 @@
                                             (-> (re-find #"\.cljs$" f)
                                                 boolean))))]
     (->> [(kondo/run! {:lint   clj-files
-                       :config (deep-merge default-options clj-options kondo-clj-options)
+                       :config (deep-merge default-options clj-options kondo-clj-options)})
                        ;; :lang is unset here, so as not to particularly prefer .clj over .cljc
-                       })
+
           (kondo/run! {:lint   cljs-files
                        :config (deep-merge default-options kondo-cljs-options)
                        :lang   :cljs})]
