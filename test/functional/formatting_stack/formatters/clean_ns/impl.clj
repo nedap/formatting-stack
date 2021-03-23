@@ -7,7 +7,7 @@
 (deftest has-duplicate-requires?
   (are [input assertion] (let [file (io/file "test" "functional" "formatting_stack" "formatters" "clean_ns" input)
                                _ (assert (-> file .exists))
-                               filename (-> file .getAbsolutePath)
+                               filename (-> file .getCanonicalPath)
                                result (sut/has-duplicate-requires? filename)]
                            (case assertion
                              :has-duplicates result

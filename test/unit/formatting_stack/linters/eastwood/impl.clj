@@ -3,7 +3,9 @@
    [clojure.string :as str]
    [clojure.test :refer [are deftest is testing]]
    [formatting-stack.linters.eastwood.impl :as sut]
-   [matcher-combinators.test :refer [match?]]))
+   [matcher-combinators.test :refer [match?]])
+  (:import
+   (java.io File)))
 
 (deftest contains-dynamic-assertions?
   (testing "matches on false-positive wrong-pre-post reports"
@@ -72,7 +74,7 @@
       :column   40
       :line     6
       :msg      "reference to field getPath can't be resolved"
-      :filename "path.clj"}]
+      :filename (-> "path.clj" File. .getCanonicalPath)}]
 
     (str/join "\n"
               ["path.clj:6:40: Reflection warning - reference to field getPath can't be resolved."
@@ -82,13 +84,13 @@
       :column   40
       :line     6
       :msg      "reference to field getPath can't be resolved"
-      :filename "path.clj"}
+      :filename (-> "path.clj" File. .getCanonicalPath)}
      {:source   :eastwood/warn-on-reflection
       :level    :warning
       :column   12
       :line     13
       :msg      "different message"
-      :filename "other-path.clj"}]
+      :filename (-> "other-path.clj" File. .getCanonicalPath)}]
 
     (str/join "\n"
               ["path.clj:6:40: Reflection warning - reference to field getPath can't be resolved."
@@ -96,6 +98,6 @@
                "path.clj: Incomplete warning - different message."
                "other-path.clj:13:12: Reflection warning - different message."])
     [{:msg      "reference to field getPath can't be resolved"
-      :filename "path.clj"}
+      :filename (-> "path.clj" File. .getCanonicalPath)}
      {:msg      "different message"
-      :filename "other-path.clj"}]))
+      :filename (-> "other-path.clj" File. .getCanonicalPath)}]))

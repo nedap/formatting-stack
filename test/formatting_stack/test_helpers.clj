@@ -8,7 +8,7 @@
 (speced/defn filename-as-resource [^string? filename]
   (str "file:" (-> filename
                    File.
-                   .getAbsolutePath)))
+                   .getCanonicalPath)))
 
 (defn with-mocked-diff-path
   "Fixture to stub the absolute path in #'util.diff/unified-diff"

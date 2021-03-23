@@ -1,13 +1,17 @@
 (ns formatting-stack.linters.eastwood
   (:require
    [clojure.java.io :as io]
+   [clojure.set :as set]
    [clojure.string :as str]
    [eastwood.lint]
    [formatting-stack.linters.eastwood.impl :as impl]
    [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.util :refer [ns-name-from-filename]]
    [medley.core :refer [assoc-some deep-merge]]
-   [nedap.utils.modular.api :refer [implement]])
+   [nedap.speced.def :as speced]
+   [nedap.utils.modular.api :refer [implement]]
+   [nedap.utils.spec.api :refer [check!]])
   (:import
    (java.io File)))
 
@@ -16,7 +20,7 @@
   (let [linters (remove #{:suspicious-test :unused-ret-vals :constant-test :wrong-tag}
                         eastwood.lint/default-linters)]
     (-> eastwood.lint/default-opts
-        (assoc :linters linters
+        (assoc :linters             linters
                :rethrow-exceptions? true))))
 
 (def parallelize-linters? (System/getProperty "formatting-stack.eastwood.parallelize-linters"))
@@ -28,6 +32,14 @@
 (note that this prefix must not be passed to Eastwood itself).")
 
 (defn lint! [{:keys [options]} filenames]
+  {:post [(do
+            (assert (check! (speced/fn [^::protocols.spec/reports xs]
+                              (let [output (->> xs (keep :filename) (set))]
+                                (set/subset? output (set filenames))))
+                            %)
+                    "The `:filename`s returned from Eastwood should be a subset of this function's `filenames`.
+Otherwise, it would mean that our filename absolutization out of Eastwood reports is buggy.")
+            true)]}
   (let [namespaces (->> filenames
                         (remove #(str/ends-with? % ".edn"))
                         (keep ns-name-from-filename))
@@ -50,9 +62,11 @@
                             :level               :warning
                             :source              (keyword "eastwood" (name linter))
                             :warning-details-url warning-details-url
-                            :filename            (if (string? uri-or-file-name)
-                                                   uri-or-file-name
-                                                   (-> ^File uri-or-file-name .getCanonicalPath)))))
+                            :filename            (speced/let [^::speced/nilable ^String s (when (string? uri-or-file-name)
+                                                                                            uri-or-file-name)
+                                                              ^File file (or (some-> s File.)
+                                                                             uri-or-file-name)]
+                                                   (-> file .getCanonicalPath)))))
          (concat (impl/warnings->reports output)
                  (impl/exceptions->reports @exceptions)))))
 
