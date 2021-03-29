@@ -1,21 +1,22 @@
 (ns integration.formatting-stack.strategies
   (:require
+   [clojure.java.io :as io]
    [clojure.java.shell :refer [sh]]
    [clojure.set :as set]
    [clojure.string :as string]
    [clojure.test :refer [deftest is testing use-fixtures]]
    [formatting-stack.strategies :as sut]
-   [formatting-stack.test-helpers :as test-helpers]
+   [formatting-stack.test-helpers :as test-helpers :refer [git-integration-dir]]
    [formatting-stack.util :refer [rcomp]]
    [nedap.speced.def :as speced])
   (:import
    (java.io File)))
 
-(def ^File deletable-file (File. "git-integration-testing/test-resources/deletable.clj"))
+(def ^File deletable-file (io/file git-integration-dir "test-resources" "deletable.clj"))
 
-(def ^File rename-destination (File. "git-integration-testing/test-resources/deletable_moved.clj"))
+(def ^File rename-destination (io/file git-integration-dir "test-resources" "deletable_moved.clj"))
 
-(def ^File creatable-filename (File. "git-integration-testing/test-resources/createable.clj"))
+(def ^File creatable-filename (io/file git-integration-dir "test-resources" "creatable.clj"))
 
 (def creatable-contents (pr-str '(ns foo)))
 
@@ -54,7 +55,7 @@
   (let [n (count corpus)]
     (is (pos? n))
     (doseq [^String filename corpus
-            :let [f (File. filename)]]
+            :let [f (io/file filename)]]
       (is (-> f .exists))
       (testing "It emits absolutized filenames"
         (is (= filename
@@ -242,4 +243,4 @@
 
     (is (set/subset? (set result)
                      (set all-files))
-        "Is a substractive (and not additive) mechanism")))
+        "Is a subtractive (and not additive) mechanism")))

@@ -28,16 +28,18 @@
       (do (io/delete-file f :silently)
           (recur (rest fs))))))
 
+(def git-integration-dir
+  "./git-integration-testing")
+
 (defn with-git-repo
-  "Clones current repo into \"./git-integration-testing\" for use in testing.
+  "Clones current repo into #'git-integration-dir for use in testing.
   Folder is removed afterwards."
   [t]
-  (let [integration-dir "./git-integration-testing"]
-    (with-sh-dir integration-dir
-      (try
-        (recursive-delete integration-dir)
-        (.mkdirs (io/as-file integration-dir))
-        (sh "git" "clone" (System/getProperty "user.dir") ".")
-        (t)
-        (finally
-          (recursive-delete integration-dir))))))
+  (with-sh-dir git-integration-dir
+    (try
+      (recursive-delete git-integration-dir)
+      (.mkdirs (io/as-file git-integration-dir))
+      (sh "git" "clone" (System/getProperty "user.dir") ".")
+      (t)
+      (finally
+        (recursive-delete git-integration-dir)))))
