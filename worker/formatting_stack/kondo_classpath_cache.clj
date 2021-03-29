@@ -8,6 +8,21 @@
   (:import
    (java.io File)))
 
+(def runner-mapping
+  {"future" `future
+   "delay"  `delay})
+
+(def ^:private runner-choice
+  (-> runner-mapping
+      (get (System/getProperty "formatting-stack.kondo-classpath-cache.runner", "future"))
+      (doto assert)))
+
+(defmacro runner
+  {:style/indent 0}
+  [& body]
+  {:pre [(seq body)]}
+  (apply list runner-choice body))
+
 ;; Use kondo's official default config dir, so that we don't bloat consumers' project layouts:
 (def cache-parent-dir ".clj-kondo")
 
@@ -17,7 +32,7 @@
 (def cache-dir (str cache-parent-dir File/separator cache-subdir))
 
 (def classpath-cache
-  (future
+  (runner
     (let [files (-> (System/getProperty "java.class.path")
                     (string/split #"\:"))]
       (-> (File. cache-parent-dir cache-subdir) .mkdirs)
