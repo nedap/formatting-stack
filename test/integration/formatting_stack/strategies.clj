@@ -3,26 +3,46 @@
    [clojure.java.shell :refer [sh]]
    [clojure.set :as set]
    [clojure.string :as string]
-   [clojure.test :refer [deftest is testing]]
+   [clojure.test :refer [deftest is testing use-fixtures]]
    [formatting-stack.strategies :as sut]
+   [formatting-stack.test-helpers :as test-helpers]
    [formatting-stack.util :refer [rcomp]]
    [nedap.speced.def :as speced])
   (:import
    (java.io File)))
 
-(def ^File deletable-file (File. "test-resources/deletable.clj"))
+(def ^File deletable-file (File. "git-integration-testing/test-resources/deletable.clj"))
 
-(def ^File rename-destination (File. "test-resources/deletable_moved.clj"))
+(def ^File rename-destination (File. "git-integration-testing/test-resources/deletable_moved.clj"))
 
-(def ^String createable-filename "test-resources/createable.clj")
+(def ^File creatable-filename (File. "git-integration-testing/test-resources/createable.clj"))
 
 (def creatable-contents (pr-str '(ns foo)))
 
-(assert (-> deletable-file .exists))
+(defn cleanup-testing-repo! []
+  (-> rename-destination .delete)
+  (-> creatable-filename .delete)
 
-(assert (not (-> rename-destination .exists)))
+  (sh "git" "reset" "--" "test-resources/deletable.clj")
+  (sh "git" "reset" "--" "test-resources/deletable_moved.clj")
+  (sh "git" "reset" "--" "test-resources/creatable.clj")
+  (sh "git" "checkout" "test-resources/deletable.clj")
 
-(assert (not (-> createable-filename File. .exists)))
+  (assert (-> deletable-file .exists))
+  (assert (not (-> rename-destination .exists)))
+  (assert (not (-> creatable-filename .exists))))
+
+(use-fixtures :once
+  test-helpers/with-git-repo
+
+  (fn [t]
+    (assert (-> deletable-file .exists))
+
+    (assert (not (-> rename-destination .exists)))
+
+    (assert (not (-> creatable-filename .exists)))
+
+    (t)))
 
 (defn assert-pristine-git-status! []
   (assert (-> (sh "git" "status" "--porcelain")
@@ -49,8 +69,7 @@
       (-> deletable-file .delete)
       (expect-sane-output! (sut/all-files :files []))
       (finally
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists)))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -60,9 +79,7 @@
       (sh "git" "add" "-A")
       (expect-sane-output! (sut/all-files :files []))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists)))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -71,10 +88,7 @@
       (-> deletable-file (.renameTo rename-destination))
       (expect-sane-output! (sut/all-files :files []))
       (finally
-        (sh "git" "checkout" (str deletable-file))
-        (sh "rm" (str rename-destination))
-        (assert (-> deletable-file .exists))
-        (assert (not (-> rename-destination .exists))))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -84,12 +98,7 @@
       (sh "git" "add" "-A")
       (expect-sane-output! (sut/all-files :files []))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "reset" "--" (str rename-destination))
-        (sh "git" "checkout" (str deletable-file))
-        (sh "rm" (str rename-destination))
-        (assert (-> deletable-file .exists))
-        (assert (not (-> rename-destination .exists)))))))
+        (cleanup-testing-repo!)))))
 
 (def root-commit
   "f-stack's first ever commit. This ensures a large, diverse corpus."
@@ -118,8 +127,7 @@
       (-> deletable-file .delete)
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
       (finally
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists)))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -129,9 +137,7 @@
       (sh "git" "add" "-A")
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists)))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -140,10 +146,7 @@
       (-> deletable-file (.renameTo rename-destination))
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
       (finally
-        (sh "git" "checkout" (str deletable-file))
-        (sh "rm" (str rename-destination))
-        (assert (-> deletable-file .exists))
-        (assert (not (-> rename-destination .exists))))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -153,12 +156,7 @@
       (sh "git" "add" "-A")
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @current-commit))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "reset" "--" (str rename-destination))
-        (sh "git" "checkout" (str deletable-file))
-        (sh "rm" (str rename-destination))
-        (assert (-> deletable-file .exists))
-        (assert (not (-> rename-destination .exists)))))))
+        (cleanup-testing-repo!)))))
 
 (deftest git-not-completely-staged
 
@@ -166,9 +164,9 @@
 
   (testing "Non-completely-added files show up"
     (try
-      (spit createable-filename creatable-contents)
+      (spit creatable-filename creatable-contents)
 
-      (is (= [(-> createable-filename File. .getCanonicalPath)]
+      (is (= [(-> creatable-filename .getCanonicalPath)]
              (sut/git-not-completely-staged :files [])))
 
       (testing "Added files don't show up"
@@ -180,7 +178,7 @@
             (sh "git" "reset" "."))))
 
       (finally
-        (-> createable-filename File. .delete))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -189,8 +187,7 @@
       (-> deletable-file .delete)
       (is (sut/git-not-completely-staged :files []))
       (finally
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists))))))
+        (cleanup-testing-repo!)))))
 
 (deftest git-completely-staged
 
@@ -198,7 +195,7 @@
 
   (testing "Non-completely-added files don't show up"
     (try
-      (spit createable-filename creatable-contents)
+      (spit creatable-filename creatable-contents)
 
       (is (= []
              (sut/git-completely-staged :files [])))
@@ -206,13 +203,13 @@
       (testing "Added files show up"
         (try
           (sh "git" "add" "-A")
-          (is (= [(-> createable-filename File. .getCanonicalPath)]
+          (is (= [(-> creatable-filename .getCanonicalPath)]
                  (sut/git-completely-staged :files [])))
           (finally
             (sh "git" "reset" "."))))
 
       (finally
-        (-> createable-filename File. .delete))))
+        (cleanup-testing-repo!))))
 
   (assert-pristine-git-status!)
 
@@ -222,9 +219,7 @@
       (sh "git" "add" (str deletable-file))
       (is (sut/git-completely-staged :files []))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "checkout" (str deletable-file))
-        (assert (-> deletable-file .exists)))))
+        (cleanup-testing-repo!))))
 
   (testing "It can gracefully handle the presence of files staged for renaming"
     (try
@@ -232,12 +227,7 @@
       (sh "git" "add" "-A")
       (is (sut/git-completely-staged :files []))
       (finally
-        (sh "git" "reset" "--" (str deletable-file))
-        (sh "git" "reset" "--" (str rename-destination))
-        (sh "git" "checkout" (str deletable-file))
-        (sh "rm" (str rename-destination))
-        (assert (-> deletable-file .exists))
-        (assert (not (-> rename-destination .exists)))))))
+        (cleanup-testing-repo!)))))
 
 (deftest namespaces-within-refresh-dirs-only
   (speced/let [^{::speced/spec (rcomp count (partial < 100))}

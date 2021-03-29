@@ -19,6 +19,7 @@
 /.lein-*
 /checkouts
 /classes
+/git-integration-testing
 /logs/
 /target
 build/
