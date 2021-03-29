@@ -68,6 +68,8 @@ jobs:
       - setup-env
       - run:
           command: << parameters.lein_test_command >>
+      - run:
+          command: .circleci/e2e.sh
   deploy:
     executor: openjdk8
     steps:

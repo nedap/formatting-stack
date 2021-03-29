@@ -36,12 +36,16 @@
                        (map git-status/remove-deletion-markers)
                        (impl/absolutize git-command)
                        (set))
-          tracked (->> (impl/file-entries git-command "ls-files" "--full-name")
-                       (impl/absolutize git-command)
-                       (remove deleted))
-          untracked (->> (impl/file-entries git-command "ls-files" "--full-name" "--others" "--exclude-standard")
-                         (impl/absolutize git-command)
-                         (remove deleted))]
+          ;; DRY the use of the `--full-name` option which is especially important:
+          ls-files (speced/fn [^list? args]
+                     (->> args
+                          (cons "--full-name")
+                          (cons "ls-files")
+                          (apply impl/file-entries git-command)
+                          (impl/absolutize git-command)
+                          (remove deleted)))
+          tracked (ls-files ())
+          untracked (ls-files '("--others" "--exclude-standard"))]
       ;; Second `binding`, to ensure correct results
       (binding [impl/*skip-existing-files-check?* false]
         (speced/let [^::impl/existing-files corpus (into tracked untracked)]
