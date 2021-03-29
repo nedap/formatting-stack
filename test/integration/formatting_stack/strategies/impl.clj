@@ -3,7 +3,8 @@
    [clojure.test :refer [are deftest is testing]]
    [formatting-stack.strategies.impl :as sut])
   (:import
-   (java.io File)))
+   (java.io File)
+   (java.util UUID)))
 
 (deftest dir-contains?
   (are [dirname filename expected] (= expected
@@ -33,3 +34,13 @@
     "src/../src/formatting_stack/strategies/impl.clj")
 
   (is (spec-assertion-thrown? ::sut/existing-files (sut/absolutize "git" ["I_dont_exist"]))))
+
+(deftest git-ref-exists?
+  (are [input expected] (testing input
+                          (is (= expected
+                                 (sut/git-ref-exists? input)))
+                          true)
+    "f374fcc"                  true
+    "master"                   true
+    "v4.3.0"                   true
+    (-> (UUID/randomUUID) str) false))
