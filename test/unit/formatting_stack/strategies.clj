@@ -33,7 +33,7 @@
                 (str/replace "test/unit/formatting_stack/g.clj -> " "")))]
     (->> files
          (map strip)
-         (sut.impl/absolutize "git"))))
+         (sut.impl/git-absolutize))))
 
 (deftest git-completely-staged
   (is (= (strip-git completely-staged-files)
@@ -48,7 +48,7 @@
            (sut/git-not-completely-staged :files [] :impl all-files)))))
 
 (deftest git-diff-against-default-branch
-  (is (= (sut.impl/absolutize "git" ["a.clj"])
+  (is (= (sut.impl/git-absolutize ["a.clj"])
          (sut/git-diff-against-default-branch :files []
                                               :impl ["a.clj" "b.clj"]
-                                              :blacklist (sut.impl/absolutize "git" ["b.clj"])))))
+                                              :blacklist (sut.impl/git-absolutize ["b.clj"])))))

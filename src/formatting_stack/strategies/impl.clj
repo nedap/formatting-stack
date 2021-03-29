@@ -1,6 +1,6 @@
 (ns formatting-stack.strategies.impl
   (:require
-   [clojure.java.shell :refer [sh]]
+   [clojure.java.shell :as shell]
    [clojure.spec.alpha :as spec]
    [clojure.string :as string]
    [clojure.tools.namespace.file :as file]
@@ -18,6 +18,11 @@
 ;; modified, added
 (def git-not-completely-staged-regex #"^( M|AM|MM|AD| D|\?\?|) ")
 
+(defn git
+  "Executes `git`-command"
+  [& args]
+  (apply shell/sh "git" args))
+
 (speced/def-with-doc ::file-entry
   "Not necessarily a filename,
   e.g. the string \"M  src/formatting_stack/strategies/impl.clj\" is a valid output."
@@ -25,9 +30,9 @@
 
 (spec/def ::file-entries (spec/coll-of ::file-entry))
 
-(speced/defn ^::file-entries file-entries
+(speced/defn ^::file-entries git-file-entries
   [& args]
-  (->> args (apply sh) :out string/split-lines (filter seq)))
+  (->> args (apply git) :out string/split-lines (filter seq)))
 
 (def separator-pattern (re-pattern File/separator))
 
@@ -38,13 +43,12 @@
                                              true
                                              (-> s File. .exists)))))
 
-(speced/defn ^::existing-files absolutize [command, ^::file-entries file-entries]
-  (let [toplevel-fragments (case command
-                             "git" (-> (sh "git" "rev-parse" "--show-toplevel")
-                                       (:out)
-                                       (string/split #"\n")
-                                       (first)
-                                       (string/split separator-pattern)))]
+(speced/defn ^::existing-files git-absolutize [^::file-entries file-entries]
+  (let [toplevel-fragments (-> (git "rev-parse" "--show-toplevel")
+                               (:out)
+                               (string/split #"\n")
+                               (first)
+                               (string/split separator-pattern))]
     (->> file-entries
          (map (fn [filename]
                 (->> (string/split filename separator-pattern)
@@ -104,6 +108,6 @@
 (speced/defn ^boolean? git-ref-exists?
   "Does `ref` denote an existing git branch, tag or commit sha?"
   [^string? ref]
-  (-> (sh "git" "rev-parse" ref)
+  (-> (git "rev-parse" ref)
       :exit
       zero?))

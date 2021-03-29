@@ -24,25 +24,23 @@
   (:import
    (java.io File)))
 
-(def git-command "git")
-
 (speced/defn all-files
   "This strategy unconditionally processes all files."
   [& {:keys [^::protocols.spec/filenames files]}]
   ;; This first `binding` is necessary for obtaining an absolutized list of deletions
   (binding [impl/*skip-existing-files-check?* true]
-    (let [deleted (->> (impl/file-entries git-command "status" "--porcelain")
+    (let [deleted (->> (impl/git-file-entries "status" "--porcelain")
                        (filter git-status/deleted-file?)
                        (map git-status/remove-deletion-markers)
-                       (impl/absolutize git-command)
+                       (impl/git-absolutize)
                        (set))
           ;; DRY the use of the `--full-name` option which is especially important:
           ls-files (speced/fn [^list? args]
                      (->> args
                           (cons "--full-name")
                           (cons "ls-files")
-                          (apply impl/file-entries git-command)
-                          (impl/absolutize git-command)
+                          (apply impl/git-file-entries)
+                          (impl/git-absolutize)
                           (remove deleted)))
           tracked (ls-files ())
           untracked (ls-files '("--others" "--exclude-standard"))]
@@ -56,7 +54,7 @@
 (speced/defn git-completely-staged
   "This strategy processes the new or modified files that are _completely_ staged with git."
   [& {:keys [^::protocols.spec/filenames files, impl]
-      :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
+      :or   {impl (impl/git-file-entries "status" "--porcelain")}}]
   (->> impl
        (filter #(re-find impl/git-completely-staged-regex %))
        (remove git-status/deleted-file?)
@@ -64,19 +62,19 @@
        (map (fn [s]
               ;; for renames:
               (-> s (string/split #" -> ") last)))
-       (impl/absolutize git-command)
+       (impl/git-absolutize)
        (impl/extract-clj-files)
        (into files)))
 
 (speced/defn git-not-completely-staged
   "This strategy processes all files that are not _completely_ staged with git. Untracked files are also included."
   [& {:keys [^::protocols.spec/filenames files, impl]
-      :or   {impl (impl/file-entries git-command "status" "--porcelain")}}]
+      :or   {impl (impl/git-file-entries "status" "--porcelain")}}]
   (->> impl
        (remove git-status/deleted-file?)
        (filter #(re-find impl/git-not-completely-staged-regex %))
        (map #(string/replace-first % impl/git-not-completely-staged-regex ""))
-       (impl/absolutize git-command)
+       (impl/git-absolutize)
        (impl/extract-clj-files)
        (into files)))
 
@@ -87,12 +85,12 @@
       :or   {target-branch "master"
              ;; We filter for Added, Copied, Modified and Renamed files,
              ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
-             impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
+             impl          (impl/git-file-entries "diff" "--name-only" "--diff-filter=ACMR" target-branch)
              blacklist     (git-not-completely-staged :files [])}}]
   (assert (impl/git-ref-exists? target-branch)
           (str (pr-str target-branch) " was not recognised as an existing git branch, tag or commit sha."))
   (->> impl
-       (impl/absolutize git-command)
+       (impl/git-absolutize)
        (remove (set blacklist))
        (impl/extract-clj-files)
        (into files)))

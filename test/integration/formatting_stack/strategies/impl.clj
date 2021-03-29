@@ -25,15 +25,15 @@
     "dev"                           (File. "I_dont_exist")                                false
     "dev"                           (File. "user.clj")                                    false))
 
-(deftest absolutize
+(deftest git-absolutize
   (are [target] (testing target
                   (is (= [(-> target File. .getCanonicalPath)]
-                         (sut/absolutize "git" [target])))
+                         (sut/git-absolutize [target])))
                   true)
     "src/formatting_stack/strategies/impl.clj"
     "src/../src/formatting_stack/strategies/impl.clj")
 
-  (is (spec-assertion-thrown? ::sut/existing-files (sut/absolutize "git" ["I_dont_exist"]))))
+  (is (spec-assertion-thrown? ::sut/existing-files (sut/git-absolutize ["I_dont_exist"]))))
 
 (deftest git-ref-exists?
   (are [input expected] (testing input
