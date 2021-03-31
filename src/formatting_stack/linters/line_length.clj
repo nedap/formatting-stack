@@ -2,41 +2,33 @@
   (:require
    [clojure.string :as string]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
+   [formatting-stack.util :refer [ensure-sequential partition-between process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]
    [medley.core :refer [assoc-some]]))
 
 (defn exceeding-lines [{:keys [max-line-length merge-threshold]} filename]
   (->> (-> filename slurp string/split-lines)
-       (map-indexed (fn [i row]
-                      (let [column-count (count row)]
-                        (when (< max-line-length column-count)
-                          {:filename filename
-                           :source   :formatting-stack/line-length
-                           :level    :warning
-                           :column   column-count
-                           :line     (inc i)
-                           :line-start (inc i)}))))
-       (filter some?)
-       ;; remove duplicates within `merge-threshold` lines
-       (reduce (fn [memo {:keys [line] :as report}]
-                 (let [last-report (last memo)
-                       diff (- (or line 0)
-                               (or (:line last-report) 0))]
-                   (if (< diff merge-threshold)
-                     (conj (vec (butlast memo))
-                           ;; track 'original' line-start
-                           (assoc-some report :line-start (:line-start last-report)))
-                     (conj memo report))))
-               [])
-       (mapv (fn [{:keys [line line-start] :as report}]
-               (assoc report
-                      :msg (str "Line exceeding " max-line-length " columns"
-                                (when (not= line line-start)
-                                  (str " (spanning " (inc (- line line-start)) " lines)"))
-                                ".")
-              ;; make sure reporting is on the first line (not the last)
-                      :line line-start)))))
+       (map count)
+       (keep-indexed (fn [i column]
+                       (when (< max-line-length column)
+                         {:column column
+                          :line   (inc i)})))
+       (partition-between (fn [{first-line :line} {second-line :line}]
+                            (< merge-threshold
+                               (- second-line first-line))))
+       (mapv (fn [reports]
+               (let [{first-line :line
+                      first-column :column} (first reports)
+                     {last-line :line}      (last reports)]
+                 {:filename filename
+                  :source   :formatting-stack/line-length
+                  :level    :warning
+                  :line     first-line
+                  :column   first-column
+                  :msg      (str "Line exceeding " max-line-length " columns"
+                                 (when (not= last-line first-line)
+                                   (str " (spanning " (inc (- last-line first-line)) " lines)"))
+                                 ".")})))))
 
 (defn lint! [options filenames]
   (->> filenames
