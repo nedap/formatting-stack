@@ -26,5 +26,5 @@
       [{:source   :formatting-stack/line-length
         :line     3
         :column   33
-        :msg      "Line exceeding 24 columns (spanning 4 lines)."
+        :msg      "Line exceeding 24 columns (spanning 5 lines)."
         :filename "test-resources/linelength_sample.clj"}])))

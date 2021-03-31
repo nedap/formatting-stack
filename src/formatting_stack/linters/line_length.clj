@@ -33,7 +33,7 @@
                (assoc report
                       :msg (str "Line exceeding " max-line-length " columns"
                                 (when (not= line line-start)
-                                  (str " (spanning " (- line line-start) " lines)"))
+                                  (str " (spanning " (inc (- line line-start)) " lines)"))
                                 ".")
               ;; make sure reporting is on the first line (not the last)
                       :line line-start)))))
