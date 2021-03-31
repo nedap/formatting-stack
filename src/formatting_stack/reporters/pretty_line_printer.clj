@@ -58,7 +58,7 @@
                           (format (str "%-" max-msg-length "." max-msg-length "s") msg)
                           (cond-> (str "  " source) colorize? (colorize :grey)))
                  (doseq [entry msg-extra-data]
-                   (println "          " (truncate-line-wise entry max-msg-length))))))))
+                   (println "           " (truncate-line-wise entry max-msg-length))))))))
 
 (defn print-report
   [options reports]
