@@ -68,4 +68,6 @@
     (concat (repeat 5 {:level :warning})
             (repeat 4 {:level :error})
             (repeat 3 {:level :exception}))
-    "4 errors found\n3 exceptions occurred\n5 warnings found\n"))
+    "4 errors found
+3 exceptions occurred
+5 warnings found\n"))
