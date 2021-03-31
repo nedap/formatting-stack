@@ -3,7 +3,8 @@
    [clojure.string :as string]
    [formatting-stack.protocols.linter :as linter]
    [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
-   [nedap.utils.modular.api :refer [implement]]))
+   [nedap.utils.modular.api :refer [implement]]
+   [medley.core :refer [assoc-some]]))
 
 (defn exceeding-lines [{:keys [max-line-length merge-threshold]} filename]
   (->> (-> filename slurp string/split-lines)
@@ -15,16 +16,27 @@
                            :level    :warning
                            :column   column-count
                            :line     (inc i)
-                           :msg      (str "Line exceeding " max-line-length " columns.")}))))
+                           :line-start (inc i)}))))
        (filter some?)
        ;; remove duplicates within `merge-threshold` lines
        (reduce (fn [memo {:keys [line] :as report}]
-                 (let [diff (- (or line 0)
-                               (or (:line (last memo)) 0))]
+                 (let [last-report (last memo)
+                       diff (- (or line 0)
+                               (or (:line last-report) 0))]
                    (if (< diff merge-threshold)
-                     (conj (vec (butlast memo)) report)
+                     (conj (vec (butlast memo))
+                           ;; track 'original' line-start
+                           (assoc-some report :line-start (:line-start last-report)))
                      (conj memo report))))
-               [])))
+               [])
+       (mapv (fn [{:keys [line line-start] :as report}]
+               (assoc report
+                      :msg (str "Line exceeding " max-line-length " columns"
+                                (when (not= line line-start)
+                                  (str " (spanning " (- line line-start) " lines)"))
+                                ".")
+              ;; make sure reporting is on the first line (not the last)
+                      :line line-start)))))
 
 (defn lint! [options filenames]
   (->> filenames
