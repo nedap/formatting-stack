@@ -82,6 +82,10 @@ As you can see in the screenshot, **formatting-stack** presents linters' outputs
 
 <img width="710" alt="Screenshot 2020-02-19 at 07 04 38" src="https://user-images.githubusercontent.com/1162994/74806403-2aaa9700-52e6-11ea-8088-b073d82e2879.png">
 
+Alternative reporters can be found in `./src/formatting_stack/reporters`, such as
+ - `formatting-stack.pretty-line-printer` offers more concise output
+ - `formatting-stack.file-writer` offers a file-output instead of stdout
+
 ## Installation
 
 #### Coordinates

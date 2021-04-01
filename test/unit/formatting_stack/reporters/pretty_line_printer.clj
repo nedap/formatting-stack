@@ -20,6 +20,12 @@
     "filename
  ⚠️   0:0   message                :unit.formatting-stack.reporters.pretty-line-printer/source\n"
 
+    "Truncating message"
+    [{:filename "filename", :source ::source, :level :warning, :line 0 :column 0,
+      :msg "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et"}]
+    "filename
+ ⚠️   0:0   Lorem ipsum dolor si   :unit.formatting-stack.reporters.pretty-line-printer/source\n"
+
     "Sorts by `:line`"
     [{:filename "filename", :msg "message", :source ::source, :level :warning, :line 0 :column 0}
      {:filename "filename", :msg "message", :source ::source, :level :warning, :line 2 :column 2}

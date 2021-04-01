@@ -1,4 +1,5 @@
 (ns formatting-stack.reporters.pretty-line-printer
+  "Outputs report similar to github.com/xojs/xo"
   (:require
    [clojure.stacktrace :refer [print-stack-trace]]
    [formatting-stack.protocols.reporter :as reporter]
