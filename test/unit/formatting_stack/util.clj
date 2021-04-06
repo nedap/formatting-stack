@@ -43,3 +43,22 @@
         :level     :exception
         :filename  "made_up_name.clj"
         :msg       #(str/starts-with? % "Encountered an exception while running")}])))
+
+(deftest partition-between
+  (are [pred input expected] (= expected
+                                (sut/partition-between pred input))
+    identity
+    ()
+    ()
+
+    >
+    '(1 2 3)
+    '((1 2 3))
+
+    <
+    '(1 2 3)
+    '((1) (2) (3))
+
+    #(< 2 (- %2 %1))
+    '(1 2 3 8 9 10)
+    '((1 2 3) (8 9 10))))

@@ -159,3 +159,11 @@
      (binding [*out* s#
                *err* s#]
        ~@body)))
+
+;; see https://stackoverflow.com/a/23221442/2046200
+(defn partition-between
+  "Applies f to each value and the next value, splitting each time f returns a new value.
+  Returns a lazy sequence or partitions."
+  [pred coll]
+  (let [switch (reductions not= true (map pred coll (rest coll)))]
+    (map (partial map first) (partition-by second (map list coll switch)))))
