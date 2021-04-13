@@ -14,3 +14,17 @@
       cwd                     ""
       (str cwd "/a.clj")      "a.clj"
       (str cwd "/a.clj" cwd), (str "a.clj" cwd))))
+
+(deftest truncate-line-wise
+  (are [input expected] (testing input
+                          (is (= expected
+                                 (sut/truncate-line-wise input 5)))
+                          true)
+    ""                  ""
+    "a"                 "a"
+    "aaaaa"             "aaaaa"
+    "aaaaaEXCEEDING"    "aaaa…"
+    "\n"                "\n"
+    "a\na"              "a\na"
+    "a\naaaaaEXCEEDING" "a\naaaa…"
+    "aaaaaEXCEEDING\na" "aaaa…\na"))
