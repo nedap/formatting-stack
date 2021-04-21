@@ -3,7 +3,9 @@
    [clojure.string :as string]
    [eastwood.reporting-callbacks :as reporting-callbacks]
    [formatting-stack.protocols.spec :as protocols.spec]
-   [nedap.speced.def :as speced]))
+   [nedap.speced.def :as speced])
+  (:import
+   (java.io File)))
 
 (speced/defn ^boolean? contains-dynamic-assertions?
   "Does this linting result refer to a :pre/:post containing dynamic assertions?
@@ -36,8 +38,8 @@ See https://git.io/fhQTx"
   [^string? warnings]
   (->> warnings
        (re-seq #"(.*):(\d+):(\d+): Reflection warning - (.+)\.")
-       (map (fn [[_, filename, line, column, msg]]
-              {:filename filename
+       (map (speced/fn [[_, ^String filename, line, column, msg]]
+              {:filename (-> filename File. .getCanonicalPath)
                :line     (Long/parseLong line)
                :column   (Long/parseLong column)
                :msg      msg
