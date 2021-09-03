@@ -1,3 +1,5 @@
+(def eastwood-version "0.9.9")
+
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.4.0-alpha1"
   ;; Please keep the dependencies sorted a-z.
@@ -10,7 +12,7 @@
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
-                 [jonase/eastwood "0.3.14"]
+                 [jonase/eastwood ~eastwood-version]
                  [medley "1.2.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.classpath "1.0.0"]
@@ -55,7 +57,8 @@
 
   :monkeypatch-clojure-test false
 
-  :plugins [[lein-pprint "1.1.2"]]
+  :plugins [[lein-pprint "1.1.2"]
+            [jonase/eastwood ~eastwood-version]]
 
   ;; A variety of common dependencies are bundled with `nedap/lein-template`.
   ;; They are divided into two categories:
@@ -102,9 +105,9 @@
                                                     [integrant "0.8.0"]
                                                     [org.clojure/clojurescript "1.7.228"]]}
 
-             :provided              {:dependencies [[org.clojure/clojurescript "1.10.597"]
-                                                    [com.stuartsierra/component "0.4.0"]
-                                                    [integrant "0.8.0"]]
+             :provided              {:dependencies         [[org.clojure/clojurescript "1.10.597"]
+                                                            [com.stuartsierra/component "0.4.0"]
+                                                            [integrant "0.8.0"]]
                                      :managed-dependencies [[com.cognitect/transit-clj "1.0.324"]
                                                             [com.google.code.findbugs/jsr305 "3.0.2"]
                                                             [com.google.errorprone/error_prone_annotations "2.1.3"]
@@ -131,14 +134,12 @@
                                      ;; (and shipped with this refactor-nrepl):
                                      :plugins      [[cider/cider-nrepl "0.24.0"]]}
 
-             :parallel-eastwood     {:jvm-opts ["-Dformatting-stack.eastwood.parallelize-linters=true"]}
-
-             :ncrw                  {:global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+             :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
                                      :test-paths     ^:replace []
                                      :resource-paths ^:replace []
                                      :plugins        ^:replace []
                                      :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.12.0"]]}
 
-             :ci                    {:pedantic?    :abort
-                                     :jvm-opts     ["-Dclojure.main.report=stderr"]}})
+             :ci                    {:pedantic? :abort
+                                     :jvm-opts  ["-Dclojure.main.report=stderr"]}})
