@@ -20,6 +20,7 @@
                 (Thread/sleep 50))))]
     (-> f
         Thread.
+        (doto (.setName (str `runner)))
         ;; Important - daemonize this thread, otherwise under certain conditions it can prevent the JVM from exiting.
         ;; (We exercise this implicitly via `lein eastwood` in CI)
         (doto (.setDaemon true))
