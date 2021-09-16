@@ -27,11 +27,11 @@
 
       "test-resources/eastwood_warning.clj"
       (matchers/in-any-order
-       [{:source              :eastwood/warn-on-reflection
-         :msg                 "reference to field getPath can't be resolved"
+       [{:source              :eastwood/reflection
+         :msg                 "reference to field getPath can't be resolved."
          :line                pos-int?
          :column              pos-int?
-         :warning-details-url matchers/absent
+         :warning-details-url "https://github.com/jonase/eastwood#reflection"
          :filename            "test-resources/eastwood_warning.clj"}
         {:source              :eastwood/def-in-def
          :line                pos-int?

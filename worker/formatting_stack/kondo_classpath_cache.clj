@@ -24,10 +24,10 @@
   (apply list runner-choice body))
 
 ;; Use kondo's official default config dir, so that we don't bloat consumers' project layouts:
-(def cache-parent-dir ".clj-kondo")
+(def ^String cache-parent-dir ".clj-kondo")
 
 ;; Don't use .clj-kondo directly since it can be accessed concurrently (e.g. f-s + a second Kondo from VS Code):
-(def cache-subdir "formatting-stack-cache")
+(def ^String cache-subdir "formatting-stack-cache")
 
 (def cache-dir (str cache-parent-dir File/separator cache-subdir))
 

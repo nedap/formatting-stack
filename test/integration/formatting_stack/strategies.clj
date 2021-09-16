@@ -5,6 +5,7 @@
    [clojure.set :as set]
    [clojure.string :as string]
    [clojure.test :refer [deftest is testing use-fixtures]]
+   [clojure.tools.namespace.repl :as tools.namespace.repl]
    [formatting-stack.strategies :as sut]
    [formatting-stack.test-helpers :as test-helpers :refer [git-integration-dir]]
    [formatting-stack.util :refer [rcomp]]
@@ -233,7 +234,11 @@
 (deftest namespaces-within-refresh-dirs-only
   (speced/let [^{::speced/spec (rcomp count (partial < 100))}
                all-files (sut/all-files :files [])
-               result (sut/namespaces-within-refresh-dirs-only :files all-files)]
+               refresh-dirs (->> tools.namespace.repl/refresh-dirs
+                                 (mapv (rcomp (partial io/file git-integration-dir)
+                                              str)))
+               result (sut/namespaces-within-refresh-dirs-only :files all-files
+                                                               :refresh-dirs refresh-dirs)]
     (is (seq result)
         "Returns non-empty results (since f-s itself has namespaces within `src`, `test`, etc)")
 

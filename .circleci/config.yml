@@ -9,7 +9,7 @@ commands:
             - v2-dependencies-{{ checksum "project.clj" }}
             # fallback to using the latest cache if no exact match is found
             - v2-dependencies-
-      - run: lein with-profile -dev,+ci,+test,+refactor-nrepl deps
+      - run: lein with-profile -user,-dev,+ci,+test,+refactor-nrepl deps
       - save_cache:
           paths:
             - ~/.m2
@@ -70,6 +70,8 @@ jobs:
           command: << parameters.lein_test_command >>
       - run:
           command: .circleci/e2e.sh
+      - run:
+          command: lein with-profile -user,+test eastwood
   deploy:
     executor: openjdk8
     steps:
@@ -79,13 +81,13 @@ jobs:
           command: echo -e "$GPG_KEY_V2" | gpg --import
       - run:
           name: Perform pre-release sanity check
-          command: lein with-profile -dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
+          command: lein with-profile -user,-dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
       - run:
           name: release to JFrog
-          command: lein deploy
+          command: lein with-profile -user deploy
       - run:
           name: release to Clojars
-          command: lein deploy clojars
+          command: lein with-profile -user deploy clojars
 
 test_code_filters: &test_code_filters
   filters:
@@ -101,57 +103,45 @@ workflows:
       - test_code:
           name: "JDK 8 including refactor-nrepl"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
-          <<: *test_code_filters
-      - test_code:
-          name: "JDK 8 including refactor-nrepl, and parallel Eastwood linters"
-          jdk_version: openjdk8-parallel
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci,+refactor-nrepl do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 including refactor-nrepl (at its latest version)"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci,+refactor-nrepl-latest do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8 excluding refactor-nrepl"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,+ci do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 8, with an old clojurescript dependency on the classpath"
           jdk_version: openjdk8
-          lein_test_command: lein with-profile -dev,-provided,+ci,+cljs-old do clean, test
+          lein_test_command: lein with-profile -user,-dev,-provided,+ci,+cljs-old do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl do clean, test
-          <<: *test_code_filters
-      - test_code:
-          name: "JDK 11 including refactor-nrepl, and parallel Eastwood linters"
-          jdk_version: openjdk11-parallel
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl,+parallel-eastwood do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci,+refactor-nrepl do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 including refactor-nrepl (at its latest version)"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci,+refactor-nrepl-latest do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci,+refactor-nrepl-latest do clean, test
           <<: *test_code_filters
       - test_code:
           name: "JDK 11 excluding refactor-nrepl"
           jdk_version: openjdk11
-          lein_test_command: lein with-profile -dev,+ci do clean, test
+          lein_test_command: lein with-profile -user,-dev,+ci do clean, test
           <<: *test_code_filters
       - deploy:
           context: JFrog
           requires:
             - "JDK 8, with an old clojurescript dependency on the classpath"
-            - "JDK 8 including refactor-nrepl, and parallel Eastwood linters"
             - "JDK 8 including refactor-nrepl"
             - "JDK 8 excluding refactor-nrepl"
             - "JDK 11 including refactor-nrepl"
-            - "JDK 11 including refactor-nrepl, and parallel Eastwood linters"
             - "JDK 11 excluding refactor-nrepl"
           filters:
             branches:

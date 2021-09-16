@@ -13,7 +13,7 @@
   A strategy may not return nil."
   (:require
    [clojure.string :as string]
-   [clojure.tools.namespace.repl :refer [refresh-dirs]]
+   [clojure.tools.namespace.repl :as tools.namespace.repl]
    [formatting-stack.protocols.spec :as protocols.spec]
    [formatting-stack.strategies.impl :as impl]
    [formatting-stack.strategies.impl.git-status :as git-status]
@@ -163,7 +163,9 @@
   and then ensuring that code-evaluating tools such as refactor-nrepl or Eastwood also respect that exclusion.
 
   That can avoid some code-reloading issues related to duplicate `defprotocol` definitions, etc."
-  [& {:keys [^::protocols.spec/filenames files]}]
+  [& {:keys [^::protocols.spec/filenames files
+             refresh-dirs]
+      :or {refresh-dirs tools.namespace.repl/refresh-dirs}}]
   {:pre [(check! seq                            refresh-dirs
                  (partial every? (speced/fn [^string? refresh-dir]
                                    (let [file (-> refresh-dir File.)]
