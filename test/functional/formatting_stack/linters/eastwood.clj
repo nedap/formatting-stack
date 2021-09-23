@@ -4,7 +4,9 @@
    [formatting-stack.linters.eastwood :as sut]
    [formatting-stack.protocols.linter :as linter]
    [matcher-combinators.matchers :as matchers]
-   [matcher-combinators.test :refer [match?]]))
+   [matcher-combinators.test :refer [match?]])
+  (:import
+   (java.io File)))
 
 (use-fixtures :once (fn [tests]
                       ;; prevent humongous AST representations from being printed:
@@ -14,7 +16,7 @@
 (deftest lint!
   (let [linter (sut/new {})]
     (are [filename expected] (match? expected
-                                     (linter/lint! linter [filename]))
+                                     (linter/lint! linter [(-> filename File. .getCanonicalPath)]))
       "test-resources/valid_syntax.clj"
       []
 
@@ -32,14 +34,14 @@
          :line                pos-int?
          :column              pos-int?
          :warning-details-url "https://github.com/jonase/eastwood#reflection"
-         :filename            "test-resources/eastwood_warning.clj"}
+         :filename            (-> "test-resources/eastwood_warning.clj" File. .getCanonicalPath)}
         {:source              :eastwood/def-in-def
          :line                pos-int?
          :column              pos-int?
          :warning-details-url "https://github.com/jonase/eastwood#def-in-def"
-         :filename            "test-resources/eastwood_warning.clj"}
+         :filename            (-> "test-resources/eastwood_warning.clj" File. .getCanonicalPath)}
         {:source              :eastwood/wrong-pre-post
          :line                pos-int?
          :column              pos-int?
          :warning-details-url "https://github.com/jonase/eastwood#wrong-pre-post"
-         :filename            "test-resources/eastwood_warning.clj"}]))))
+         :filename            (-> "test-resources/eastwood_warning.clj" File. .getCanonicalPath)}]))))

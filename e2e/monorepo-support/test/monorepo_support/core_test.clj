@@ -22,7 +22,7 @@
 
     (doseq [filename all
             :let [file (File. filename)
-                  absolute (-> file .getAbsolutePath)]]
+                  absolute (-> file .getCanonicalPath)]]
       (is (= filename
              absolute)
           "Returns absolutized filenames, which is important for monorepo support")
