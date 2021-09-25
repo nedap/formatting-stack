@@ -167,3 +167,16 @@
   [pred coll]
   (let [switch (reductions not= true (map pred coll (rest coll)))]
     (map (partial map first) (partition-by second (map list coll switch)))))
+
+(speced/defn resolve-sym [^qualified-symbol? sym]
+  (deref (requiring-resolve sym)))
+
+(speced/defn resolve-keyword [^keyword? kwd]
+  (try
+    (require (str (namespace kwd) "." (name kwd)))
+    true
+    (catch Exception _
+      false)))
+
+(defn accumulate [m k v]
+  (update m k (fnil conj []) v))

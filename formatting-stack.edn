@@ -1,0 +1,2 @@
+{:files   ["src/" "test/"]
+ :plugins []}
