@@ -15,7 +15,7 @@
    [formatting-stack.report :as report]
    [formatting-stack.reporters.impl :refer [normalize-filenames]]
    [formatting-stack.reporters.pretty-printer :as reporters.pretty-printer]
-   [formatting-stack.util :refer [accumulate resolve-keyword resolve-sym with-serialized-output]]))
+   [formatting-stack.util :refer [resolve-sym with-serialized-output]]))
 
 (defn files-from-strategies [strategies]
   (->> strategies

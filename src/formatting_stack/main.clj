@@ -2,9 +2,9 @@
   (:require
    [clojure.tools.cli :as tools.cli]
    [formatting-stack.config :as config]
+   [formatting-stack.core :as formatting-stack]
    [formatting-stack.hooks :refer [run-hook]]
    [formatting-stack.plugin :as plugin]
-   [formatting-stack.core :as formatting-stack]
    [formatting-stack.util :refer [accumulate resolve-keyword resolve-sym]]))
 
 (def ^:private cli-options

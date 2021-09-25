@@ -4,11 +4,11 @@
 (defproject formatting-stack "4.4.0-alpha1"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[aero "1.1.6"]
-                 [clj-kondo "2021.01.20"]
+                 [clj-kondo "2021.09.25"]
                  [cljfmt "0.7.0"]
                  [com.gfredericks/how-to-ns "0.2.8"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
-                 [com.nedap.staffing-solutions/speced.def "2.0.0"]
+                 [com.nedap.staffing-solutions/speced.def "2.1.0-alpha1"]
                  [com.nedap.staffing-solutions/utils.collections "2.1.0"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]

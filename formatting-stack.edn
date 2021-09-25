@@ -1,2 +1,3 @@
-{:files   ["src/" "test/"]
- :plugins []}
+{:files                                 ["src/" "test/"]
+ :formatting-stack.linters.kondo/config #include ".clj-kondo/config.edn"
+ :plugins                               []}

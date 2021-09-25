@@ -1,0 +1,17 @@
+{:cache        true
+ :parallel     true
+ :linters      {:cond-else            {:level :off}  ;; undesired
+                :missing-docstring    {:level :off}  ;; undesired
+                :unused-binding       {:level :off}  ;; undesired
+                :private-call         {:level :off}  ;; undesired
+                :unresolved-symbol    {:level :off}  ;; can give false positives
+                :unused-symbol        {:level :off}  ;; can give false positives
+                :unused-private-var   {:level :off}  ;; can give false positives
+                :unresolved-var       {:level :off}  ;; already offered by clj
+                :consistent-alias     {:level :off}  ;; already offered by how-to-ns
+                :duplicate-require    {:level :off}  ;; already offered by clean-ns
+                :unused-import        {:level :off}  ;; already offered by clean-ns
+                :unused-namespace     {:level :off}  ;; already offered by clean-ns
+                :unused-referred-var  {:level :off}  ;; already offered by clean-ns
+                :unresolved-namespace {:level :off}} ;; already offered by clean-ns
+ :config-paths ["nedap/speced.def"]}

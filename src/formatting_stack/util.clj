@@ -180,3 +180,32 @@
 
 (defn accumulate [m k v]
   (update m k (fnil conj []) v))
+
+;; TODO check compat with different repls
+(defn carriage-return []
+  ;; needs to be this, or `\r` dependent on terminal capabilities :')
+  (print "\033[1K\u001B[1K"))
+
+;; FIXME assert interruptions work as intended
+(defmacro with-spinner
+  "print a spinner while running a (long-running) process in the background"
+  [label & body]
+  `(let [chars# "|/-\\"
+         running# (atom true)]
+     (future
+       (try
+         ~@body
+         (finally
+           (reset! running# false))))
+
+     (loop [i# 0]
+       (carriage-return)
+       (print ~label (get chars# (mod i# (count chars#))))
+       (flush)
+       (Thread/sleep 150)
+       (if @running#
+         (recur (inc i#))
+         (do
+           (carriage-return)
+           (print ~label "✓")
+           (flush))))))
