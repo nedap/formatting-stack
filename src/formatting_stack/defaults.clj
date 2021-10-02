@@ -10,6 +10,7 @@
    [formatting-stack.formatters.no-extra-blank-lines :as formatters.no-extra-blank-lines]
    [formatting-stack.formatters.trivial-ns-duplicates :as formatters.trivial-ns-duplicates]
    [formatting-stack.linters.eastwood :as linters.eastwood]
+   [formatting-stack.linters.kondo :as linters.kondo]
    [formatting-stack.linters.line-length :as linters.line-length]
    [formatting-stack.linters.loc-per-ns :as linters.loc-per-ns]
    [formatting-stack.linters.ns-aliases :as linters.ns-aliases]
@@ -49,7 +50,10 @@
                                          strategies/do-not-use-cached-results!))))]
          (filterv some?))))
 
-(def default-linters [(-> (linters.one-resource-per-ns/new {})
+(def default-linters [(-> (linters.kondo/new {})
+                          (assoc :strategies (conj extended-strategies
+                                                   strategies/exclude-edn)))
+                      (-> (linters.one-resource-per-ns/new {})
                           (assoc :strategies (conj extended-strategies
                                                    strategies/files-with-a-namespace)))
                       (-> (linters.ns-aliases/new {})
