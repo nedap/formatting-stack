@@ -139,7 +139,7 @@
                                      :test-paths     ^:replace []
                                      :resource-paths ^:replace []
                                      :plugins        ^:replace []
-                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.12.0"]]}
+                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.13.1"]]}
 
              :ci                    {:pedantic? :abort
                                      :jvm-opts  ["-Dclojure.main.report=stderr"]}})
