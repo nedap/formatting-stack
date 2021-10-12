@@ -87,7 +87,7 @@
       :or   {target-branch "master"
              ;; We filter for Added, Copied, Modified and Renamed files,
              ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
-             impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch)
+             impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch "--")
              blacklist     (git-not-completely-staged :files [])}}]
   (assert (impl/git-ref-exists? target-branch)
           (str (pr-str target-branch) " was not recognised as an existing git branch, tag or commit sha."))
