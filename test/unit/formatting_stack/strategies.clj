@@ -49,6 +49,7 @@
 
 (deftest git-diff-against-default-branch
   (is (= (sut.impl/absolutize "git" ["a.clj"])
-         (sut/git-diff-against-default-branch :files []
+         (sut/git-diff-against-default-branch :target-branch "main"
+                                              :files []
                                               :impl ["a.clj" "b.clj"]
                                               :blacklist (sut.impl/absolutize "git" ["b.clj"])))))
