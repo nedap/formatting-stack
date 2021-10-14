@@ -135,8 +135,15 @@
     (when-not (= replacement ns-form)
       replacement)))
 
+(defn unlimited-pr-str
+  "#'clojure.core/pr-str with no print limits"
+  [s]
+  (binding [*print-length* nil
+            *print-level* nil]
+    (pr-str s)))
+
 (speced/defn ^{::speced/spec (complement #{"nil"})} duplicate-cleaner [ns-form]
-  (some-> ns-form remove-exact-duplicates pr-str))
+  (some-> ns-form remove-exact-duplicates unlimited-pr-str))
 
 (defn replaceable-ns-form
   [how-to-ns-opts filename]
