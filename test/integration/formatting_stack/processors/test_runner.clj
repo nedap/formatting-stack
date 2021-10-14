@@ -7,4 +7,4 @@
   (testing "asserts *load-tests* is true"
     (binding [*load-tests* false]
       (is (thrown-with-msg? AssertionError #"clojure.test/\*load-tests\*"
-                            (sut/test!))))))
+                            (sut/test! :target-branch "main"))))))

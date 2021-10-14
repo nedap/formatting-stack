@@ -158,7 +158,23 @@
       (sh "git" "add" "-A")
       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @current-commit))
       (finally
-        (cleanup-testing-repo!)))))
+        (cleanup-testing-repo!))))
+
+  (assert-pristine-git-status!)
+
+  (testing "It runs without errors, exercising its specs, even in face of an ambiguous target-branch"
+    ;; git commands require a distinct invocation when it cannot determine a filename or a ref is passed.
+    ;; Creating a file which collides with a ref, should not impact #'sut/git-diff-against-default-branch
+    ;; see https://git.io/JKG8m
+    (let [git-sha-named-file (io/file git-integration-dir @root-commit)]
+     (try
+       ;; creating a file with a filename which collides with a sha.
+       (spit git-sha-named-file creatable-contents)
+       (expect-sane-output! (sut/git-diff-against-default-branch :target-branch @root-commit))
+       (finally
+         (sh "git" "reset" "--" @root-commit)
+         (-> git-sha-named-file .delete)
+         (cleanup-testing-repo!))))))
 
 (deftest git-not-completely-staged
 

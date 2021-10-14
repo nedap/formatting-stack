@@ -41,6 +41,6 @@
                                  (sut/git-ref-exists? input)))
                           true)
     "f374fcc"                  true
-    "master"                   true
+    "main"                     true
     "v4.3.0"                   true
     (-> (UUID/randomUUID) str) false))
