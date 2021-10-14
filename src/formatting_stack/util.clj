@@ -167,3 +167,10 @@
   [pred coll]
   (let [switch (reductions not= true (map pred coll (rest coll)))]
     (map (partial map first) (partition-by second (map list coll switch)))))
+
+(defn unlimited-pr-str
+  "#'clojure.core/pr-str with no print limits"
+  [s]
+  (binding [*print-length* nil
+            *print-level* nil]
+    (pr-str s)))

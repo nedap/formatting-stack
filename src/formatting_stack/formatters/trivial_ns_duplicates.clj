@@ -9,7 +9,7 @@
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl unlimited-pr-str]]
    [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
@@ -134,13 +134,6 @@
                                               (apply list (first x) all-forms))))))]
     (when-not (= replacement ns-form)
       replacement)))
-
-(defn unlimited-pr-str
-  "#'clojure.core/pr-str with no print limits"
-  [s]
-  (binding [*print-length* nil
-            *print-level* nil]
-    (pr-str s)))
 
 (speced/defn ^{::speced/spec (complement #{"nil"})} duplicate-cleaner [ns-form]
   (some-> ns-form remove-exact-duplicates unlimited-pr-str))
