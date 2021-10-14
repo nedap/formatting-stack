@@ -4,7 +4,7 @@
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-sequential process-in-parallel! try-require]]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel! try-require unlimited-pr-str]]
    [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
@@ -19,7 +19,7 @@
                                  :original-ns-form                     original-ns-form
                                  :namespaces-that-should-never-cleaned namespaces-that-should-never-cleaned
                                  :libspec-whitelist                    libspec-whitelist})
-            pr-str)))
+            unlimited-pr-str)))
 
 (def default-libspecs
   ["specs" "imports" "exports" "extensions" "side-effects" "init" "initialization" "load" "migration" "migrations"])
