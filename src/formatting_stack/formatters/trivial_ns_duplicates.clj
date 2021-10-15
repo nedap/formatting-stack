@@ -9,7 +9,7 @@
    [formatting-stack.formatters.how-to-ns]
    [formatting-stack.protocols.formatter :as formatter]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl]]
+   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel! rcomp read-ns-decl unlimited-pr-str]]
    [formatting-stack.util.diff :as diff :refer [diff->line-numbers]]
    [formatting-stack.util.ns :as util.ns :refer [replace-ns-form! write-ns-replacement!]]
    [medley.core :refer [deep-merge]]
@@ -136,7 +136,7 @@
       replacement)))
 
 (speced/defn ^{::speced/spec (complement #{"nil"})} duplicate-cleaner [ns-form]
-  (some-> ns-form remove-exact-duplicates pr-str))
+  (some-> ns-form remove-exact-duplicates unlimited-pr-str))
 
 (defn replaceable-ns-form
   [how-to-ns-opts filename]

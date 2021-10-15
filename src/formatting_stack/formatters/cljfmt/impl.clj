@@ -7,7 +7,7 @@
    [clojure.tools.namespace.parse :as parse]
    [formatting-stack.indent-specs]
    [formatting-stack.project-parsing :refer [project-namespaces]]
-   [formatting-stack.util :refer [dissoc-by rcomp require-lock]]
+   [formatting-stack.util :refer [dissoc-by rcomp require-lock unlimited-pr-str]]
    [nedap.speced.def :as speced]))
 
 (def ^:dynamic *cache* nil)
@@ -99,8 +99,8 @@
     (swap! result
            #(-> %
                 (dissoc-by (fn [x] ;; regexes can't be compared, hence this contraption
-                             (not= (pr-str x)
-                                   (pr-str #"^def"))))
+                             (not= (unlimited-pr-str x)
+                                   (unlimited-pr-str #"^def"))))
                 (assoc #"^def(?!ault)(?!late)(?!er)" [[:inner 0]])))
     ;; :refer awareness:
     (doseq [[sym var-ref] ns-mappings

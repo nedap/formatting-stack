@@ -62,3 +62,19 @@
     #(< 2 (- %2 %1))
     '(1 2 3 8 9 10)
     '((1 2 3) (8 9 10))))
+
+(deftest unlimited-pr-str
+  (let [input [1 2 [3 4 [5 6]]]
+        expected "[1 2 [3 4 [5 6]]]"]
+    ;; override user settings
+    (binding [*print-length* nil
+              *print-level* nil]
+      (is (= expected (sut/unlimited-pr-str input)))
+
+      (testing "not affected by *print-length*"
+        (binding [*print-length* 1]
+          (is (= expected (sut/unlimited-pr-str input)))))
+
+      (testing "not affected by *print-level*"
+        (binding [*print-level* 1]
+          (is (= expected (sut/unlimited-pr-str input))))))))

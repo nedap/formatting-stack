@@ -113,3 +113,24 @@
 
     "(ns foo (:require #?(:clj foo :cljs bar) [#?(:clj foo :cljs bar)]))"
     nil))
+
+(deftest duplicate-cleaner
+  (let [input '(ns foo
+                 (:require
+                  [a :refer [a]]
+                  [a :refer [a]]
+                  [b :refer [b]]))
+        expected "(ns foo (:require [a :refer [a]] [b :refer [b]]))"]
+
+    ;; override user settings
+    (binding [*print-length* nil
+              *print-level* nil]
+      (is (= expected (sut/duplicate-cleaner input)))
+
+      (testing "not affected by *print-length*"
+        (binding [*print-length* 1]
+          (is (= expected (sut/duplicate-cleaner input)))))
+
+      (testing "not affected by *print-level*"
+        (binding [*print-level* 1]
+          (is (= expected (sut/duplicate-cleaner input))))))))
