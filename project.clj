@@ -124,15 +124,10 @@
                                      :resource-paths ["test-resources-extra"
                                                       "test-resources"]}
 
-             :refactor-nrepl        {:dependencies [[refactor-nrepl "2.4.0"]]
-                                     ;; exercise cider-nrepl as of those days:
-                                     :plugins      [[cider/cider-nrepl "0.22.0"]]}
-
-             ;; There was a 18 month gap between 2.4.0 and 2.5.0, hence the extra build
-             :refactor-nrepl-latest {:dependencies [[refactor-nrepl "2.5.0"]]
-                                     ;; exercise the latest cider-nrepl, increasingly typical
-                                     ;; (and shipped with this refactor-nrepl):
-                                     :plugins      [[cider/cider-nrepl "0.24.0"]]}
+             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.0.0"]
+                                                    [nrepl "0.9.0-beta3"]]
+                                     ;; cider-nrepl is a :provided dependency from refactor-nrepl.
+                                     :plugins      [[cider/cider-nrepl "0.27.2" :exclusions [nrepl]]]}
 
              :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
