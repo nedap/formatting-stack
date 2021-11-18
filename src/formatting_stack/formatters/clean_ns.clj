@@ -48,7 +48,9 @@
 (def default-nrepl-opts
   (delay
     (-> @default-nrepl-config-opts
-        (assoc :prefix-rewriting false))))
+        (assoc :prefix-rewriting false
+               :print-right-margin nil
+               :print-miser-width nil))))
 
 (def default-namespaces-that-should-never-cleaned
   #{'user 'dev})
