@@ -1,26 +1,26 @@
-(def eastwood-version "0.9.9")
+(def eastwood-version "1.0.0")
 
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.4.1"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2021.12.19"]
-                 [cljfmt "0.7.0"]
-                 [com.gfredericks/how-to-ns "0.2.8"]
-                 [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.1"]
-                 [com.nedap.staffing-solutions/speced.def "2.0.0"]
-                 [com.nedap.staffing-solutions/utils.collections "2.1.0"]
-                 [com.nedap.staffing-solutions/utils.modular "2.2.0-alpha3"]
-                 [com.nedap.staffing-solutions/utils.spec.predicates "1.1.0"]
+                 [cljfmt "0.8.0"]
+                 [com.gfredericks/how-to-ns "0.2.9"]
+                 [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.2"]
+                 [com.nedap.staffing-solutions/speced.def "2.1.1"]
+                 [com.nedap.staffing-solutions/utils.collections "2.2.0"]
+                 [com.nedap.staffing-solutions/utils.modular "2.2.0"]
+                 [com.nedap.staffing-solutions/utils.spec.predicates "1.2.1"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
-                 [medley "1.2.0"]
-                 [org.clojure/clojure "1.10.1"]
+                 [medley "1.3.0"]
+                 [org.clojure/clojure "1.10.3"]
                  [org.clojure/java.classpath "1.0.0"]
-                 [org.clojure/java.data "1.0.64"]
-                 [org.clojure/tools.namespace "0.3.1"]
-                 [org.clojure/tools.reader "1.3.4"]]
+                 [org.clojure/java.data "1.0.95"]
+                 [org.clojure/tools.namespace "1.2.0"]
+                 [org.clojure/tools.reader "1.3.6"]]
 
-  :managed-dependencies [[rewrite-clj "0.6.1"]]
+  :managed-dependencies [[rewrite-clj "1.0.699-alpha"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
   ;; avoiding having the global version shadow the local one
@@ -57,7 +57,7 @@
 
   :monkeypatch-clojure-test false
 
-  :plugins [[lein-pprint "1.1.2"]
+  :plugins [[lein-pprint "1.3.2"]
             [jonase/eastwood ~eastwood-version]]
 
   ;; A variety of common dependencies are bundled with `nedap/lein-template`.
@@ -69,15 +69,15 @@
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
   ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
-  :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
-                                                    [com.stuartsierra/component "0.4.0"]
+  :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.3.1"]
+                                                    [com.stuartsierra/component "1.0.0"]
                                                     [com.taoensso/timbre "4.10.0"]
-                                                    [criterium "0.4.5"]
-                                                    [integrant/repl "0.3.1"]
-                                                    [lambdaisland/deep-diff "0.0-29"]
-                                                    [org.clojure/core.async "0.5.527"]
-                                                    [org.clojure/math.combinatorics "0.1.1"]
-                                                    [org.clojure/test.check "0.10.0-alpha3"]]
+                                                    [criterium "0.4.6"]
+                                                    [integrant/repl "0.3.2"]
+                                                    [lambdaisland/deep-diff "0.0-47"]
+                                                    [org.clojure/core.async "1.5.648"]
+                                                    [org.clojure/math.combinatorics "0.1.6"]
+                                                    [org.clojure/test.check "1.1.1"]]
                                      :jvm-opts     ["-Dclojure.compiler.disable-locals-clearing=true"]
                                      :source-paths ["dev"]
                                      :repl-options {:init-ns dev}
@@ -103,16 +103,20 @@
              :cljs-old              {:dependencies [[cljfmt "0.6.5"]
                                                     [com.stuartsierra/component "0.4.0"]
                                                     [integrant "0.8.0"]
-                                                    [org.clojure/clojurescript "1.7.228"]]}
+                                                    [org.clojure/clojurescript
+                                                     #_"Please do not change, its entire point is to exercise an old version in CI"
+                                                     "1.7.228"]]}
 
-             :provided              {:dependencies         [[org.clojure/clojurescript "1.10.597"]
-                                                            [com.stuartsierra/component "0.4.0"]
-                                                            [integrant "0.8.0"]]
-                                     :managed-dependencies [[com.cognitect/transit-clj "1.0.324"]
+             :provided              {:dependencies         [[com.stuartsierra/component "0.4.0"]
+                                                            [integrant "0.8.0"]
+                                                            [org.clojure/clojurescript "1.10.914"]]
+                                     :managed-dependencies [[cheshire "5.10.1"]
+                                                            [com.cognitect/transit-clj "1.0.324"]
                                                             [com.google.code.findbugs/jsr305 "3.0.2"]
-                                                            [com.google.errorprone/error_prone_annotations "2.1.3"]
-                                                            [com.google.guava/guava "25.1-jre"]
-                                                            [com.google.protobuf/protobuf-java "3.4.0"]]}
+                                                            [com.google.errorprone/error_prone_annotations "2.10.0"]
+                                                            [com.google.guava/guava "31.0.1-jre"]
+                                                            [com.google.javascript/closure-compiler-unshaded "v20211201"]
+                                                            [com.google.protobuf/protobuf-java "3.19.1"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
@@ -125,9 +129,9 @@
                                                       "test-resources"]}
 
              :refactor-nrepl        {:dependencies [[refactor-nrepl "3.1.0"]
-                                                    [nrepl "0.9.0-beta3"]]
+                                                    [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.27.2" :exclusions [nrepl]]]}
+                                     :plugins      [[cider/cider-nrepl "0.27.4" :exclusions [nrepl]]]}
 
              :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
