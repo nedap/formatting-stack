@@ -1,4 +1,4 @@
-(def eastwood-version "1.0.0")
+(def eastwood-version "1.1.1")
 
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.4.1"
