@@ -3,7 +3,7 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.4.1"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2021.12.19"]
+  :dependencies [[clj-kondo "2022.01.15"]
                  [cljfmt "0.8.0"]
                  [com.gfredericks/how-to-ns "0.2.9"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.2"]
