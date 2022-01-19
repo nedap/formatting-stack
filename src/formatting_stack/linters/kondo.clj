@@ -9,23 +9,30 @@
 
 (def off {:level :off})
 
+(def warn {:level :warning})
+
 (def default-options
   {:cache     true
    :cache-dir formatting-stack.kondo-classpath-cache/cache-dir
-   :linters   {:cond-else            off ;; undesired
-               :missing-docstring    off ;; undesired
-               :unused-binding       off ;; undesired
-               :private-call         off ;; undesired
-               :unresolved-symbol    off ;; can give false positives
-               :unused-symbol        off ;; can give false positives
-               :unused-private-var   off ;; can give false positives
-               :unresolved-var       off ;; already offered by clj
-               :consistent-alias     off ;; already offered by how-to-ns
-               :duplicate-require    off ;; already offered by clean-ns
-               :unused-import        off ;; already offered by clean-ns
-               :unused-namespace     off ;; already offered by clean-ns
-               :unused-referred-var  off ;; already offered by clean-ns
-               :unresolved-namespace off ;; already offered by clean-ns
+   ;; https://github.com/clj-kondo/clj-kondo/blob/v2021.12.19/doc/linters.md
+   :linters   {:docstring-leading-trailing-whitespace warn ;; disabled-by-default
+               :reduce-without-init                   warn ;; disabled-by-default
+               :single-key-in                         warn ;; disabled-by-default
+               :used-underscored-binding              warn ;; disabled-by-default
+               :cond-else                             off  ;; undesired
+               :missing-docstring                     off  ;; undesired
+               :unused-binding                        off  ;; undesired
+               :private-call                          off  ;; undesired
+               :unresolved-symbol                     off  ;; can give false positives
+               :unused-symbol                         off  ;; can give false positives
+               :unused-private-var                    off  ;; can give false positives
+               :unresolved-var                        off  ;; already offered by clj
+               :consistent-alias                      off  ;; already offered by how-to-ns
+               :duplicate-require                     off  ;; already offered by clean-ns
+               :unused-import                         off  ;; already offered by clean-ns
+               :unused-namespace                      off  ;; already offered by clean-ns
+               :unused-referred-var                   off  ;; already offered by clean-ns
+               :unresolved-namespace                  off  ;; already offered by clean-ns
                }
    :lint-as   '{nedap.speced.def/def-with-doc clojure.core/defonce
                 nedap.speced.def/defn         clojure.core/defn
