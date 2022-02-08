@@ -64,32 +64,45 @@
      (make-cleaner how-to-ns-opts refactor-nrepl-opts namespaces-that-should-never-cleaned libspec-whitelist filename)
      how-to-ns-opts)))
 
+(defmacro with-memoized-libspec-allowlist
+  "Uses refactor-nrepl's 'memoized libspec' facility for best performance,
+  while respecting formatting-stack's need of lazily requiring refactor-nrepl."
+  {:style/indent 0}
+  [& body]
+  `(do
+     (require 'refactor-nrepl.ns.libspec-allowlist)
+     ((resolve 'refactor-nrepl.ns.libspec-allowlist/with-memoized-libspec-allowlist*)
+      (fn []
+        ~@body))))
+
 (defn format!
   [this files]
-  (->> files
-       (process-in-parallel! (fn [filename]
-                               (when-let [ns-replacement (replaceable-ns-form this filename)]
-                                 (println "Cleaning unused imports:" filename)
-                                 (write-ns-replacement! filename ns-replacement)))))
+  (with-memoized-libspec-allowlist
+    (->> files
+         (process-in-parallel! (bound-fn [filename]
+                                 (when-let [ns-replacement (replaceable-ns-form this filename)]
+                                   (println "Cleaning unused imports:" filename)
+                                   (write-ns-replacement! filename ns-replacement))))))
   nil)
 
 (defn lint! [this files]
-  (->> files
-       (process-in-parallel! (fn [filename]
-                               (when-let [{:keys [final-ns-form-str
-                                                  original-ns-form-str]} (replaceable-ns-form this filename)]
-                                 (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
-                                   (->> (diff->line-numbers diff)
-                                        (mapv (fn [{:keys [start]}]
-                                                {:filename filename
-                                                 :diff diff
-                                                 :level :warning
-                                                 :column 0
-                                                 :line start
-                                                 :msg "ns can be cleaned"
-                                                 :source :formatting-stack/clean-ns})))))))
-       (filter some?)
-       (mapcat ensure-sequential)))
+  (with-memoized-libspec-allowlist
+    (->> files
+         (process-in-parallel! (bound-fn [filename]
+                                 (when-let [{:keys [final-ns-form-str
+                                                    original-ns-form-str]} (replaceable-ns-form this filename)]
+                                   (let [diff (diff/unified-diff filename original-ns-form-str final-ns-form-str)]
+                                     (->> (diff->line-numbers diff)
+                                          (mapv (fn [{:keys [start]}]
+                                                  {:filename filename
+                                                   :diff diff
+                                                   :level :warning
+                                                   :column 0
+                                                   :line start
+                                                   :msg "ns can be cleaned"
+                                                   :source :formatting-stack/clean-ns})))))))
+         (filter some?)
+         (mapcat ensure-sequential))))
 
 (defn new [{:keys [refactor-nrepl-opts libspec-whitelist how-to-ns-opts namespaces-that-should-never-cleaned]
             :or   {namespaces-that-should-never-cleaned default-namespaces-that-should-never-cleaned
