@@ -39,11 +39,8 @@
 
 (def default-nrepl-config-opts
   (delay
-
-    (require ;; lazy-loading in order to support unconfigured consumers
-     '[refactor-nrepl.config])
-
-    (-> 'refactor-nrepl.config/*config* resolve deref)))
+    ;; lazy-loading in order to support unconfigured consumers
+    (-> 'refactor-nrepl.config/*config* requiring-resolve deref)))
 
 (def default-nrepl-opts
   (delay
@@ -69,11 +66,9 @@
   while respecting formatting-stack's need of lazily requiring refactor-nrepl."
   {:style/indent 0}
   [& body]
-  `(do
-     (require 'refactor-nrepl.ns.libspec-allowlist)
-     ((resolve 'refactor-nrepl.ns.libspec-allowlist/with-memoized-libspec-allowlist*)
-      (fn []
-        ~@body))))
+  `((requiring-resolve 'refactor-nrepl.ns.libspec-allowlist/with-memoized-libspec-allowlist*)
+    (fn []
+      ~@body)))
 
 (defn format!
   [this files]
