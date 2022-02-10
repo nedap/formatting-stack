@@ -1,4 +1,4 @@
-(def eastwood-version "1.1.1")
+(def eastwood-version "1.2.2")
 
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.5.0"
@@ -128,10 +128,10 @@
                                      :resource-paths ["test-resources-extra"
                                                       "test-resources"]}
 
-             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.1.0"]
+             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.3.2"]
                                                     [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.27.4" :exclusions [nrepl]]]}
+                                     :plugins      [[cider/cider-nrepl "0.28.2" :exclusions [nrepl]]]}
 
              :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
