@@ -1,14 +1,14 @@
-(def eastwood-version "1.2.2")
+(def eastwood-version "1.2.3")
 
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
 (defproject formatting-stack "4.5.0"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[clj-kondo "2022.01.15"]
+  :dependencies [[clj-kondo "2022.02.09"]
                  [cljfmt "0.8.0"]
                  [com.gfredericks/how-to-ns "0.2.9"]
                  [com.gfredericks/lein-all-my-files-should-end-with-exactly-one-newline-character "0.1.2"]
                  [com.nedap.staffing-solutions/speced.def "2.1.1"]
-                 [com.nedap.staffing-solutions/utils.collections "2.2.0"]
+                 [com.nedap.staffing-solutions/utils.collections "2.2.1"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.2.1"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
@@ -70,7 +70,7 @@
 
   ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.3.1"]
-                                                    [com.stuartsierra/component "1.0.0"]
+                                                    [com.stuartsierra/component "1.1.0"]
                                                     [com.taoensso/timbre "4.10.0"]
                                                     [criterium "0.4.6"]
                                                     [integrant/repl "0.3.2"]
@@ -109,14 +109,14 @@
 
              :provided              {:dependencies         [[com.stuartsierra/component "0.4.0"]
                                                             [integrant "0.8.0"]
-                                                            [org.clojure/clojurescript "1.10.914"]]
-                                     :managed-dependencies [[cheshire "5.10.1"]
-                                                            [com.cognitect/transit-clj "1.0.324"]
+                                                            [org.clojure/clojurescript "1.11.4"]]
+                                     :managed-dependencies [[cheshire "5.10.2"]
+                                                            [com.cognitect/transit-clj "1.0.329"]
                                                             [com.google.code.findbugs/jsr305 "3.0.2"]
-                                                            [com.google.errorprone/error_prone_annotations "2.10.0"]
-                                                            [com.google.guava/guava "31.0.1-jre"]
-                                                            [com.google.javascript/closure-compiler-unshaded "v20211201"]
-                                                            [com.google.protobuf/protobuf-java "3.19.1"]]}
+                                                            [com.google.errorprone/error_prone_annotations "2.11.0"]
+                                                            [com.google.guava/guava "31.1-jre"]
+                                                            [com.google.javascript/closure-compiler-unshaded "v20220202"]
+                                                            [com.google.protobuf/protobuf-java "3.19.4"]]}
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
