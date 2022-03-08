@@ -29,6 +29,7 @@
     (are [input expected] (= expected
                              (sut/sut-consumers corpus input))
       (the-ns 'formatting-stack.strategies) [(the-ns 'integration.formatting-stack.strategies)
+                                             (the-ns 'integration.formatting-stack.strategies.default-branch-name)
                                              (the-ns 'unit.formatting-stack.strategies)])))
 
 (deftest permutations
@@ -72,4 +73,5 @@
     ;; `sut` alias detection
     ["src/formatting_stack/strategies.clj"]
     [(the-ns 'integration.formatting-stack.strategies)
+     (the-ns 'integration.formatting-stack.strategies.default-branch-name)
      (the-ns 'unit.formatting-stack.strategies)]))

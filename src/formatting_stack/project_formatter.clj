@@ -59,7 +59,9 @@
    (-> (linters.one-resource-per-ns/new {})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace)))
-   (-> (linters.ns-aliases/new {})
+   (-> (linters.ns-aliases/new {;; When linting an entire project, this option should be false
+                                ;; since the user's intent is clearly to not particularly regard the current formatting:
+                                :augment-acceptable-aliases-whitelist? false})
        (assoc :strategies (conj default-strategies
                                 strategies/files-with-a-namespace
                                 ;; reader conditionals may confuse `linters.ns-aliases`

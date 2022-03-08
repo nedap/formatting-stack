@@ -82,7 +82,7 @@
   (pretty-printer/new {}))
 
 (defn format-and-lint-branch! [& {:keys [target-branch in-background? reporter]
-                                  :or   {target-branch  "master"
+                                  :or   {target-branch  (strategies/default-branch-name)
                                          in-background? (not (System/getenv "CI"))
                                          reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]
@@ -97,7 +97,7 @@
                                    :in-background? in-background?)))
 
 (defn lint-branch! [& {:keys [target-branch in-background? reporter]
-                       :or   {target-branch  "master"
+                       :or   {target-branch  (strategies/default-branch-name)
                               in-background? false
                               reporter       default-reporter}}]
   (let [default-strategies [(fn [& {:as options}]

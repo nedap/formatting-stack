@@ -12,6 +12,7 @@
 
   A strategy may not return nil."
   (:require
+   [clojure.java.shell :refer [sh]]
    [clojure.string :as string]
    [clojure.tools.namespace.repl :as tools.namespace.repl]
    [formatting-stack.protocols.spec :as protocols.spec]
@@ -27,7 +28,7 @@
 (def git-command "git")
 
 (speced/defn all-files
-  "This strategy unconditionally processes all files."
+  "This strategy unconditionally processes all Clojure and ClojureScript files."
   [& {:keys [^::protocols.spec/filenames files]}]
   ;; This first `binding` is necessary for obtaining an absolutized list of deletions
   (binding [impl/*skip-existing-files-check?* true]
@@ -80,11 +81,33 @@
        (impl/extract-clj-files)
        (into files)))
 
+(defn current-branch-name []
+  (-> (sh "git" "rev-parse" "--abbrev-ref" "HEAD")
+      (:out)
+      (string/split-lines)
+      (first)))
+
+(defn default-branch-name []
+  (let [all-branches (->> (sh "git" "branch")
+                          :out
+                          string/split-lines
+                          (map (fn [s]
+                                 (-> s (string/split #"\s+") last)))
+                          (set))]
+
+    (or (reduce (fn [_ branch]
+                  (when (contains? all-branches branch)
+                    (reduced branch)))
+                nil
+                ["master" "main" "stable" "dev"])
+        ;; return something, for not breaking code that traditionally assumed "master":
+        "master")))
+
 (defn git-diff-against-default-branch
   "This strategy processes all files that this branch has modified.
   The diff is compared against the `:target-branch` option."
   [& {:keys [target-branch impl files blacklist]
-      :or   {target-branch "master"
+      :or   {target-branch (default-branch-name)
              ;; We filter for Added, Copied, Modified and Renamed files,
              ;; excluding Unmerged, Deleted, Type-changed, Broken (pair), and Unknown files
              impl          (impl/file-entries git-command "diff" "--name-only" "--diff-filter=ACMR" target-branch "--")
