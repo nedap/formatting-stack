@@ -94,12 +94,7 @@
                           (map (fn [s]
                                  (-> s (string/split #"\s+") last)))
                           (set))]
-
-    (or (reduce (fn [_ branch]
-                  (when (contains? all-branches branch)
-                    (reduced branch)))
-                nil
-                ["master" "main" "stable" "dev"])
+    (or (some all-branches ["master" "main" "stable" "dev"])
         ;; return something, for not breaking code that traditionally assumed "master":
         "master")))
 
