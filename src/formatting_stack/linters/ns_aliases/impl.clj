@@ -49,10 +49,11 @@
          (mapv (speced/fn [^String s]
                  (File. s))))))
 
-(def project-aliases (memoize
-                      (fn [{_cache-key :cache-key}] ;; there's a cache key for correct memoization
+(def project-aliases
+  (memoize
+   (fn [{_cache-key :cache-key}] ;; there's a cache key for correct memoization
 
-                        ;; note that memoizing results is correct -
-                        ;; results don't have to be recomputed as the git status changes:
-                        ;; touching more files doesn't alter the fact that these aliases already were existing.
-                        (namespace-aliases-for (stable-files)))))
+     ;; note that memoizing results is correct -
+     ;; results don't have to be recomputed as the git status changes:
+     ;; touching more files doesn't alter the fact that these aliases already were existing.
+     (namespace-aliases-for (stable-files)))))
