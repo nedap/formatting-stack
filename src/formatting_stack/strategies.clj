@@ -211,6 +211,14 @@
       (catch Throwable _
         false))))
 
+(defn refactor-nrepl-3-4-1-available? []
+  (locking require-lock
+    (try
+      (requiring-resolve 'refactor-nrepl.ns.libspecs/namespace-aliases-for)
+      true
+      (catch Throwable _
+        false))))
+
 (speced/defn when-refactor-nrepl
   "This strategy leaves all `files` as-is iff the `refactor-nrepl` library is in the classpath;
   else all `files` will be filtered out."

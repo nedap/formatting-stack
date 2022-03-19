@@ -4,6 +4,7 @@
    [formatting-stack.linters.ns-aliases :as sut]
    [formatting-stack.linters.ns-aliases.impl :as sut.impl]
    [formatting-stack.protocols.linter :as linter]
+   [formatting-stack.strategies :as strategies]
    [matcher-combinators.test :refer [match?]]))
 
 (deftest lint!
@@ -25,7 +26,7 @@
         :msg                 "[clojure.string :as foo] is not a derived alias."
         :filename            "test-resources/ns_aliases_warning.clj"}]))
 
-  (when sut.impl/namespace-aliases-for*
+  (when (strategies/refactor-nrepl-3-4-1-available?)
     (testing "`:augment-acceptable-aliases-whitelist?`"
       (are [input expected] (match? expected
                                     (linter/lint! (sut/new {:augment-acceptable-aliases-whitelist? input})

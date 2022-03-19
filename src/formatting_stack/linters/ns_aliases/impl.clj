@@ -21,12 +21,8 @@
               m2))
 
 (def namespace-aliases-for*
-  "Not available if not using refactor-nrepl >= 3.4.1."
-  (when-let [f (try
-                 (requiring-resolve 'refactor-nrepl.ns.libspecs/namespace-aliases-for)
-                 (catch Exception _
-                   nil))]
-    @f))
+  (when (strategies/refactor-nrepl-3-4-1-available?)
+    @(requiring-resolve 'refactor-nrepl.ns.libspecs/namespace-aliases-for)))
 
 (defn namespace-aliases-for [files]
   (when namespace-aliases-for*
