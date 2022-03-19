@@ -16,7 +16,7 @@
 
 (speced/defn ^::project-aliases merge-aliases [^::project-aliases m1, ^::project-aliases m2]
   (merge-with (fn [x y]
-                (vec (reduce into #{} [x y])))
+                (vec (into #{} cat [x y])))
               m1
               m2))
 
@@ -37,9 +37,9 @@
   and that haven't been touched in the current branch"
   []
   (let [with (set (strategies/all-files :files []))
-        without (reduce into #{} [(strategies/git-diff-against-default-branch :files [])
-                                  (strategies/git-completely-staged :files [])
-                                  (strategies/git-not-completely-staged :files [])])
+        without (into #{} cat [(strategies/git-diff-against-default-branch :files [])
+                               (strategies/git-completely-staged :files [])
+                               (strategies/git-not-completely-staged :files [])])
         corpus (set/difference with without)]
     (->> corpus
          (mapv (speced/fn [^String s]
