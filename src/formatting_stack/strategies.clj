@@ -88,15 +88,21 @@
       (first)))
 
 (defn default-branch-name []
-  (let [all-branches (->> (sh "git" "branch")
-                          :out
-                          string/split-lines
-                          (map (fn [s]
-                                 (-> s (string/split #"\s+") last)))
-                          (set))]
-    (or (some all-branches ["master" "main" "stable" "dev"])
-        ;; return something, for not breaking code that traditionally assumed "master":
-        "master")))
+  (let [fallback-property-name "formatting-stack.default-branch-name"
+        fallback-branch-name "master"]
+    (or (not-empty (System/getProperty fallback-property-name))
+        (let [all-branches (->> (sh "git" "branch")
+                                :out
+                                string/split-lines
+                                (map (fn [s]
+                                       (-> s (string/split #"\s+") last)))
+                                (set))]
+          (or (some all-branches ["master" "main" "stable" "dev"])
+              (do
+                (println (format "No default branch could be determined. Falling back to `%s`.
+You can choose another one by setting the `%s` system property." fallback-branch-name fallback-property-name))
+                ;; return something, for not breaking code that traditionally assumed "master":
+                fallback-branch-name))))))
 
 (defn git-diff-against-default-branch
   "This strategy processes all files that this branch has modified.
