@@ -91,7 +91,7 @@ Alternative reporters can be found in `./src/formatting_stack/reporters`, such a
 #### Coordinates
 
 ```clojure
-[formatting-stack "4.5.0"]
+[formatting-stack "4.6.0"]
 ```
 
 **Also** you might have to add the [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl) dependency.
