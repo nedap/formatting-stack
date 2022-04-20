@@ -128,7 +128,7 @@
                                      :resource-paths ["test-resources-extra"
                                                       "test-resources"]}
 
-             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.3.2"]
+             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.2"]
                                                     [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
                                      :plugins      [[cider/cider-nrepl "0.28.2" :exclusions [nrepl]]]}

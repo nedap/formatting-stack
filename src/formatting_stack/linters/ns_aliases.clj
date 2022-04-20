@@ -2,8 +2,10 @@
   "Observes these guidelines: https://stuartsierra.com/2015/05/10/clojure-namespace-aliases"
   (:require
    [clojure.string :as string]
+   [formatting-stack.linters.ns-aliases.impl :as impl]
    [formatting-stack.protocols.linter :as linter]
-   [formatting-stack.util :refer [ensure-coll ensure-sequential process-in-parallel!]]
+   [formatting-stack.strategies :as strategies]
+   [formatting-stack.util :refer [ensure-sequential process-in-parallel!]]
    [nedap.utils.modular.api :refer [implement]]))
 
 (defn clause= [a b]
@@ -88,8 +90,17 @@
                                              :source              :formatting-stack/ns-aliases})))))
        (mapcat ensure-sequential)))
 
-(defn new [{:keys [acceptable-aliases-whitelist]
-            :or   {acceptable-aliases-whitelist default-acceptable-aliases-whitelist}}]
+(defn new
+  "If `:augment-acceptable-aliases-whitelist?` is true,
+  all aliases already used in your current project (as Git status and branch info indicates) will be deemed acceptable."
+  [{:keys [acceptable-aliases-whitelist
+           augment-acceptable-aliases-whitelist?]
+    :or   {acceptable-aliases-whitelist default-acceptable-aliases-whitelist
+           augment-acceptable-aliases-whitelist? true}}]
   (implement {:id ::id
-              :acceptable-aliases-whitelist acceptable-aliases-whitelist}
+              :acceptable-aliases-whitelist
+              (cond-> acceptable-aliases-whitelist
+                (and augment-acceptable-aliases-whitelist?
+                     impl/namespace-aliases-for*)
+                (impl/merge-aliases (impl/project-aliases {:cache-key (strategies/current-branch-name)})))}
     linter/--lint! lint!))

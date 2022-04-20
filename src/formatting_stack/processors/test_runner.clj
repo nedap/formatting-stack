@@ -8,7 +8,7 @@
    [clojure.test]
    [formatting-stack.processors.test-runner.impl :refer [ns->sym testable-namespaces]]
    [formatting-stack.protocols.processor :as processor]
-   [formatting-stack.strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]
+   [formatting-stack.strategies :as strategies :refer [git-completely-staged git-diff-against-default-branch git-not-completely-staged]]
    [nedap.utils.modular.api :refer [implement]]))
 
 ;; Not provided into any default stack, as it would be overly assuming about users' practices
@@ -32,7 +32,7 @@
   Out of those files, namespaces are derived (1:N, using smart heuristics),
   and those namespaces are run via `#'clojure.test/run-tests`."
   [& {:keys [target-branch]
-      :or   {target-branch "master"}}]
+      :or   {target-branch (strategies/default-branch-name)}}]
   (let [filenames (->> (git-diff-against-default-branch :target-branch target-branch)
                        (concat (git-completely-staged :files []))
                        (concat (git-not-completely-staged :files []))
