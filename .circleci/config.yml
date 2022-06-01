@@ -81,7 +81,7 @@ jobs:
           command: echo -e "$GPG_KEY_V2" | gpg --import
       - run:
           name: Perform pre-release sanity check
-          command: lein with-profile -user,-dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
+          command: lein with-profile -user,-dev,+ci run -m nedap.ci.release-workflow.api sanity-check
       - run:
           name: release to Clojars
           command: lein with-profile -user deploy clojars
