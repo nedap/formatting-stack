@@ -38,14 +38,6 @@
 
   :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
-  :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
-                             :username :env/artifactory_user
-                             :password :env/artifactory_pass}}
-
-  :repository-auth {#"https://nedap.jfrog\.io/nedap/staffing-solutions/"
-                    {:username :env/artifactory_user
-                     :password :env/artifactory_pass}}
-
   :deploy-repositories {"clojars" {:url      "https://clojars.org/repo"
                                    :username :env/clojars_user
                                    :password :env/clojars_pass}}
@@ -140,7 +132,7 @@
                                      :test-paths     ^:replace []
                                      :resource-paths ^:replace []
                                      :plugins        ^:replace []
-                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.13.1"]]}
+                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.14.1"]]}
 
              :ci                    {:pedantic? :abort
                                      :jvm-opts  ["-Dclojure.main.report=stderr"]}})

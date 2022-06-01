@@ -83,9 +83,6 @@ jobs:
           name: Perform pre-release sanity check
           command: lein with-profile -user,-dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
       - run:
-          name: release to JFrog
-          command: lein with-profile -user deploy
-      - run:
           name: release to Clojars
           command: lein with-profile -user deploy clojars
 
@@ -126,7 +123,10 @@ workflows:
           lein_test_command: lein with-profile -user,-dev,+ci do clean, test
           <<: *test_code_filters
       - deploy:
-          context: JFrog
+          context:
+            - Clojars
+            - GPG
+            - JFrog
           requires:
             - "JDK 8, with an old clojurescript dependency on the classpath"
             - "JDK 8 including refactor-nrepl"
