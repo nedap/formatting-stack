@@ -1,7 +1,7 @@
 (def eastwood-version "1.2.3")
 
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject formatting-stack "4.6.1-alpha1"
+(defproject formatting-stack "4.6.1-alpha2"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[clj-kondo "2022.02.09"]
                  [cljfmt "0.8.0"]
