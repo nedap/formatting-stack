@@ -108,7 +108,7 @@
 
              :provided              {:dependencies         [[com.stuartsierra/component "1.1.0"]
                                                             [integrant "0.8.0"]
-                                                            [org.clojure/clojurescript "1.11.4"]]
+                                                            [org.clojure/clojurescript "1.11.60"]]
                                      :managed-dependencies [[cheshire "5.10.2"]
                                                             [com.cognitect/transit-clj "1.0.329"]
                                                             [com.google.code.findbugs/jsr305 "3.0.2"]
