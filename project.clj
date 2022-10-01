@@ -130,7 +130,7 @@
              :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.5"]
                                                     [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.28.2"
+                                     :plugins      [[cider/cider-nrepl "0.28.6"
                                                      ;; not excluding nrepl will cause conflicting versions
                                                      :exclusions [nrepl]]]}
 
