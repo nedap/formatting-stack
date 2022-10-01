@@ -13,7 +13,7 @@
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.2.2"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
-                 [medley "1.3.0"]
+                 [medley "1.4.0"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/java.classpath "1.0.0"]
                  [org.clojure/java.data "1.0.95"]
