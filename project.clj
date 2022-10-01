@@ -71,6 +71,7 @@
 
   ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.3.1"]
+                                                    [com.stuartsierra/component.repl "1.0.0"]
                                                     [com.taoensso/timbre "4.10.0"]
                                                     [criterium "0.4.6"]
                                                     [integrant/repl "0.3.2"]
