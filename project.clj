@@ -10,6 +10,7 @@
                  [com.nedap.staffing-solutions/speced.def "2.1.1"]
                  [com.nedap.staffing-solutions/utils.collections "2.2.1"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0"]
+                 [com.nedap.staffing-solutions/utils.spec "1.5.0"]
                  [com.nedap.staffing-solutions/utils.spec.predicates "1.2.2"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
@@ -17,10 +18,11 @@
                  [org.clojure/clojure "1.11.0"]
                  [org.clojure/java.classpath "1.0.0"]
                  [org.clojure/java.data "1.0.95"]
-                 [org.clojure/tools.namespace "1.2.0"]
+                 [org.clojure/tools.namespace "1.3.0"]
                  [org.clojure/tools.reader "1.3.6"]]
 
   :managed-dependencies [[rewrite-clj "1.1.45"]
+                         [org.clojure/spec.alpha "0.3.218"]
                          [org.slf4j/slf4j-api "1.7.30"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
@@ -71,7 +73,6 @@
 
   ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.3.1"]
-                                                    [com.stuartsierra/component.repl "1.0.0"]
                                                     [com.taoensso/timbre "4.10.0"]
                                                     [criterium "0.4.6"]
                                                     [integrant/repl "0.3.2"]
@@ -120,7 +121,7 @@
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
                                      :dependencies   [[com.nedap.staffing-solutions/utils.test "1.9.0"]
-                                                      [nubank/matcher-combinators "3.3.1"]]
+                                                      [nubank/matcher-combinators "3.5.1"]]
                                      :managed-dependencies [[commons-codec "1.11"]]
                                      :jvm-opts       ["-Dclojure.core.async.go-checking=true"
                                                       "-Duser.language=en-US"]
