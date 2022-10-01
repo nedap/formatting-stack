@@ -10,7 +10,7 @@
                  [com.nedap.staffing-solutions/speced.def "2.1.1"]
                  [com.nedap.staffing-solutions/utils.collections "2.2.1"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0"]
-                 [com.nedap.staffing-solutions/utils.spec.predicates "1.2.1"]
+                 [com.nedap.staffing-solutions/utils.spec.predicates "1.2.2"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
                  [medley "1.3.0"]
