@@ -130,7 +130,9 @@
              :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.2"]
                                                     [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.28.2"]]}
+                                     :plugins      [[cider/cider-nrepl "0.28.2"
+                                                     ;; not excluding nrepl will cause conflicting versions
+                                                     :exclusions [nrepl]]]}
 
              :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
