@@ -119,7 +119,7 @@
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
-                                     :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]
+                                     :dependencies   [[com.nedap.staffing-solutions/utils.test "1.9.0"]
                                                       [nubank/matcher-combinators "3.3.1"]]
                                      :managed-dependencies [[commons-codec "1.11"]]
                                      :jvm-opts       ["-Dclojure.core.async.go-checking=true"
