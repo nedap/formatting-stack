@@ -14,7 +14,7 @@
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
                  [medley "1.4.0"]
-                 [org.clojure/clojure "1.10.3"]
+                 [org.clojure/clojure "1.11.0"]
                  [org.clojure/java.classpath "1.0.0"]
                  [org.clojure/java.data "1.0.95"]
                  [org.clojure/tools.namespace "1.2.0"]
