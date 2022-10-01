@@ -20,7 +20,7 @@
                  [org.clojure/tools.namespace "1.2.0"]
                  [org.clojure/tools.reader "1.3.6"]]
 
-  :managed-dependencies [[rewrite-clj "1.0.699-alpha"]
+  :managed-dependencies [[rewrite-clj "1.1.45"]
                          [org.slf4j/slf4j-api "1.7.30"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
