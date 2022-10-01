@@ -106,7 +106,7 @@
                                                      #_"Please do not change, its entire point is to exercise an old version in CI"
                                                      "1.7.228"]]}
 
-             :provided              {:dependencies         [[com.stuartsierra/component "0.4.0"]
+             :provided              {:dependencies         [[com.stuartsierra/component "1.1.0"]
                                                             [integrant "0.8.0"]
                                                             [org.clojure/clojurescript "1.11.4"]]
                                      :managed-dependencies [[cheshire "5.10.2"]
