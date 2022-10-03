@@ -120,8 +120,8 @@
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
                                      :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]
-                                                      [nubank/matcher-combinators "1.0.1"
-                                                       :exclusions [commons-codec]]]
+                                                      [nubank/matcher-combinators "1.0.1"]]
+                                     :managed-dependencies [[commons-codec "1.11"]]
                                      :jvm-opts       ["-Dclojure.core.async.go-checking=true"
                                                       "-Duser.language=en-US"]
                                      :resource-paths ["test-resources-extra"
@@ -130,7 +130,9 @@
              :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.2"]
                                                     [nrepl "0.9.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.28.2" :exclusions [nrepl]]]}
+                                     :plugins      [[cider/cider-nrepl "0.28.2"
+                                                     ;; not excluding nrepl will cause conflicting versions
+                                                     :exclusions [nrepl]]]}
 
              :ncrw                  {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
                                      :source-paths   ^:replace []
