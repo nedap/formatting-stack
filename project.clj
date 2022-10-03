@@ -10,17 +10,17 @@
                  [com.nedap.staffing-solutions/speced.def "2.1.1"]
                  [com.nedap.staffing-solutions/utils.collections "2.2.1"]
                  [com.nedap.staffing-solutions/utils.modular "2.2.0"]
-                 [com.nedap.staffing-solutions/utils.spec.predicates "1.2.1"]
+                 [com.nedap.staffing-solutions/utils.spec.predicates "1.2.2"]
                  [io.reflectoring.diffparser/diffparser "1.4"]
                  [jonase/eastwood ~eastwood-version]
-                 [medley "1.3.0"]
+                 [medley "1.4.0"]
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/java.classpath "1.0.0"]
                  [org.clojure/java.data "1.0.95"]
                  [org.clojure/tools.namespace "1.2.0"]
                  [org.clojure/tools.reader "1.3.6"]]
 
-  :managed-dependencies [[rewrite-clj "1.0.699-alpha"]
+  :managed-dependencies [[rewrite-clj "1.1.45"]
                          [org.slf4j/slf4j-api "1.7.30"]]
 
   ;; The f-s exclusion allows adding f-s in a global profile, while still allowing developing f-s itself,
@@ -106,9 +106,9 @@
                                                      #_"Please do not change, its entire point is to exercise an old version in CI"
                                                      "1.7.228"]]}
 
-             :provided              {:dependencies         [[com.stuartsierra/component "0.4.0"]
+             :provided              {:dependencies         [[com.stuartsierra/component "1.1.0"]
                                                             [integrant "0.8.0"]
-                                                            [org.clojure/clojurescript "1.11.4"]]
+                                                            [org.clojure/clojurescript "1.11.60"]]
                                      :managed-dependencies [[cheshire "5.10.2"]
                                                             [com.cognitect/transit-clj "1.0.329"]
                                                             [com.google.code.findbugs/jsr305 "3.0.2"]
@@ -119,18 +119,18 @@
 
              ;; `dev` in :test is important - a test depends on it:
              :test                  {:source-paths   ["dev"]
-                                     :dependencies   [[com.nedap.staffing-solutions/utils.test "1.6.2"]
-                                                      [nubank/matcher-combinators "1.0.1"]]
+                                     :dependencies   [[com.nedap.staffing-solutions/utils.test "1.9.0"]
+                                                      [nubank/matcher-combinators "3.3.1"]]
                                      :managed-dependencies [[commons-codec "1.11"]]
                                      :jvm-opts       ["-Dclojure.core.async.go-checking=true"
                                                       "-Duser.language=en-US"]
                                      :resource-paths ["test-resources-extra"
                                                       "test-resources"]}
 
-             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.2"]
-                                                    [nrepl "0.9.0"]]
+             :refactor-nrepl        {:dependencies [[refactor-nrepl "3.5.5"]
+                                                    [nrepl "1.0.0"]]
                                      ;; cider-nrepl is a :provided dependency from refactor-nrepl.
-                                     :plugins      [[cider/cider-nrepl "0.28.2"
+                                     :plugins      [[cider/cider-nrepl "0.28.6"
                                                      ;; not excluding nrepl will cause conflicting versions
                                                      :exclusions [nrepl]]]}
 
@@ -139,7 +139,7 @@
                                      :test-paths     ^:replace []
                                      :resource-paths ^:replace []
                                      :plugins        ^:replace []
-                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.13.1"]]}
+                                     :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.14.1"]]}
 
              :ci                    {:pedantic? :abort
                                      :jvm-opts  ["-Dclojure.main.report=stderr"]}})
