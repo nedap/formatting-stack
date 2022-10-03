@@ -71,7 +71,7 @@
 
   ;; Manage transitive deps using :managed-dependencies, see https://git.io/JtUGI
   :profiles {:dev                   {:dependencies [[com.clojure-goes-fast/clj-java-decompiler "0.3.1"]
-                                                    [com.stuartsierra/component "1.1.0"]
+                                                    [com.stuartsierra/component.repl "1.0.0"]
                                                     [com.taoensso/timbre "4.10.0"]
                                                     [criterium "0.4.6"]
                                                     [integrant/repl "0.3.2"]
@@ -102,10 +102,7 @@
                                                                                                         vec))))))
                                                        'user/nedap-ensure-exclusions)]}
 
-             :cljs-old              {:dependencies [[cljfmt "0.6.5"]
-                                                    [com.stuartsierra/component "0.4.0"]
-                                                    [integrant "0.8.0"]
-                                                    [org.clojure/clojurescript
+             :cljs-old              {:dependencies [[org.clojure/clojurescript
                                                      #_"Please do not change, its entire point is to exercise an old version in CI"
                                                      "1.7.228"]]}
 
