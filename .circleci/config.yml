@@ -78,7 +78,9 @@ jobs:
       - setup-env
       - run:
           name: import GPG key
-          command: echo -e "$GPG_KEY_V2" | gpg --import
+          command: |
+            export GPG_TTY=$(tty)
+            echo -e "$GPG_KEY_V2" | gpg --no-tty --batch --passphrase "$GPG_KEY_V2_PASSPHRASE" --pinentry-mode loopback --import
       - run:
           name: Perform pre-release sanity check
           command: lein with-profile -user,-dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
