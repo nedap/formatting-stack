@@ -60,8 +60,13 @@
     (the-ns ns-name)
     (catch Exception _)))
 
-(speced/defn ^::speced/nilable ^Namespace filename->ns [^string? filename]
-  (some-> filename read-ns-decl parse/name-from-ns-decl safe-the-ns))
+(speced/defn ^::speced/nilable ^Namespace filename->ns [^String filename]
+  ;; sometimes, cider-nrepl or other tooling can create (essentially empty) `Namespace` objects for .cljs files.
+  ;; These are not only useless, but prevent us from processing .cljs namespaces properly
+  ;; (i.e. parse their contents instead of inspecting the JVM runtime).
+  ;; So, we disregard .cljs files:
+  (when-not (-> filename (.endsWith ".cljs"))
+    (some-> filename read-ns-decl parse/name-from-ns-decl safe-the-ns)))
 
 (defn readable?
   "Is this file readable to clojure.tools.reader? (given custom reader tags, unbalanced parentheses or such)"
