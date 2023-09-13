@@ -17,5 +17,5 @@
     false
 
     (-> (io/file "test-resources" "magic.clj")
-        (.getAbsolutePath))
+        (.getCanonicalPath))
     true))
